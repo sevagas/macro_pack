@@ -1,0 +1,13 @@
+
+__pycache__
+*.bak
+*.prefs
+*.old
+*.log
+*.pyc
+*.exe
+*.dll
+bin/
+build_tmp/
+
+
