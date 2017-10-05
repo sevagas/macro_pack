@@ -55,7 +55,7 @@ I do not know yet what I intend to do with pro mode, release it, keep it for mys
 Download and install dependencies:
 ```bash
 git clone https://github.com/sevagas/macro_pack.git
-cd macro\_pack
+cd macro_pack
 pip3 install -r requirements.txt
 ```
 
