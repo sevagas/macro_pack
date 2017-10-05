@@ -16,8 +16,11 @@ from modules.vba_gen import VBAGenerator
 from common import utils
 from _ast import arg
 if sys.platform == "win32":
-    # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
-    import win32com.client # @UnresolvedImport
+    try:
+        import win32com.client # @UnresolvedImport
+    except:
+        print("Error: Could not find win32com. You have to download pywin32 at https://sourceforge.net/projects/pywin32/files/pywin32/")
+        sys.exit(1)
 MP_TYPE="Pro"
 try:
     from pro_modules.vbom_encode import VbomEncoder
