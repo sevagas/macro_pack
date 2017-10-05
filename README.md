@@ -59,7 +59,7 @@ cd macro\_pack
 pip3 install -r requirements.txt
 ```
 
-**Note:**For windows, you also need to ownload manually pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
+**Note:** For windows, you also need to download manually pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
 
 The tool is in python 3 so just start with with your python3 install. ex:
 ```bash
