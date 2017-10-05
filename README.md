@@ -51,6 +51,14 @@ I do not know yet what I intend to do with pro mode, release it, keep it for mys
 
 
 ## Run/Install
+
+Download and install dependencies:
+```bash
+git clone https://github.com/sevagas/macro_pack.git
+cd macro\_pack
+pip3 install -r requirements.txt
+```
+
 The tool is in python 3 so just start with with your python3 install. ex:
 ```bash
 python3 macro_pack.py --help
