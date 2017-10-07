@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import os, mmap
+from common import utils
 
 
 class MpModule():
@@ -13,11 +14,13 @@ class MpModule():
             self.reservedFunctions.append(self._startFunction)
         self.reservedFunctions.append("AutoOpen")
         self.reservedFunctions.append("Workbook_Open")
-        self.reservedFunctions.append("Document_Open")    
+        self.reservedFunctions.append("Document_Open")
+        self.reservedFunctions.append("Auto_Open")    
         self.potentialStartFunctions = []
         self.potentialStartFunctions.append("AutoOpen")
         self.potentialStartFunctions.append("Workbook_Open")
-        self.potentialStartFunctions.append("Document_Open")    
+        self.potentialStartFunctions.append("Document_Open")  
+        self.potentialStartFunctions.append("Auto_Open")    
         
     @property
     def startFunction(self):
@@ -65,6 +68,12 @@ class MpModule():
                             
         return result
     
+    def addVBAModule(self, moduleContent):
+        """ Add a new VBA module file containing moduleContent and with random name """
+        newModuleName = os.path.join(self.workingPath,utils.randomAlpha(9)+".vba")
+        f = open(newModuleName, 'w')
+        f.write(moduleContent)
+        f.close()
     
     def run(self):
         """ Run the module """

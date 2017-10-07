@@ -3,6 +3,7 @@
 
 # Only enabled on windows
 import sys
+import os
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
@@ -73,6 +74,7 @@ class ExcelGenerator(MpModule):
                 with open (vbaFile, "r") as f:
                     macro=f.read()
                     excelModule = workbook.VBProject.VBComponents.Add(1)
+                    excelModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                     excelModule.CodeModule.AddFromString(macro)
         
         logging.info("   [-] Save workbook...")
@@ -91,7 +93,7 @@ class ExcelGenerator(MpModule):
         del excel
         
         self.disableVbom()
-        
+           
         if self.excel97FilePath is not None:
             logging.info("   [-] Generated Excel file path: %s" % self.excel97FilePath)
         if self.excelFilePath is not None:

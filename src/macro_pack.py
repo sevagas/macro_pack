@@ -15,6 +15,7 @@ from modules.template_gen import TemplateToVba
 from modules.vba_gen import VBAGenerator
 from common import utils
 from _ast import arg
+from modules import mp_module
 if sys.platform == "win32":
     try:
         import win32com.client # @UnresolvedImport
@@ -28,6 +29,7 @@ try:
     from pro_modules.av_bypass import AvBypass
     from pro_modules.excel_trojan import ExcelTrojan
     from pro_modules.word_trojan import WordTrojan
+    from pro_modules.stealth import Stealth
 except:
     MP_TYPE="Community"
 
@@ -68,6 +70,7 @@ def usage():
     --persist       Use with --vbom-encode option. Macro will automatically be persisted in application startup path 
                     (works with Excel documents only). The macro will be then be executed anytime an Excel document is opened.
     --trojan       Inject macro in an existing MS office file. Use in conjunction with -x, -X, -w, or -W
+    --stealth      Anti-debug and hiding features
 """
 
     details = \
@@ -132,6 +135,7 @@ def main(argv):
     _persist = False
     _keepAlive = False
     trojan = False
+    stealth = False
     vbaInput = None  
     startFunction = None
     fileOutput = False
@@ -148,7 +152,7 @@ def main(argv):
         longOptions = ["quiet", "input-file=","vba-output=", "mask-strings", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function="] 
         # only for Pro release
         if MP_TYPE == "Pro":
-            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan"])
+            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan", "stealth"])
         
         # Only enabled on windows
         if sys.platform == "win32":
@@ -215,6 +219,8 @@ def main(argv):
                     avBypass = True
                 elif opt=="--trojan":
                     trojan = True
+                elif opt == "--stealth":
+                    stealth = True
                 else:
                     usage()                         
                     sys.exit(0)
@@ -343,6 +349,12 @@ def main(argv):
            
         # MS Office generation/trojan is only enabled on windows
         if sys.platform == "win32":
+            if stealth == True:
+                # Add a new empty module to keep VBA library if we hide other modules
+                # See http://seclists.org/fulldisclosure/2017/Mar/90
+                genericModule = mp_module.MpModule(WORKING_DIR, startFunction)
+                genericModule.addVBAModule("")
+        
             if trojan == False:
                 if excelFilePath is not None:
                     generator = ExcelGenerator(WORKING_DIR, startFunction, excelFilePath=excelFilePath)
@@ -386,7 +398,10 @@ def main(argv):
                         generator = WordGenerator(WORKING_DIR, startFunction, excelFilePath=excelFilePath)
                         generator.run()
     
-        
+        if stealth == True:
+            obfuscator = Stealth(WORKING_DIR, startFunction=startFunction, keepAlive=_keepAlive, persist=_persist, excel97FilePath=excel97FilePath, excelFilePath=excelFilePath, word97FilePath=word97FilePath, wordFilePath=wordFilePath)
+            obfuscator.run()
+    
         if vbaFilePath is not None or fileOutput == False:
             generator = VBAGenerator(WORKING_DIR, startFunction, vbaFilePath,fileOutput)
             generator.run()
