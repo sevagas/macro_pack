@@ -54,7 +54,7 @@ I do not know yet what I intend to do with pro mode, release it, keep it for mys
 
 ### Run Windows binary
 1) Get the latest binary from https://github.com/sevagas/macro_pack/releases/
-2) Download binry on PC with genuine Microsoft Office installed.
+2) Download binary on PC with genuine Microsoft Office installed.
 3) Open console, CD to binary dir and call the binary, simple as that!
 ```bash
 macro_pack.exe --help
