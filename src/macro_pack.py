@@ -138,7 +138,7 @@ def main(argv):
     _keepAlive = False
     trojan = False
     stealth = False
-    vbaInput = None  
+    vbaInput = None
     startFunction = None
     fileOutput = False
     excelFilePath = None   
