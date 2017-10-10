@@ -287,19 +287,16 @@ def main(argv):
     try:
 
         logging.info("   [-] Store input file..." )
-        if stdinContent is not None:
-            # Create temporary work file.
-            vbaFile = os.path.join(WORKING_DIR,utils.randomAlpha(8))+".vba"
+        # Create temporary work file.
+        vbaFile = os.path.join(WORKING_DIR,utils.randomAlpha(9))+".vba"
+        if stdinContent is not None: 
             f = open(vbaFile, 'w')
             f.writelines(stdinContent)
-            f.close()
-            logging.info("   [-] VBA file: %s" %  vbaFile)
+            f.close()    
         else:
             # Create temporary work file
-            (macroFileFolder, macroFileName) = os.path.split(vbaInput)  # @UnusedVariable
-            vbaFile = os.path.join(WORKING_DIR,macroFileName)
             shutil.copy2(vbaInput, vbaFile)
-            logging.info("   [-] VBA file: %s" %  vbaFile)
+        logging.info("   [-] Temp VBA file: %s" %  vbaFile)
             
         
         # Generate template
@@ -324,7 +321,7 @@ def main(argv):
         if MP_TYPE == "Pro":
             #macro split
             if avBypass:
-                obfuscator = AvBypass(WORKING_DIR, startFunction=startFunction, keepAlive=_keepAlive, persist=_persist, excel97FilePath=excel97FilePath, excelFilePath=excelFilePath, word97FilePath=word97FilePath, wordFilePath=wordFilePath)
+                obfuscator = AvBypass(WORKING_DIR, startFunction=startFunction, keepAlive=_keepAlive, persist=_persist, excel97FilePath=excel97FilePath, excelFilePath=excelFilePath, word97FilePath=word97FilePath, wordFilePath=wordFilePath, pptFilePath=pptFilePath)
                 obfuscator.run() 
                 
             # MAcro encoding    
@@ -410,7 +407,7 @@ def main(argv):
                         generator.run()
     
         if stealth == True:
-            obfuscator = Stealth(WORKING_DIR, startFunction=startFunction, keepAlive=_keepAlive, persist=_persist, excel97FilePath=excel97FilePath, excelFilePath=excelFilePath, word97FilePath=word97FilePath, wordFilePath=wordFilePath)
+            obfuscator = Stealth(WORKING_DIR, startFunction=startFunction, keepAlive=_keepAlive, persist=_persist, excel97FilePath=excel97FilePath, excelFilePath=excelFilePath, word97FilePath=word97FilePath, wordFilePath=wordFilePath, pptFilePath=pptFilePath)
             obfuscator.run()
     
         if vbaFilePath is not None or fileOutput == False:
