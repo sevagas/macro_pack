@@ -11,6 +11,7 @@ from modules.obfuscate_form import ObfuscateForm
 from modules.obfuscate_strings import ObfuscateStrings
 from modules.excel_gen import ExcelGenerator
 from modules.word_gen import WordGenerator
+from modules.ppt_gen import PowerPointGenerator
 from modules.template_gen import TemplateToVba
 from modules.vba_gen import VBAGenerator
 from common import utils
@@ -104,10 +105,11 @@ def usage():
     if sys.platform == "win32":
         details += \
 """
-    -X, --excel-output=EXCEL_FILE_PATH \t Generates MS Excel (*.xlsm) file containing the macro.
-    -x, --excel97-output=EXCEL_FILE_PATH \t Generates MS Excel 97-2003 (*.xls) file containing the macro.
-    -W, --word-output=WORD_FILE_PATH \t Generates MS Word (.docm) file containing the macro.
-    -w, --word97-output=WORD_FILE_PATH \t Generates MS Word 97-2003 (.doc) file containing the macro.
+    -X, --excel-output=EXCEL_FILE_PATH \t Generates MS Excel (*.xlsm) file.
+    -x, --excel97-output=EXCEL_FILE_PATH \t Generates MS Excel 97-2003 (*.xls) file.
+    -W, --word-output=WORD_FILE_PATH \t Generates MS Word (.docm) file.
+    -w, --word97-output=WORD_FILE_PATH \t Generates MS Word 97-2003 (.doc) file.
+    -P --ppt-output=PPT_FILE_PATH \t Generates MS PowerPoint (.pptm) file.
 """
     details +="    -h, --help   Displays help and exit"
     details += \
@@ -143,6 +145,7 @@ def main(argv):
     excel97FilePath = None   
     wordFilePath = None 
     word97FilePath = None
+    pptFilePath = None
     vbaFilePath = None
     stdinContent = None
     template = None
@@ -156,9 +159,9 @@ def main(argv):
         
         # Only enabled on windows
         if sys.platform == "win32":
-            longOptions.extend(["excel-output=", "word-output=", "excel97-output=", "word97-output="])
+            longOptions.extend(["excel-output=", "word-output=", "excel97-output=", "word97-output=", "ppt-output="])
             
-        opts, args = getopt.getopt(argv, "s:f:t:v:x:X:w:W:hqmo", longOptions) # @UnusedVariable
+        opts, args = getopt.getopt(argv, "s:f:t:v:x:X:w:W:P:hqmo", longOptions) # @UnusedVariable
     except getopt.GetoptError:          
         usage()                         
         sys.exit(2)                  
@@ -203,6 +206,11 @@ def main(argv):
             # Only enabled on windows
             if sys.platform == "win32":
                 word97FilePath = os.path.abspath(arg)
+                fileOutput = True
+        elif opt in ("-P","--ppt-output"):
+            # Only enabled on windows
+            if sys.platform == "win32":
+                pptFilePath = os.path.abspath(arg)
                 fileOutput = True
         elif opt=="-h" or opt=="--help": 
             usage()                         
@@ -254,7 +262,7 @@ def main(argv):
     
     if trojan==False:
         # verify that output file does not already exist
-        for outputPath in [vbaFilePath, excelFilePath, wordFilePath, excel97FilePath, word97FilePath]:
+        for outputPath in [vbaFilePath, excelFilePath, wordFilePath, excel97FilePath, word97FilePath, pptFilePath]:
             if outputPath is not None:
                 if os.path.isfile(outputPath):
                     logging.error("   [!] ERROR: Output file %s already exist!" % outputPath)
@@ -367,6 +375,9 @@ def main(argv):
                     generator.run()
                 if word97FilePath is not None:
                     generator = WordGenerator(WORKING_DIR, startFunction, word97FilePath=word97FilePath)
+                    generator.run()
+                if pptFilePath is not None:
+                    generator = PowerPointGenerator(WORKING_DIR, startFunction, pptFilePath=pptFilePath)
                     generator.run()
             else:
                 if excelFilePath is not None:
