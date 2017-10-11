@@ -18,10 +18,6 @@ from modules.mp_module import MpModule
 
 class PowerPointGenerator(MpModule):
     """ Module used to generate MS Powerpoint file from working dir content"""
-    
-    def __init__(self,workingPath, startFunction,pptFilePath=None):
-        self.pptFilePath = pptFilePath
-        super().__init__(workingPath, startFunction)
         
     def enableVbom(self):
         # Enable writing in macro (VBOM)
@@ -85,7 +81,7 @@ class PowerPointGenerator(MpModule):
         
         self.enableVbom()
         
-        # open up an instance of Excel with the win32com driver
+        # open up an instance of PowerPoint with the win32com driver
         ppt = win32com.client.Dispatch("PowerPoint.Application")
 
         logging.info("   [-] Open presentation...")
@@ -103,7 +99,7 @@ class PowerPointGenerator(MpModule):
         ppSaveAsOpenXMLPresentationMacroEnabled = 25 
         if self.pptFilePath is not None:
             presentation.SaveAs(self.pptFilePath, FileFormat=ppSaveAsOpenXMLPresentationMacroEnabled)
-        # save the workbook and close
+        # save the presentation and close
         ppt.DisplayAlerts=False
         ppt.Presentations(1).Close()
         ppt.Quit()

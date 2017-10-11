@@ -10,11 +10,6 @@ import os
 class VBAGenerator(MpModule):
     """ Module used to generate MS excel file from working dir content"""
     
-    def __init__(self,workingPath, startFunction,vbaFilePath=None, fileOutput=False):
-        self.vbaFilePath = vbaFilePath
-        self.fileOutput = fileOutput
-        super().__init__(workingPath, startFunction)
-    
     def run(self):
         logging.info(" [+] Analyzing generated VBA files...")
         if self.vbaFilePath is not None:

@@ -16,11 +16,6 @@ from modules.mp_module import MpModule
 class WordGenerator(MpModule):
     """ Module used to generate MS Word file from working dir content"""
     
-    def __init__(self,workingPath, startFunction,wordFilePath=None, word97FilePath=None):
-        self.wordFilePath = wordFilePath
-        self.word97FilePath = word97FilePath
-        super().__init__(workingPath, startFunction)
-    
     def enableVbom(self):
         # Enable writing in macro (VBOM)
         # First fetch the application version

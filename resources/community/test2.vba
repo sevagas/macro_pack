@@ -8,8 +8,13 @@ Private Sub testMacro()
 End Sub
 
 
+' triggered when Word/Powerpoint generator is used 
+Sub AutoOpen()
+    testMacro
+End Sub
 
-' triggered when document is opened
+
+' triggered when Ecel generator is used
 Sub Workbook_Open()
     testMacro
 End Sub

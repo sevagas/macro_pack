@@ -15,11 +15,6 @@ from modules.mp_module import MpModule
 
 class ExcelGenerator(MpModule):
     """ Module used to generate MS excel file from working dir content"""
-    
-    def __init__(self,workingPath, startFunction,excelFilePath=None,excel97FilePath=None):
-        self.excelFilePath = excelFilePath
-        self.excel97FilePath = excel97FilePath
-        super().__init__(workingPath, startFunction)
         
     def enableVbom(self):
         # Enable writing in macro (VBOM)

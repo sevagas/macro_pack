@@ -11,18 +11,13 @@ from common import templates, utils
 
 class TemplateToVba(MpModule):
     """ Generate a VBA document from a given template """
-    
-    def __init__(self,workingPath, startFunction,template):
-        self.template = template
-        super().__init__(workingPath, startFunction)
-    
-    
+        
     def _fillTemplate(self, content, values):
         for value in values:
             content = content.replace("<<<TEMPLATE>>>", value, 1)
         
         # generate random file name
-        vbaFile = os.path.abspath(os.path.join(self.workingPath,utils.randomAlpha(8)+".vba"))
+        vbaFile = os.path.abspath(os.path.join(self.workingPath,utils.randomAlpha(9)+".vba"))
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         # Write in new file 
         f = open(vbaFile, 'w')
