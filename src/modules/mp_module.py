@@ -59,6 +59,10 @@ class MpModule():
         vbaFiles += [os.path.join(self.workingPath,each) for each in os.listdir(self.workingPath) if each.endswith('.vba')]
         return vbaFiles
     
+    def getCMDFile(self):
+        """ Return command line file (for DDE mode)"""
+        return os.path.join(self.workingPath,"command.cmd")
+        
     
     def getMainVBAFile(self):
         """ return main vba file (the one containing macro entry point) """

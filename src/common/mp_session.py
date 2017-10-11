@@ -27,3 +27,5 @@ class MpSession():
         self.vbaFilePath = None
         self.stdinContent = None
         self.template = None
+        
+        self.ddeMode = False # attack using Dynamic Data Exchange (DDE) protocol (see https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/)
