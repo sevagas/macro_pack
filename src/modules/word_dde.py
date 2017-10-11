@@ -15,6 +15,7 @@ class WordDDE(WordGenerator):
     """ 
     Module used to generate MS Word file with DDE object attack
     Inspired by: https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/
+    ex: download execute file:
     """
          
     
