@@ -31,7 +31,9 @@ class TemplateToVba(MpModule):
             logging.info("   [!] No template defined")
             return
         
-        if self.template == "DROPPER":
+        if self.template == "HELLO":
+            content = templates.HELLO
+        elif self.template == "DROPPER":
             content = templates.DROPPER
         elif self.template == "DROPPER2":
             content = templates.DROPPER2

