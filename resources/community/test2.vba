@@ -3,18 +3,21 @@ Private Sub toto()
 End Sub
 
 
-Private Sub testMacro()
+Private Sub testMacroXl()
     Application.Run "ThisWorkbook.toto"
 End Sub
 
+Private Sub testMacroWd()
+    toto
+End Sub
 
 ' triggered when Word/Powerpoint generator is used 
 Sub AutoOpen()
-    testMacro
+    testMacroWd
 End Sub
 
 
 ' triggered when Ecel generator is used
 Sub Workbook_Open()
-    testMacro
+    testMacroXl
 End Sub

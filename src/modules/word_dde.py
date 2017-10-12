@@ -51,6 +51,10 @@ class WordDDE(WordGenerator):
         
         # save the document and close
         word.DisplayAlerts=False
+        # Remove Informations
+        logging.info("   [-] Remove hidden data and personal info...")
+        wdRDIAll=99
+        document.RemoveDocumentInformation(wdRDIAll)
         document.Save()
         document.Close()
         word.Application.Quit()

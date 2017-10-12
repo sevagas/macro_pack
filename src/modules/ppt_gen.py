@@ -95,12 +95,17 @@ class PowerPointGenerator(MpModule):
                 pptModule = presentation.VBProject.VBComponents.Add(1)
                 pptModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                 pptModule.CodeModule.AddFromString(macro)
+        
+        # Remove Informations
+        logging.info("   [-] Remove hidden data and personal info...")
+        ppRDIAll=99
+        presentation.RemoveDocumentInformation(ppRDIAll)
+        
         logging.info("   [-] Save presentation...")
         ppSaveAsOpenXMLPresentationMacroEnabled = 25 
         if self.pptFilePath is not None:
             presentation.SaveAs(self.pptFilePath, FileFormat=ppSaveAsOpenXMLPresentationMacroEnabled)
         # save the presentation and close
-        ppt.DisplayAlerts=False
         ppt.Presentations(1).Close()
         ppt.Quit()
         # garbage collection

@@ -71,6 +71,12 @@ class WordGenerator(MpModule):
                     wordModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                     wordModule.CodeModule.AddFromString(macro)
         
+        word.DisplayAlerts=False
+        # Remove Informations
+        logging.info("   [-] Remove hidden data and personal info...")
+        wdRDIAll=99
+        document.RemoveDocumentInformation(wdRDIAll)
+        
         logging.info("   [-] Save Document...")
         wdFormatXMLDocumentMacroEnabled = 13
         wdFormatDocument = 0
@@ -79,8 +85,7 @@ class WordGenerator(MpModule):
         if self.wordFilePath is not None:
             document.SaveAs(self.wordFilePath, FileFormat=wdFormatXMLDocumentMacroEnabled)
         
-        # save the workbook and close
-        word.DisplayAlerts=False
+        # save the document and close
         document.Save()
         document.Close()
         word.Application.Quit()

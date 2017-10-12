@@ -49,7 +49,7 @@ class ExcelGenerator(MpModule):
         
         self.enableVbom()
         
-        # open up an instance of Excel with the win32com driver
+        # open up an instance of Excel with the win32com driver\        \\
         excel = win32com.client.Dispatch("Excel.Application")
         # do the operation in background without actually opening Excel
         excel.Visible = False
@@ -72,6 +72,12 @@ class ExcelGenerator(MpModule):
                     excelModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                     excelModule.CodeModule.AddFromString(macro)
         
+        excel.DisplayAlerts=False
+        # Remove Informations
+        logging.info("   [-] Remove hidden data and personal info...")
+        xlRDIAll=99
+        workbook.RemoveDocumentInformation(xlRDIAll)
+        
         logging.info("   [-] Save workbook...")
         xlOpenXMLWorkbookMacroEnabled = 52
         xlExcel8 = 56
@@ -81,13 +87,13 @@ class ExcelGenerator(MpModule):
         if self.excelFilePath is not None:
             workbook.SaveAs(self.excelFilePath, FileFormat=xlOpenXMLWorkbookMacroEnabled)
         # save the workbook and close
-        excel.DisplayAlerts=False
         excel.Workbooks(1).Close(SaveChanges=1)
         excel.Application.Quit()
         # garbage collection
         del excel
         
         self.disableVbom()
+        
            
         if self.excel97FilePath is not None:
             logging.info("   [-] Generated Excel file path: %s" % self.excel97FilePath)
