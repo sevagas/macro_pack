@@ -4,7 +4,7 @@
 
 ## Short description
 
-The macro\_pack is a tool used to automatize obfuscation and generation of MS Office documents for pentest, demo,  and social engineering assessments.  
+The macro\_pack is a tool used to automatize obfuscation and generation of MS Office documents for pentest, demo,  and social engineering assessments.
 The goal of macro\_pack is to simplify antimalware solutions bypass and automatize the process from vba generation to final Office document generation.  
 It is very simple to use:
 * No configuration
