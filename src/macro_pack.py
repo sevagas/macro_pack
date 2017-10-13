@@ -45,7 +45,7 @@ init()
 
 
 WORKING_DIR = "temp"
-VERSION="1.1-dev"
+VERSION="1.1"
 BANNER = """\
 
   _  _   __    ___  ____   __     ____   __    ___  __ _ 
@@ -93,7 +93,7 @@ def usage():
     -t, --template=TEMPLATE_NAME 
         Available templates:
             HELLO   -> Just print a hello message and awareness about macro
-                    -> Example use: echo "@EmericNasi" | %s -t HELLO -P hello.pptm
+                    -> Example use: echo "@Author" | %s -t HELLO -P hello.pptm
             DROPPER -> Download and exec file
                     -> Example use:  echo <file_to_drop_url> "<download_path>" | %s -t DROPPER -o -x dropper.xls
             DROPPER2 -> Download and exec file. File attributes are also set to system, read-only, and hidden
