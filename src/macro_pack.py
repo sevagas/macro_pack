@@ -16,7 +16,7 @@ from modules.template_gen import TemplateToVba
 from modules.vba_gen import VBAGenerator
 from modules.word_dde import WordDDE
 
-from common import utils, mp_session
+from common import utils, mp_session, help
 from _ast import arg
 from modules import mp_module
 if sys.platform == "win32":
@@ -57,90 +57,13 @@ BANNER = """\
    Pentest with MS Office VBA - Version:%s Release:%s 
                                                                                            
 """ % (VERSION, MP_TYPE)
-
-
-def usage():
-    print(colored(BANNER, 'green'))
-    print(" Usage 1: %s  -f input_file_path [options] " % sys.argv[0])
-    print(" Usage 2: cat input_file_path | %s [options] " %sys.argv[0])
-    proDetails = ""
-    if MP_TYPE == "Pro":
-        proDetails = \
-"""
-    --vbom-encode   Use VBA self encoding to bypass antimalware detection and enable VBOM access (will exploit VBOM self activation vuln). 
-                  --start-function option may be needed.
-    --av-bypass  Use various tricks  efficient to bypass most av (combine with -o for best result)
-    --keep-alive    Use with --vbom-encode option. Ensure new app instance will stay alive even when macro has finished
-    --persist       Use with --vbom-encode option. Macro will automatically be persisted in application startup path 
-                    (works with Excel documents only). The macro will be then be executed anytime an Excel document is opened.
-    --trojan       Inject macro in an existing MS office file. Use in conjunction with -x, -X, -w, or -W
-    --stealth      Anti-debug and hiding features
-"""
-
-    details = \
-"""
- All options:
-    -f, --input-file=INPUT_FILE_PATH A VBA macro file or file containing params for --template option 
-        If no input file is provided, input must be passed via stdin (using a pipe).
-    -q, --quiet     Do not display anything on screen, just process request. 
-    -o, --obfuscate Obfuscate macro Destroy document readability by changing form,names, and strings
-                    Same as '--obfuscate-form --obfuscate-names --obfuscate-strings'
-    --obfuscate-form  Modify readability by removing all spaces and comments in VBA
-    --obfuscate-strings  Randomly split strings and encode them
-    --obfuscate-names Change functions, variables, and constants names  
-    -s, --start-function=START_FUNCTION   Entry point of macro file 
-        Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
-    -t, --template=TEMPLATE_NAME 
-        Available templates:
-            HELLO   -> Just print a hello message and awareness about macro
-                    -> Example use: echo "@Author" | %s -t HELLO -P hello.pptm
-            DROPPER -> Download and exec file
-                    -> Example use:  echo <file_to_drop_url> "<download_path>" | %s -t DROPPER -o -x dropper.xls
-            DROPPER2 -> Download and exec file. File attributes are also set to system, read-only, and hidden
-                    -> Example use:  echo <file_to_drop_url> "<download_path>" | %s -t DROPPER2 -o -X dropper.xlsm
-            DROPPER_PS -> Download and execute Powershell script using rundll32 (to bypass blocked powershell.exe)
-                    -> Example use:  echo "<powershell_script_url>" | %s -t DROPPER_PS -o -w powpow.doc
-                    Note: This payload will download PowerShdll from Github.
-    -v, --vba-output=VBA_FILE_PATH Output generated vba macro (text format) to given path.         
-""" % (sys.argv[0],sys.argv[0],sys.argv[0],sys.argv[0])   
-
-    details +=proDetails
-
-    # Only enabled on windows
-    if sys.platform == "win32":
-        details += \
-"""
-    -X, --excel-output=EXCEL_FILE_PATH \t Generates MS Excel (*.xlsm) file.
-    -x, --excel97-output=EXCEL_FILE_PATH \t Generates MS Excel 97-2003 (*.xls) file.
-    -W, --word-output=WORD_FILE_PATH \t Generates MS Word (.docm) file.
-    -w, --word97-output=WORD_FILE_PATH \t Generates MS Word 97-2003 (.doc) file.
-    -P --ppt-output=PPT_FILE_PATH \t Generates MS PowerPoint (.pptm) file.
-    --dde \t  Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
-         DDE attack mode is not compatible with VBA Macro related options.
-         Usage: echo calc.exe | %s --dde -W DDE.docx
-"""  % (sys.argv[0])
-    details +="    -h, --help   Displays help and exit"
-    details += \
-"""
-
- Notes:
-    If no output file is provided, the result will be displayed on stdout.
-    Combine this with -q option to pipe only processed result into another program
-    ex: %s -f my_vba.vba -o -q | another_app
-    Another valid usage is:
-    cat input_file.vba | %s -o -q  > output_file.vba 
-    
-  Have a look at README.md file for more details and usage!
-    
-""" % (sys.argv[0],sys.argv[0])   
-    print(details)
     
 
 def main(argv):   
     
     logLevel = "INFO"
     # initialize macro_pack session object
-    mpSession = mp_session.MpSession(WORKING_DIR, VERSION)
+    mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
          
     try:
         longOptions = ["quiet", "input-file=","vba-output=", "mask-strings", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
@@ -154,7 +77,7 @@ def main(argv):
             
         opts, args = getopt.getopt(argv, "s:f:t:v:x:X:w:W:P:hqmo", longOptions) # @UnusedVariable
     except getopt.GetoptError:          
-        usage()                         
+        help.printUsage(BANNER, sys.argv[0], mpSession)                     
         sys.exit(2)                  
     for opt, arg in opts:                
         if opt in ("-o", "--obfuscate"):                 
@@ -172,7 +95,11 @@ def main(argv):
         elif opt == "-f" or opt== "--input-file": 
             mpSession.vbaInput = arg
         elif opt=="-t" or opt=="--template": 
-            mpSession.template = arg
+            if arg is None or arg.startswith("-") or  arg == "help" or arg == "HELP":
+                help.printTemplatesUsage(BANNER, sys.argv[0])
+                sys.exit(0)
+            else:
+                mpSession.template = arg
         elif opt=="-q" or opt=="--quiet": 
             logLevel = "ERROR"
         elif opt=="-v" or opt=="--vba-output": 
@@ -207,7 +134,7 @@ def main(argv):
                 mpSession.pptFilePath = os.path.abspath(arg)
                 mpSession.fileOutput = True
         elif opt=="-h" or opt=="--help": 
-            usage()                         
+            help.printUsage(BANNER, sys.argv[0], mpSession)                         
             sys.exit(0)
         else:
             if MP_TYPE == "Pro":  
@@ -224,10 +151,10 @@ def main(argv):
                 elif opt == "--stealth":
                     mpSession.stealth = True
                 else:
-                    usage()                         
+                    help.printUsage(BANNER, sys.argv[0], mpSession)                         
                     sys.exit(0)
             else:
-                usage()                         
+                help.printUsage(BANNER, sys.argv[0], mpSession)                          
                 sys.exit(0)
                     
     

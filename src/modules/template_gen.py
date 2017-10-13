@@ -39,6 +39,8 @@ class TemplateToVba(MpModule):
             content = templates.DROPPER2
         elif self.template == "DROPPER_PS":
             content = templates.DROPPER_PS
+        elif self.template == "METERPRETER":
+            content = templates.METERPRETER
         else: # if not one of default template suppose its a custom template
             if os.path.isfile(self.template):
                 f = open(self.template, 'r')

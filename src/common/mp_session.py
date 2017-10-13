@@ -4,9 +4,11 @@
 
 class MpSession():
     """ Represents the state of the current macro_pack run """
-    def __init__(self, workingPath, version):
+    def __init__(self, workingPath, version, mpType):
         self.workingPath = workingPath
         self.version = version
+        self.mpType = mpType
+        
         self.vbomEncode = False
         self.avBypass = False
         self.obfuscateForm =  False  
@@ -27,5 +29,4 @@ class MpSession():
         self.vbaFilePath = None
         self.stdinContent = None
         self.template = None
-        
         self.ddeMode = False # attack using Dynamic Data Exchange (DDE) protocol (see https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/)
