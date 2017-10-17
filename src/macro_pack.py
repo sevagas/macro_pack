@@ -207,7 +207,7 @@ def main(argv):
 
         logging.info("   [-] Store input file..." )
         # Create temporary work file.
-        if mpSession.ddeMode:
+        if mpSession.ddeMode or mpSession.template:
             inputFile = os.path.join(WORKING_DIR,"command.cmd")
         else:
             inputFile = os.path.join(WORKING_DIR,utils.randomAlpha(9))+".vba"

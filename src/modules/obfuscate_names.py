@@ -16,24 +16,40 @@ class ObfuscateNames(MpModule):
         logging.info("   [-] Rename functions...")
         keyWords = []
         for line in macroLines:
-            matchObj = re.match( r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*\(.*\).*', line, re.M|re.I) 
+            matchObj = re.match( r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*\(.*\).*', line, re.M|re.I) 
             if matchObj:
                 keyword = matchObj.groups()[1]
                 if keyword not in self.reservedFunctions:
                     keyWords.append(keyword)
                     self.reservedFunctions.append(keyword)
-    
+            else:
+                matchObj = re.match( r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*As\s*.*', line, re.M|re.I) 
+                if matchObj:
+                    keyword = matchObj.groups()[1]
+                    if keyword not in self.reservedFunctions:
+                        keyWords.append(keyword)
+                        self.reservedFunctions.append(keyword)
+        
+        # Different situation surrounding variables
+        varDelimitors=[(" "," "),("\t"," "),(" ","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
+        
         # Replace functions and function calls by random string
         for keyWord in keyWords:
             keyTmp = randomAlpha(randint(8, 20)) # Generate random names with random size
-            for n,line in enumerate(macroLines):
-                matchObj = re.match( r'.*".*%s.*".*'%keyWord, line, re.M|re.I) # check if word is inside a string
-                if matchObj:
-                    if "Application.Run" in line: # dynamic function call detected
-                        macroLines[n] = line.replace(keyWord, keyTmp)
-                    # else word is part of normal string so we do not touch
-                else:
-                    macroLines[n] = line.replace(keyWord, keyTmp)
+            #logging.info("|%s|->|%s|" %(keyWord,keyTmp))
+            self.reservedFunctions.append(keyTmp)
+
+            for varDelimitor in varDelimitors:
+                newKeyWord = varDelimitor[0] + keyTmp +varDelimitor[1]
+                keywordTmp = varDelimitor[0] + keyWord +varDelimitor[1]
+                for n,line in enumerate(macroLines):
+                    matchObj = re.match( r'.*".*%s.*".*' %keyWord, line, re.M|re.I) # check if word is inside a string
+                    if matchObj:
+                        if "Application.Run" in line: # dynamic function call detected
+                            macroLines[n] = line.replace(keywordTmp, newKeyWord)
+                    else:
+                        macroLines[n] = line.replace(keywordTmp, newKeyWord)
+                
         return macroLines
 
 
@@ -104,6 +120,7 @@ class ObfuscateNames(MpModule):
         # replace all keywords by random name
         for keyWord in keyWords:
             keyTmp = randomAlpha(randint(8, 20)) # Generate random names with random size
+            #logging.info("|%s|->|%s|" %(keyWord,keyTmp))
             for varDelimitor in varDelimitors:
                 newKeyWord = varDelimitor[0] + keyTmp +varDelimitor[1]
                 keywordTmp = varDelimitor[0] + keyWord +varDelimitor[1]

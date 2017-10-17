@@ -55,15 +55,41 @@ class WordGenerator(MpModule):
         word.Visible = False
         document = word.Documents.Add()
 
+        logging.info("   [-] Save document format...")
+        wdFormatXMLDocumentMacroEnabled = 13
+        wdFormatDocument = 0
+        if self.word97FilePath is not None:
+            document.SaveAs(self.word97FilePath, FileFormat=wdFormatDocument)
+        if self.wordFilePath is not None:
+            document.SaveAs(self.wordFilePath, FileFormat=wdFormatXMLDocumentMacroEnabled)
+
         logging.info("   [-] Inject VBA...")
         # Read generated files
         for vbaFile in self.getVBAFiles():
             if vbaFile == self.getMainVBAFile():       
                 with open (vbaFile, "r") as f:
-                    macro=f.read()
                     # Add the main macro- into ThisDocument part of Word document
                     wordModule = document.VBProject.VBComponents("ThisDocument")
+                    macro=f.read()
                     wordModule.CodeModule.AddFromString(macro)
+                    """
+                    # Handle big macros by inserting them chink by chunk
+                    if len(macro) > 1000000:
+                        macrolines = macro.split("\n")
+                        for i in range(0,len(macrolines),500):
+                            logging.info("i:%s" % str(i))
+                            wordModule.CodeModule.insertLines(i+1, "\n".join(macrolines[i:i+500]))
+                            #word.DisplayAlerts=False
+                            document.Application.Options.Pagination = False
+                            document.UndoClear()
+                            document.Repaginate()
+                            document.Application.ScreenUpdating = True
+                            document.Application.ScreenRefresh()
+                            document.Save()
+  
+                    else:
+                        wordModule.CodeModule.AddFromString(macro)
+                    """
             else: # inject other vba files as modules
                 with open (vbaFile, "r") as f:
                     macro=f.read()
@@ -76,14 +102,6 @@ class WordGenerator(MpModule):
         logging.info("   [-] Remove hidden data and personal info...")
         wdRDIAll=99
         document.RemoveDocumentInformation(wdRDIAll)
-        
-        logging.info("   [-] Save Document...")
-        wdFormatXMLDocumentMacroEnabled = 13
-        wdFormatDocument = 0
-        if self.word97FilePath is not None:
-            document.SaveAs(self.word97FilePath, FileFormat=wdFormatDocument)
-        if self.wordFilePath is not None:
-            document.SaveAs(self.wordFilePath, FileFormat=wdFormatXMLDocumentMacroEnabled)
         
         # save the document and close
         document.Save()
