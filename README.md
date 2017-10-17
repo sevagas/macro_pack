@@ -294,6 +294,7 @@ Blog post about MS Office security:
  - https://medium.com/@vivami/phishing-between-the-app-whitelists-1b7dcdab4279
  - https://www.metasploit.com/
  - https://github.com/Cn33liz/MacroMeter
+ - https://github.com/khr0x40sh/MacroShop
  
 
 ## Contact
