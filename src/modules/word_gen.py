@@ -97,7 +97,7 @@ class WordGenerator(MpModule):
                     wordModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                     wordModule.CodeModule.AddFromString(macro)
         
-        word.DisplayAlerts=False
+        #word.DisplayAlerts=False
         # Remove Informations
         logging.info("   [-] Remove hidden data and personal info...")
         wdRDIAll=99
