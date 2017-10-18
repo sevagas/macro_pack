@@ -300,8 +300,9 @@ Blog post about MS Office security:
 ## Contact
 
 Feel free to message me on my Twitter account [@EmericNasi](http://twitter.com/EmericNasi)  
-email1: emeric.nasi[ at ]sevagas.com  
-email2: ena.sevagas[ at ]protonmail.com  
+Emails:
+* emeric.nasi[ at ]sevagas.com  
+* ena.sevagas[ at ]protonmail.com  
 
 
 ## License and credits
