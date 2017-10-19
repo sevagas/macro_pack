@@ -140,6 +140,8 @@ class TemplateToVba(MpModule):
             content = templates.DROPPER_PS
         elif self.template == "METERPRETER":
             content = templates.METERPRETER
+        elif self.template == "CMD":
+            content = templates.CMD
         elif self.template == "EMBED_EXE":
             # More complexe template, not the usual treatment
             self._processEmbedExeTemplate()

