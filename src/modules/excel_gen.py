@@ -4,6 +4,7 @@
 # Only enabled on windows
 import sys
 import os
+from common.utils import MSTypes
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
@@ -81,11 +82,10 @@ class ExcelGenerator(MpModule):
         logging.info("   [-] Save workbook...")
         xlOpenXMLWorkbookMacroEnabled = 52
         xlExcel8 = 56
-        if self.excel97FilePath is not None:
-            workbook.SaveAs(self.excel97FilePath, FileFormat=xlExcel8)
-        
-        if self.excelFilePath is not None:
-            workbook.SaveAs(self.excelFilePath, FileFormat=xlOpenXMLWorkbookMacroEnabled)
+        if self.outputFileType == MSTypes.XL97:
+            workbook.SaveAs(self.outputFilePath, FileFormat=xlExcel8)
+        elif self.outputFileType == MSTypes.XL:
+            workbook.SaveAs(self.outputFilePath, FileFormat=xlOpenXMLWorkbookMacroEnabled)
         # save the workbook and close
         excel.Workbooks(1).Close(SaveChanges=1)
         excel.Application.Quit()
@@ -93,10 +93,7 @@ class ExcelGenerator(MpModule):
         del excel
         
         self.disableVbom()
-        
-           
-        if self.excel97FilePath is not None:
-            logging.info("   [-] Generated Excel file path: %s" % self.excel97FilePath)
-        if self.excelFilePath is not None:
-            logging.info("   [-] Generated Excel file path: %s" % self.excelFilePath)
+
+        logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+
         

@@ -6,6 +6,7 @@ import sys
 import os
 import shutil
 from zipfile import ZipFile
+from common.utils import MSTypes
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
@@ -52,7 +53,7 @@ class PowerPointGenerator(MpModule):
         relationShipContent =  \
 """<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail" Target="docProps/thumbnail.jpeg"/><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/><Relationship Id="%s" Type="http://schemas.microsoft.com/office/2007/relationships/ui/extensibility" Target="/customUI/%s" /></Relationships>""" \
  % ("rId5", customUIfile)
-        generatedFile = self.pptFilePath
+        generatedFile = self.outputFilePath
         #  0 copy file to temp dir
         fileCopy = shutil.copy2(generatedFile, self.workingPath)
         # 1 extract zip file in temp working dir
@@ -103,8 +104,8 @@ class PowerPointGenerator(MpModule):
         
         logging.info("   [-] Save presentation...")
         ppSaveAsOpenXMLPresentationMacroEnabled = 25 
-        if self.pptFilePath is not None:
-            presentation.SaveAs(self.pptFilePath, FileFormat=ppSaveAsOpenXMLPresentationMacroEnabled)
+        if MSTypes.PPT == self.outputFileType:
+            presentation.SaveAs(self.outputFilePath, FileFormat=ppSaveAsOpenXMLPresentationMacroEnabled)
         # save the presentation and close
         ppt.Presentations(1).Close()
         ppt.Quit()
@@ -116,6 +117,5 @@ class PowerPointGenerator(MpModule):
         logging.info("   [-] Inject Custom UI...")
         self._injectCustomUi()
            
-        if self.pptFilePath is not None:
-            logging.info("   [-] Generated PowerPoint file path: %s" % self.pptFilePath)
+        logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
         

@@ -4,6 +4,7 @@
 # Only enabled on windows
 import sys
 import os
+from common.utils import MSTypes
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
@@ -56,12 +57,17 @@ class WordGenerator(MpModule):
         document = word.Documents.Add()
 
         logging.info("   [-] Save document format...")
-        wdFormatXMLDocumentMacroEnabled = 13
         wdFormatDocument = 0
-        if self.word97FilePath is not None:
-            document.SaveAs(self.word97FilePath, FileFormat=wdFormatDocument)
-        if self.wordFilePath is not None:
-            document.SaveAs(self.wordFilePath, FileFormat=wdFormatXMLDocumentMacroEnabled)
+        wdFormatXMLDocument = 12
+        wdFormatXMLDocumentMacroEnabled = 13
+        
+        if MSTypes.WD97 == self.outputFileType:
+            document.SaveAs(self.outputFilePath, FileFormat=wdFormatDocument)
+        elif MSTypes.WD == self.outputFileType and ".docx" in self.outputFilePath:
+            document.SaveAs(self.outputFilePath, FileFormat=wdFormatXMLDocument)
+        elif MSTypes.WD == self.outputFileType and ".docm" in self.outputFilePath:
+            document.SaveAs(self.outputFilePath, FileFormat=wdFormatXMLDocumentMacroEnabled)
+                    
 
         logging.info("   [-] Inject VBA...")
         # Read generated files
@@ -109,14 +115,7 @@ class WordGenerator(MpModule):
         word.Application.Quit()
         # garbage collection
         del word
-        
         self.disableVbom()
-        
-        if self.word97FilePath is not None:
-            logging.info("   [-] Generated Word file path: %s" % self.word97FilePath)
-        
-        if self.wordFilePath is not None:
-            logging.info("   [-] Generated Word file path: %s" % self.wordFilePath)
-         
-        
+
+        logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
         

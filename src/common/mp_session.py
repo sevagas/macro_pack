@@ -1,14 +1,20 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+from common.utils import MSTypes
 
-class MpSession():
+class MpSession:
     """ Represents the state of the current macro_pack run """
     def __init__(self, workingPath, version, mpType):
         self.workingPath = workingPath
         self.version = version
         self.mpType = mpType
         
+        # Attrs depending on getter/setter
+        self._outputFilePath = None
+        self._outputFileType = MSTypes.UNKNOWN
+        
+        # regular Attrs
         self.vbomEncode = False
         self.avBypass = False
         self.obfuscateForm =  False  
@@ -20,15 +26,23 @@ class MpSession():
         self.stealth = False
         self.vbaInput = None
         self.startFunction = None
-        self.fileOutput = False
-        self.excelFilePath = None   
-        self.excel97FilePath = None   
-        self.wordFilePath = None 
-        self.word97FilePath = None
-        self.pptFilePath = None
-        self.vbaFilePath = None
         self.stdinContent = None
         self.template = None
         self.ddeMode = False # attack using Dynamic Data Exchange (DDE) protocol (see https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/)
         self.dcom = False
         self.dcomTarget = None
+    
+    @property
+    def outputFileType(self):
+        return self._outputFileType 
+    
+    @property
+    def outputFilePath(self):
+        return self._outputFilePath 
+    
+    @outputFilePath.setter
+    def outputFilePath(self, outputFilePath):
+        self._outputFilePath = outputFilePath
+        self._outputFileType = MSTypes.guessApplicationType(self._outputFilePath)
+        
+        

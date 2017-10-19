@@ -8,25 +8,6 @@ import logging
 from termcolor import colored
 import os
 
-def randomAlpha(length):
-    """ Returns a random alphabetic string of length 'length' """
-    key = ''
-    for i in range(length): # @UnusedVariable
-        key += choice(string.ascii_lowercase)
-    return key
-
-
-def guessApplicationType(documentPath):
-    """ Guess MS office application type based on extension """
-    result = ""
-    extension = os.path.splitext(documentPath)[1]
-    if "xls" in extension:
-        result = "Excel"
-    elif "doc" in  extension:
-        result = "Word"
-    elif "ppt" in extension:
-        result = "PowerPoint"
-    return result
 
 
 class ColorLogFiler(logging.StreamHandler):
@@ -43,4 +24,51 @@ class ColorLogFiler(logging.StreamHandler):
             self.flush()
         except Exception:
             self.handleError(record)
+
+def randomAlpha(length):
+    """ Returns a random alphabetic string of length 'length' """
+    key = ''
+    for i in range(length): # @UnusedVariable
+        key += choice(string.ascii_lowercase)
+    return key
+
+
+class MSTypes():
     
+    XL="Excel"
+    XL97="Excel97"
+    WD="Word"
+    WD97="Word97"
+    PPT="PowerPoint"
+    PPT97="PowerPoint97"
+    VBA="VBA"
+    UNKNOWN = "Unknown"
+    
+    @classmethod
+    def guessApplicationType(self, documentPath):
+        """ Guess MS office application type based on extension """
+        result = ""
+        extension = os.path.splitext(documentPath)[1]
+        if ".xls" == extension:
+            result = self.XL97
+        elif ".xlsx" == extension or extension == ".xlsm":
+            result = self.XL
+        elif ".doc" ==  extension:
+            result = self.WD97
+        elif ".docx" ==  extension or extension == ".docm":
+            result = self.WD
+        elif ".ppt" ==  extension:
+            result = self.PPT97
+        elif ".pptm" ==  extension or extension == ".pptx":
+            result = self.PPT
+        elif ".vba" ==  extension:
+            result = self.VBA
+        else:
+            result = self.UNKNOWN
+        return result
+
+
+
+
+
+

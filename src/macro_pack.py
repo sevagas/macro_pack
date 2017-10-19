@@ -17,6 +17,7 @@ from modules.vba_gen import VBAGenerator
 from modules.word_dde import WordDDE
 
 from common import utils, mp_session, help
+from common.utils import MSTypes
 from _ast import arg
 from modules import mp_module
 if sys.platform == "win32":
@@ -68,15 +69,16 @@ def main(argv):
          
     try:
         longOptions = ["quiet", "input-file=","vba-output=", "mask-strings", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
+        shortOptions= "s:f:t:v:x:X:w:W:P:G:hqmo"
         # only for Pro release
         if MP_TYPE == "Pro":
-            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan", "stealth", "dcom="])
-        
+            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom="])
+            shortOptions += "T:"
         # Only enabled on windows
         if sys.platform == "win32":
-            longOptions.extend([ "excel-output=", "word-output=", "excel97-output=", "word97-output=", "ppt-output="])
+            longOptions.extend([ "generate=", "excel-output=", "word-output=", "excel97-output=", "word97-output=", "ppt-output="])
             
-        opts, args = getopt.getopt(argv, "s:f:t:v:x:X:w:W:P:hqmo", longOptions) # @UnusedVariable
+        opts, args = getopt.getopt(argv, "s:f:t:v:x:X:w:W:P:G:hqmo", longOptions) # @UnusedVariable
     except getopt.GetoptError:          
         help.printUsage(BANNER, sys.argv[0], mpSession)                     
         sys.exit(2)                  
@@ -109,31 +111,10 @@ def main(argv):
         elif opt == "--dde":
             if sys.platform == "win32":
                 mpSession.ddeMode = True
-        elif opt in ("-X", "--excel-output"): 
-            # Only enabled on windows
+        elif opt in ("-G", "--generate"): 
+            # Document generation enabled only on windows
             if sys.platform == "win32":
-                mpSession.excelFilePath = os.path.abspath(arg)
-                mpSession.fileOutput = True
-        elif opt in ("-W","--word-output"): 
-            # Only enabled on windows
-            if sys.platform == "win32":
-                mpSession.wordFilePath = os.path.abspath(arg)
-                mpSession.fileOutput = True
-        elif opt in ("-x", "--excel97-output"): 
-            # Only enabled on windows
-            if sys.platform == "win32":
-                mpSession.excel97FilePath = os.path.abspath(arg)
-                mpSession.fileOutput = True
-        elif opt in ("-w", "--word97-output"): 
-            # Only enabled on windows
-            if sys.platform == "win32":
-                mpSession.word97FilePath = os.path.abspath(arg)
-                mpSession.fileOutput = True
-        elif opt in ("-P","--ppt-output"):
-            # Only enabled on windows
-            if sys.platform == "win32":
-                mpSession.pptFilePath = os.path.abspath(arg)
-                mpSession.fileOutput = True
+                mpSession.outputFilePath = os.path.abspath(arg)
         elif opt=="-h" or opt=="--help": 
             help.printUsage(BANNER, sys.argv[0], mpSession)                         
             sys.exit(0)
@@ -147,8 +128,11 @@ def main(argv):
                     mpSession.keepAlive = True  
                 elif opt=="--av-bypass":
                     mpSession.avBypass = True
-                elif opt=="--trojan":
-                    mpSession.trojan = True
+                elif opt == "T" or opt=="--trojan":
+                    # Document generation enabled only on windows
+                    if sys.platform == "win32":
+                        mpSession.outputFilePath = os.path.abspath(arg)
+                        mpSession.trojan = True
                 elif opt == "--stealth":
                     mpSession.stealth = True
                 elif opt == "--dcom":
@@ -188,18 +172,17 @@ def main(argv):
     
     if mpSession.trojan==False:
         # verify that output file does not already exist
-        for outputPath in [mpSession.vbaFilePath, mpSession.excelFilePath, mpSession.wordFilePath, mpSession.excel97FilePath, mpSession.word97FilePath, mpSession.pptFilePath]:
-            if outputPath is not None:
-                if os.path.isfile(outputPath):
-                    logging.error("   [!] ERROR: Output file %s already exist!" % outputPath)
-                    sys.exit(2)
+        if mpSession.outputFilePath is not None:
+            if os.path.isfile(mpSession.outputFilePath):
+                logging.error("   [!] ERROR: Output file %s already exist!" % mpSession.outputFilePath)
+                sys.exit(2)
     else:
         # In trojan mod, file are tojane if they already exist and created if they dont.
         # except for vba output which is not concerned by trojan feature
-        for outputPath in [mpSession.vbaFilePath]:
-            if outputPath is not None:
-                if os.path.isfile(outputPath):
-                    logging.error("   [!] ERROR: Output file %s already exist!" % outputPath)
+        if mpSession.outputFilePath is not None and mpSession.outputFileType == MSTypes.VBA:
+            if mpSession.outputFilePath is not None:
+                if os.path.isfile(mpSession.outputFilePath):
+                    logging.error("   [!] ERROR: Output file %s already exist!" % mpSession.outputFilePath)
                     sys.exit(2)
     
     
@@ -207,10 +190,8 @@ def main(argv):
     logging.info("   [-] Temporary working dir: %s" % WORKING_DIR)
     if not os.path.exists(WORKING_DIR):
         os.makedirs(WORKING_DIR)
-
     
     try:
-
         
         # Create temporary work file.
         if mpSession.ddeMode or mpSession.template:
@@ -229,132 +210,123 @@ def main(argv):
                 shutil.copy2(mpSession.vbaInput, inputFile)
         if os.path.isfile(inputFile):
             logging.info("   [-] Temporary input file: %s" %  inputFile)
+        # Check output file format
+        if mpSession.outputFilePath:
+            logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
         
-        if mpSession.ddeMode: # DDE Attack mode
-            if mpSession.wordFilePath or mpSession.word97FilePath:
-                generator = WordDDE(mpSession)
-                generator.run()
-        
-        else: # VBA macro mode
+         
                
-            # Generate template
-            if mpSession.template:
-                generator = TemplateToVba(mpSession)
-                generator.run()
-                
-            # Macro obfuscation
-            if mpSession.obfuscateNames:
-                obfuscator = ObfuscateNames(mpSession)
-                obfuscator.run()
-            # Mask strings
-            if mpSession.obfuscateStrings:
-                obfuscator = ObfuscateStrings(mpSession)
-                obfuscator.run()
-            # Macro obfuscation
-            if mpSession.obfuscateForm:
-                obfuscator = ObfuscateForm(mpSession)
-                obfuscator.run()     
+        # Generate template
+        if mpSession.template:
+            generator = TemplateToVba(mpSession)
+            generator.run()
             
-            if MP_TYPE == "Pro":
-                #macro split
-                if mpSession.avBypass:
-                    obfuscator = AvBypass(mpSession)
-                    obfuscator.run() 
+        # Macro obfuscation
+        if mpSession.obfuscateNames:
+            obfuscator = ObfuscateNames(mpSession)
+            obfuscator.run()
+        # Mask strings
+        if mpSession.obfuscateStrings:
+            obfuscator = ObfuscateStrings(mpSession)
+            obfuscator.run()
+        # Macro obfuscation
+        if mpSession.obfuscateForm:
+            obfuscator = ObfuscateForm(mpSession)
+            obfuscator.run()     
+        
+        if MP_TYPE == "Pro":
+            #macro split
+            if mpSession.avBypass:
+                obfuscator = AvBypass(mpSession)
+                obfuscator.run() 
+                
+            # MAcro encoding    
+            if mpSession.vbomEncode:
+                obfuscator = VbomEncoder(mpSession)
+                obfuscator.run() 
                     
-                # MAcro encoding    
-                if mpSession.vbomEncode:
-                    obfuscator = VbomEncoder(mpSession)
+                # PErsistance management
+                if mpSession.persist:
+                    obfuscator = Persistance(mpSession)
                     obfuscator.run() 
-                        
-                    # PErsistance management
-                    if mpSession.persist:
-                        obfuscator = Persistance(mpSession)
-                        obfuscator.run() 
-                    # Macro obfuscation
-                    if mpSession.obfuscateNames:
-                        obfuscator = ObfuscateNames(mpSession)
-                        obfuscator.run()
-                    # Mask strings
-                    if mpSession.obfuscateStrings:
-                        obfuscator = ObfuscateStrings(mpSession)
-                        obfuscator.run()
-                    # Macro obfuscation
-                    if mpSession.obfuscateForm:
-                        obfuscator = ObfuscateForm(mpSession)
-                        obfuscator.run()  
-                else:
-                    # PErsistance management
-                    if mpSession.persist:
-                        obfuscator = Persistance(mpSession)
-                        obfuscator.run() 
-                                          
-            # MS Office generation/trojan is only enabled on windows
-            if sys.platform == "win32":
-                
-                if mpSession.stealth == True:
-                    # Add a new empty module to keep VBA library if we hide other modules
-                    # See http://seclists.org/fulldisclosure/2017/Mar/90
-                    genericModule = mp_module.MpModule(mpSession)
-                    genericModule.addVBAModule("")
+                # Macro obfuscation
+                if mpSession.obfuscateNames:
+                    obfuscator = ObfuscateNames(mpSession)
+                    obfuscator.run()
+                # Mask strings
+                if mpSession.obfuscateStrings:
+                    obfuscator = ObfuscateStrings(mpSession)
+                    obfuscator.run()
+                # Macro obfuscation
+                if mpSession.obfuscateForm:
+                    obfuscator = ObfuscateForm(mpSession)
+                    obfuscator.run()  
+            else:
+                # PErsistance management
+                if mpSession.persist:
+                    obfuscator = Persistance(mpSession)
+                    obfuscator.run() 
+                                      
+        # MS Office generation/trojan is only enabled on windows
+        if sys.platform == "win32":
             
-                if mpSession.trojan == False:
-                    if mpSession.excelFilePath or mpSession.excel97FilePath:
+            if mpSession.stealth == True:
+                # Add a new empty module to keep VBA library if we hide other modules
+                # See http://seclists.org/fulldisclosure/2017/Mar/90
+                genericModule = mp_module.MpModule(mpSession)
+                genericModule.addVBAModule("")
+        
+            if mpSession.trojan == False:
+                if MSTypes.XL in mpSession.outputFileType:
+                    generator = ExcelGenerator(mpSession)
+                    generator.run()
+                if MSTypes.WD in mpSession.outputFileType:
+                    generator = WordGenerator(mpSession)
+                    generator.run()
+                if MSTypes.PPT in mpSession.outputFileType:
+                    generator = PowerPointGenerator(mpSession)
+                    generator.run()
+            else:
+                if MSTypes.XL in mpSession.outputFileType:
+                    if os.path.isfile(mpSession.outputFilePath):
+                        generator = ExcelTrojan(mpSession)
+                        generator.run()
+                    else:
                         generator = ExcelGenerator(mpSession)
                         generator.run()
-                    if mpSession.wordFilePath or mpSession.word97FilePath:
+                if MSTypes.WD in mpSession.outputFileType:
+                    if os.path.isfile(mpSession.outputFilePath):
+                        generator = WordTrojan(mpSession)
+                        generator.run()
+                    else:
                         generator = WordGenerator(mpSession)
                         generator.run()
-                    if mpSession.pptFilePath:
+                if MSTypes.PPT in mpSession.outputFileType:
+                    if os.path.isfile(mpSession.outputFilePath):
+                        generator = PptTrojan(mpSession)
+                        generator.run()
+                    else:
                         generator = PowerPointGenerator(mpSession)
                         generator.run()
-                else:
-                    if mpSession.excelFilePath:
-                        if os.path.isfile(mpSession.excelFilePath):
-                            generator = ExcelTrojan(mpSession)
-                            generator.run()
-                        else:
-                            generator = ExcelGenerator(mpSession)
-                            generator.run()
-                    if mpSession.excel97FilePath:
-                        if os.path.isfile(mpSession.excel97FilePath):
-                            generator = ExcelTrojan(mpSession)
-                            generator.run()
-                        else:
-                            generator = ExcelGenerator(mpSession)
-                            generator.run()
-                    if mpSession.wordFilePath:
-                        if os.path.isfile(mpSession.wordFilePath):
-                            generator = WordTrojan(mpSession)
-                            generator.run()
-                        else:
-                            generator = WordGenerator(mpSession)
-                            generator.run()
-                    if mpSession.word97FilePath:
-                        if os.path.isfile(mpSession.word97FilePath):
-                            generator = WordTrojan(mpSession)
-                            generator.run()
-                        else:
-                            generator = WordGenerator(mpSession)
-                            generator.run()
-                    if mpSession.pptFilePath:
-                        if os.path.isfile(mpSession.pptFilePath):
-                            generator = PptTrojan(mpSession)
-                            generator.run()
-                        else:
-                            generator = PowerPointGenerator(mpSession)
-                            generator.run()
-    
-                if mpSession.stealth == True:
-                    obfuscator = Stealth(mpSession)
-                    obfuscator.run()
-                    
-                if mpSession.dcom: #run dcom attack
-                    generator = DcomGenerator(mpSession)
+
+            if mpSession.stealth == True:
+                obfuscator = Stealth(mpSession)
+                obfuscator.run()
+                
+            if mpSession.ddeMode: # DDE Attack mode
+                if MSTypes.WD in mpSession.outputFileType:
+                    generator = WordDDE(mpSession)
                     generator.run()
-        
-            if mpSession.vbaFilePath is not None or mpSession.fileOutput == False:
-                generator = VBAGenerator(mpSession)
+                else:
+                    logging.warn(" [!] Word and Word97 are only format supported for DDE attacks.")
+                
+            if mpSession.dcom: #run dcom attack
+                generator = DcomGenerator(mpSession)
                 generator.run()
+    
+        if mpSession.outputFileType == MSTypes.VBA or mpSession.outputFilePath == None:
+            generator = VBAGenerator(mpSession)
+            generator.run()
                 
                 
     except Exception:

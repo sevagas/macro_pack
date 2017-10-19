@@ -157,7 +157,7 @@ class TemplateToVba(MpModule):
          
         # open file containing template values       
         cmdFile = self.getCMDFile()
-        if cmdFile is not None:
+        if os.path.isfile(cmdFile):
             f = open(cmdFile, 'r')
             valuesFileContent = f.read()
             f.close()
@@ -166,4 +166,4 @@ class TemplateToVba(MpModule):
             os.remove(cmdFile)
             logging.info("   [-] OK!") 
         else:
-            logging.error("   [!] Could not find template input!")
+            logging.error("   [!] Could not find template input! Use \"-t help\" option for help on templates.")
