@@ -6,6 +6,7 @@ from random import choice
 import string
 import logging
 from termcolor import colored
+import os
 
 def randomAlpha(length):
     """ Returns a random alphabetic string of length 'length' """
@@ -13,6 +14,19 @@ def randomAlpha(length):
     for i in range(length): # @UnusedVariable
         key += choice(string.ascii_lowercase)
     return key
+
+
+def guessApplicationType(documentPath):
+    """ Guess MS office application type based on extension """
+    result = ""
+    extension = os.path.splitext(documentPath)[1]
+    if "xls" in extension:
+        result = "Excel"
+    elif "doc" in  extension:
+        result = "Word"
+    elif "ppt" in extension:
+        result = "PowerPoint"
+    return result
 
 
 class ColorLogFiler(logging.StreamHandler):

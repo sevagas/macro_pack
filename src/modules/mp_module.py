@@ -61,7 +61,10 @@ class MpModule():
     
     def getCMDFile(self):
         """ Return command line file (for DDE mode)"""
-        return os.path.join(self.workingPath,"command.cmd")
+        if os.path.isfile(os.path.join(self.workingPath,"command.cmd")):
+            return os.path.join(self.workingPath,"command.cmd")
+        else:
+            return ""
         
     
     def getMainVBAFile(self):

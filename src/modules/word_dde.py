@@ -21,6 +21,12 @@ class WordDDE(WordGenerator):
     def run(self):
         logging.info(" [+] Generating MS Word with DDE document...")
         
+        # Read command file
+        commandFile =self.getCMDFile()    
+        if commandFile == "":
+            logging.error("   [!] Could not find cmd input!")
+            return
+        
         self.enableVbom()
 
         logging.info("   [-] Open document...")
@@ -39,8 +45,6 @@ class WordDDE(WordGenerator):
             document.SaveAs(self.wordFilePath, FileFormat=wdFormatXMLDocument)
 
         logging.info("   [-] Inject DDE field...")
-        # Read command file
-        commandFile =self.getCMDFile()    
         with open (commandFile, "r") as f:
             command=f.read()
         

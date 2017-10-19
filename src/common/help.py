@@ -92,6 +92,9 @@ def printUsage(banner, currentApp, mpSession):
                     (works with Excel documents only). The macro will be then be executed anytime an Excel document is opened.
     --trojan       Inject macro in an existing MS office file. Use in conjunction with -x, -X, -w, or -W
     --stealth      Anti-debug and hiding features
+    --dcom=REMOTE_FILE_PATH Open remote document using DCOM for pivot/remote exec if psexec not possible for example.
+                   This will trigger AutoOpen/Workboo_Open automatically. 
+                   If no auto start function, use --start-function option to indicate wich macro to run.
 """
 
     details = \

