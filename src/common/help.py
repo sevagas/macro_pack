@@ -96,14 +96,14 @@ def printUsage(banner, currentApp, mpSession):
     --av-bypass  Use various tricks  efficient to bypass most av (combine with -o for best result)
     --keep-alive    Use with --vbom-encode option. Ensure new app instance will stay alive even when macro has finished
     --persist       Use with --vbom-encode option. Macro will automatically be persisted in application startup path 
-                    (works with Excel documents only). The macro will be then be executed anytime an Excel document is opened.
+        (works with Excel documents only). The macro will be then be executed anytime an Excel document is opened.
     -T, --trojan=OUTPUT_FILE_PATH   Inject macro in an existing MS office file. 
-                    Supported files are the same as for the -G option
-                    If file does not exist, it will be created (like -G option)
+        Supported files are the same as for the -G option
+        If file does not exist, it will be created (like -G option)
     --stealth      Anti-debug and hiding features
     --dcom=REMOTE_FILE_PATH Open remote document using DCOM for pivot/remote exec if psexec not possible for example.
-                   This will trigger AutoOpen/Workboo_Open automatically. 
-                   If no auto start function, use --start-function option to indicate wich macro to run.
+        This will trigger AutoOpen/Workbook_Open automatically. 
+        If no auto start function, use --start-function option to indicate which macro to run.
 """
 
     details = \
@@ -118,7 +118,7 @@ def printUsage(banner, currentApp, mpSession):
     --obfuscate-form\tModify readability by removing all spaces and comments in VBA
     --obfuscate-strings\tRandomly split strings and encode them
     --obfuscate-names \tChange functions, variables, and constants names
-      
+    
     -s, --start-function=START_FUNCTION   Entry point of macro file 
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
         
@@ -133,7 +133,11 @@ def printUsage(banner, currentApp, mpSession):
     --dde \t Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
          DDE attack mode is not compatible with VBA Macro related options.
          Usage: echo calc.exe | %s --dde -G DDE.docx
-         Note: This option requires Windows OS with genuine MS Office installed.  
+         Note: This option requires Windows OS with genuine MS Office installed. 
+    
+    --run=FILE_PATH Open document using COM to run macro. Can be useful to bypass whitelisting situations.
+           This will trigger AutoOpen/Workbook_Open automatically. 
+           If no auto start function, use --start-function option to indicate which macro to run. 
                
 """ % (currentApp,currentApp, currentApp)   
 

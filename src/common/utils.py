@@ -41,6 +41,7 @@ class MSTypes():
     WD97="Word97"
     PPT="PowerPoint"
     PPT97="PowerPoint97"
+    PUB="Publisher"
     VBA="VBA"
     UNKNOWN = "Unknown"
     
@@ -61,6 +62,8 @@ class MSTypes():
             result = self.PPT97
         elif ".pptm" ==  extension or extension == ".pptx":
             result = self.PPT
+        elif ".pub" ==  extension:
+            result = self.PUB
         elif ".vba" ==  extension:
             result = self.VBA
         else:

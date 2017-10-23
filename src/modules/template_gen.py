@@ -74,7 +74,7 @@ class TemplateToVba(MpModule):
         if len(params) > 1:
             outputPath = params[1]
         else:
-            outputPath = utils.randomAlpha(5)+".exe"
+            outputPath = ".\\" + utils.randomAlpha(5)+".exe"
         logging.info("   [-] Output path when exe is extracted: %s" % outputPath)
             
         #OPEN THE FILE
