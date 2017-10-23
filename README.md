@@ -18,7 +18,7 @@ This tool is written in Python3 and works on both Linux and Windows platform.
 
 **Note:** Windows platform with genuine MS Office installed is required for Office documents automatic generation or trojan features.
 
-<p align="center"><img src="./assets/releasev1.1.png" alt="Demo 1"></p>
+<p align="center"><img src="./assets/1-2release.png" alt="Demo 1"></p>
 
 ### Obfuscation
 
