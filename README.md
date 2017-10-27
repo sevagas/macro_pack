@@ -65,7 +65,7 @@ The pro mode includes features such as:
 * Anti-debug using http://seclists.org/fulldisclosure/2017/Mar/90
 
 For now I do not plan to release or sell this pro version however if you are really interrested I can send pro binary in the next case:
-* You resolve one or more opened issue (bug or enhencement)
+* You resolve one or more opened issue (bug or enhancement) + I need to know your real identity
 
 
 
