@@ -80,12 +80,18 @@ class MpModule():
         return result
     
     def addVBAModule(self, moduleContent):
-        """ Add a new VBA module file containing moduleContent and with random name """
+        """ 
+        Add a new VBA module file containing moduleContent and with random name
+        Returns name of new VBA file
+        """
         newModuleName = os.path.join(self.workingPath,utils.randomAlpha(9)+".vba")
         f = open(newModuleName, 'w')
         f.write(moduleContent)
         f.close()
+        return newModuleName
     
     def run(self):
         """ Run the module """
         raise NotImplementedError
+    
+    

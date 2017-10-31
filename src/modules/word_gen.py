@@ -78,30 +78,19 @@ class WordGenerator(MpModule):
                     wordModule = document.VBProject.VBComponents("ThisDocument")
                     macro=f.read()
                     wordModule.CodeModule.AddFromString(macro)
-                    """
-                    # Handle big macros by inserting them chink by chunk
-                    if len(macro) > 1000000:
-                        macrolines = macro.split("\n")
-                        for i in range(0,len(macrolines),500):
-                            logging.info("i:%s" % str(i))
-                            wordModule.CodeModule.insertLines(i+1, "\n".join(macrolines[i:i+500]))
-                            #word.DisplayAlerts=False
-                            document.Application.Options.Pagination = False
-                            document.UndoClear()
-                            document.Repaginate()
-                            document.Application.ScreenUpdating = True
-                            document.Application.ScreenRefresh()
-                            document.Save()
-  
-                    else:
-                        wordModule.CodeModule.AddFromString(macro)
-                    """
             else: # inject other vba files as modules
                 with open (vbaFile, "r") as f:
                     macro=f.read()
                     wordModule = document.VBProject.VBComponents.Add(1)
                     wordModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                     wordModule.CodeModule.AddFromString(macro)
+                    document.Application.Options.Pagination = False
+                    document.UndoClear()
+                    document.Repaginate()
+                    document.Application.ScreenUpdating = True 
+                    document.Application.ScreenRefresh()
+                    #logging.info("   [-] Saving module %s..." %  wordModule.Name)
+                    document.Save()
         
         #word.DisplayAlerts=False
         # Remove Informations

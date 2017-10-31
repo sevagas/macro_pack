@@ -10,47 +10,70 @@ from random import randint
 
 class ObfuscateNames(MpModule):
 
+    vbaFunctions = []
 
-    def _replaceFunctions(self,macroLines):
-        # Identify function, subs and variables names
-        logging.info("   [-] Rename functions...")
-        keyWords = []
-        for line in macroLines:
-            matchObj = re.match( r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*\(.*\).*', line, re.M|re.I) 
-            if matchObj:
-                keyword = matchObj.groups()[1]
-                if keyword not in self.reservedFunctions:
-                    keyWords.append(keyword)
-                    self.reservedFunctions.append(keyword)
-            else:
-                matchObj = re.match( r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*As\s*.*', line, re.M|re.I) 
+    def _findAllFunctions(self):
+        for vbaFile in self.getVBAFiles():
+            f = open(vbaFile)
+            content = f.readlines()
+            f.close()
+            
+            for line in content:
+                matchObj = re.match( r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*\(.*\).*', line, re.M|re.I) 
                 if matchObj:
                     keyword = matchObj.groups()[1]
                     if keyword not in self.reservedFunctions:
-                        keyWords.append(keyword)
+                        self.vbaFunctions.append(keyword)
                         self.reservedFunctions.append(keyword)
+                else:
+                    matchObj = re.match( r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*As\s*.*', line, re.M|re.I) 
+                    if matchObj:
+                        keyword = matchObj.groups()[1]
+                        if keyword not in self.reservedFunctions:
+                            self.vbaFunctions.append(keyword)
+                            self.reservedFunctions.append(keyword)
+        
+            # Write in new file 
+            f = open(vbaFile, 'w')
+            f.writelines(content)
+            f.close()
+            
+
+    def _replaceFunctions(self):
+        # Identify function, subs and variables names
+        logging.info("   [-] Rename functions...")
+        self._findAllFunctions()
         
         # Different situation surrounding variables
-        varDelimitors=[(" "," "),("\t"," "),(" ","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
+        varDelimitors=[(" "," "),("\t"," "),("\t","("),(" ","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
         
         # Replace functions and function calls by random string
-        for keyWord in keyWords:
+        for keyWord in self.vbaFunctions:
             keyTmp = randomAlpha(randint(8, 20)) # Generate random names with random size
             #logging.info("|%s|->|%s|" %(keyWord,keyTmp))
             self.reservedFunctions.append(keyTmp)
-
-            for varDelimitor in varDelimitors:
-                newKeyWord = varDelimitor[0] + keyTmp +varDelimitor[1]
-                keywordTmp = varDelimitor[0] + keyWord +varDelimitor[1]
-                for n,line in enumerate(macroLines):
-                    matchObj = re.match( r'.*".*%s.*".*' %keyWord, line, re.M|re.I) # check if word is inside a string
-                    if matchObj:
-                        if "Application.Run" in line: # dynamic function call detected
-                            macroLines[n] = line.replace(keywordTmp, newKeyWord)
-                    else:
-                        macroLines[n] = line.replace(keywordTmp, newKeyWord)
-                
-        return macroLines
+        
+            for vbaFile in self.getVBAFiles():
+                f = open(vbaFile)
+                content = f.readlines()
+                f.close()
+    
+                for varDelimitor in varDelimitors:
+                    newKeyWord = varDelimitor[0] + keyTmp +varDelimitor[1]
+                    keywordTmp = varDelimitor[0] + keyWord +varDelimitor[1]
+                    for n,line in enumerate(content):
+                        matchObj = re.match( r'.*".*%s.*".*' %keyWord, line, re.M|re.I) # check if word is inside a string
+                        if matchObj:
+                            if "Application.Run" in line: # dynamic function call detected
+                                content[n] = line.replace(keywordTmp, newKeyWord)
+                        else:
+                            
+                            content[n] = line.replace(keywordTmp, newKeyWord)
+                                
+                # Write in new file 
+                f = open(vbaFile, 'w')
+                f.writelines(content)
+                f.close()
 
 
     def _replaceLibImports(self, macroLines):
@@ -162,13 +185,14 @@ class ObfuscateNames(MpModule):
     def run(self):
         logging.info(" [+] VBA names obfuscation ...") 
         
+        # Obfuscate function name
+        content = self._replaceFunctions()
+        
         for vbaFile in self.getVBAFiles():
             f = open(vbaFile)
             content = f.readlines()
             f.close()
             
-            # Obfuscate function name
-            content = self._replaceFunctions(content)
             # Obfuscate variables name
             content = self._replaceVariables(content)
             # replace numerical consts
