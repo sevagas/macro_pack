@@ -152,6 +152,8 @@ def printUsage(banner, currentApp, mpSession):
     --run=FILE_PATH Open document using COM to run macro. Can be useful to bypass whitelisting situations.
            This will trigger AutoOpen/Workbook_Open automatically. 
            If no auto start function, use --start-function option to indicate which macro to run. 
+           
+    -l, --listen=PORT Open an HTTP server listening on defined port.
                
 """ % (currentApp,currentApp, currentApp)   
 

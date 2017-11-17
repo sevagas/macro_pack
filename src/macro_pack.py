@@ -16,6 +16,7 @@ from modules.template_gen import TemplateToVba
 from modules.vba_gen import VBAGenerator
 from modules.word_dde import WordDDE
 from modules.com_run import ComGenerator
+from modules.listen_server import ListenServer
 
 from common import utils, mp_session, help
 from common.utils import MSTypes
@@ -70,8 +71,8 @@ def main(argv):
     mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
          
     try:
-        longOptions = ["quiet", "input-file=","vba-output=", "mask-strings", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
-        shortOptions= "s:f:t:v:x:X:w:W:P:G:hqmo"
+        longOptions = ["listen=", "quiet", "input-file=","vba-output=", "mask-strings", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
+        shortOptions= "l:s:f:t:v:x:X:w:W:P:G:hqmo"
         # only for Pro release
         if MP_TYPE == "Pro":
             longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom="])
@@ -96,7 +97,10 @@ def main(argv):
         elif opt=="--obfuscate-strings":                 
             mpSession.obfuscateStrings =  True                
         elif opt=="-s" or opt=="--start-function":                 
-            mpSession.startFunction =  arg         
+            mpSession.startFunction =  arg  
+        elif opt=="-l" or opt=="--listen":                 
+            mpSession.listen =  True
+            mpSession.listenPort = int(arg)         
         elif opt == "-f" or opt== "--input-file": 
             mpSession.vbaInput = arg
         elif opt=="-t" or opt=="--template": 
@@ -337,6 +341,9 @@ def main(argv):
             generator = VBAGenerator(mpSession)
             generator.run()
                 
+        if mpSession.listen:
+            listener = ListenServer(mpSession)
+            listener.run()
                 
     except Exception:
         logging.exception(" [!] Exception caught!")
@@ -355,6 +362,9 @@ def main(argv):
      
     logging.info(" [+] Cleaning...")
     shutil.rmtree(WORKING_DIR)   
+    
+    
+    
     logging.info(" Done!\n")
         
     

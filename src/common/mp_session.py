@@ -32,6 +32,9 @@ class MpSession:
         self.dcom = False
         self.dcomTarget = None
         self.runTarget = None
+        
+        self.listen = False
+        self.listenPort = 80
     
     @property
     def outputFileType(self):

@@ -6,7 +6,7 @@ from random import choice
 import string
 import logging
 from termcolor import colored
-import os
+import os, sys
 
 
 
@@ -32,6 +32,12 @@ def randomAlpha(length):
         key += choice(string.ascii_lowercase)
     return key
 
+
+def getRunningApp():
+    if getattr(sys, 'frozen', False):
+        return sys.executable
+    else:
+        return os.path.abspath(__file__)
 
 class MSTypes():
     
