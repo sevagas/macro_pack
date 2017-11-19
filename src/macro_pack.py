@@ -12,8 +12,10 @@ from modules.obfuscate_strings import ObfuscateStrings
 from modules.excel_gen import ExcelGenerator
 from modules.word_gen import WordGenerator
 from modules.ppt_gen import PowerPointGenerator
+from modules.msproject_gen import MSProjectGenerator
 from modules.template_gen import TemplateToVba
 from modules.vba_gen import VBAGenerator
+from modules.hta_gen import HTAGenerator
 from modules.word_dde import WordDDE
 from modules.com_run import ComGenerator
 from modules.listen_server import ListenServer
@@ -292,6 +294,9 @@ def main(argv):
                 elif MSTypes.PPT in mpSession.outputFileType:
                     generator = PowerPointGenerator(mpSession)
                     generator.run()
+                elif MSTypes.MPP == mpSession.outputFileType:
+                    generator = MSProjectGenerator(mpSession)
+                    generator.run()
                 elif MSTypes.PUB == mpSession.outputFileType and MP_TYPE == "Pro":
                     generator = PublisherGenerator(mpSession)
                     generator.run()
@@ -336,6 +341,10 @@ def main(argv):
             if mpSession.dcom: #run dcom attack
                 generator = DcomGenerator(mpSession)
                 generator.run()
+    
+        if mpSession.outputFileType == MSTypes.HTA:
+            generator = HTAGenerator(mpSession)
+            generator.run()
     
         if mpSession.outputFileType == MSTypes.VBA or mpSession.outputFilePath == None:
             generator = VBAGenerator(mpSession)

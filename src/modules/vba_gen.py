@@ -9,7 +9,7 @@ from common.utils import MSTypes
 
 
 class VBAGenerator(MpModule):
-    """ Module used to generate MS excel file from working dir content"""
+    """ Module used to generate VBA file from working dir content"""
     
     def run(self):
         if len(self.getVBAFiles())>0:

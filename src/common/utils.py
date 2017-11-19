@@ -47,8 +47,10 @@ class MSTypes():
     WD97="Word97"
     PPT="PowerPoint"
     PPT97="PowerPoint97"
+    MPP = "MSProject"
     PUB="Publisher"
     VBA="VBA"
+    HTA="HTA"
     UNKNOWN = "Unknown"
     
     @classmethod
@@ -64,6 +66,10 @@ class MSTypes():
             result = self.WD97
         elif ".docx" ==  extension or extension == ".docm":
             result = self.WD
+        elif ".hta" ==  extension:
+            result = self.HTA
+        elif ".mpp" ==  extension:
+            result = self.MPP
         elif ".ppt" ==  extension:
             result = self.PPT97
         elif ".pptm" ==  extension or extension == ".pptx":
