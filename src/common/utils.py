@@ -49,6 +49,8 @@ class MSTypes():
     PPT97="PowerPoint97"
     MPP = "MSProject"
     PUB="Publisher"
+    VSD="Visio"
+    VSD97="Visio97"
     VBA="VBA"
     HTA="HTA"
     UNKNOWN = "Unknown"
@@ -74,6 +76,10 @@ class MSTypes():
             result = self.PPT97
         elif ".pptm" ==  extension or extension == ".pptx":
             result = self.PPT
+        elif ".vsd" ==  extension:
+            result = self.VSD97
+        elif ".vsdm" ==  extension or extension == ".vsdx":
+            result = self.VSD
         elif ".pub" ==  extension:
             result = self.PUB
         elif ".vba" ==  extension:

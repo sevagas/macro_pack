@@ -17,6 +17,7 @@ from modules.template_gen import TemplateToVba
 from modules.vba_gen import VBAGenerator
 from modules.hta_gen import HTAGenerator
 from modules.word_dde import WordDDE
+from modules.visio_gen import VisioGenerator
 from modules.com_run import ComGenerator
 from modules.listen_server import ListenServer
 
@@ -296,6 +297,9 @@ def main(argv):
                     generator.run()
                 elif MSTypes.MPP == mpSession.outputFileType:
                     generator = MSProjectGenerator(mpSession)
+                    generator.run()
+                elif MSTypes.VSD in mpSession.outputFileType:
+                    generator = VisioGenerator(mpSession)
                     generator.run()
                 elif MSTypes.PUB == mpSession.outputFileType and MP_TYPE == "Pro":
                     generator = PublisherGenerator(mpSession)

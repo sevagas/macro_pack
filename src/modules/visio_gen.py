@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+# Only enabled on windows
+import sys
+import os
+from common.utils import MSTypes
+if sys.platform == "win32":
+    # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
+    import win32com.client # @UnresolvedImport
+    import winreg # @UnresolvedImport
+
+import logging
+from modules.mp_module import MpModule
+
+
+class VisioGenerator(MpModule):
+    """ Module used to generate MS Visio file from working dir content"""
+    
+    def enableVbom(self):
+        # Enable writing in macro (VBOM)
+        # First fetch the application version
+        objVisio = win32com.client.Dispatch("Visio.InvisibleApp")
+        self.version = objVisio.Application.Version.replace(",", ".")
+        # IT is necessary to exit office or value wont be saved
+        objVisio.Application.Quit()
+        del objVisio
+        # Next change/set AccessVBOM registry value to 1
+        keyval = "Software\\Microsoft\Office\\"  + self.version + "\\Visio\\Security"
+        logging.info("   [-] Set %s to 1..." % keyval)
+        Registrykey = winreg.CreateKey(winreg.HKEY_CURRENT_USER,keyval)
+        winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,1) # "REG_DWORD"
+        winreg.CloseKey(Registrykey)
+        
+    
+    def disableVbom(self):
+        # Disable writing in VBA project
+        #  Change/set AccessVBOM registry value to 0
+        keyval = "Software\\Microsoft\Office\\"  + self.version + "\\Visio\\Security"
+        logging.info("   [-] Set %s to 0..." % keyval)
+        Registrykey = winreg.CreateKey(winreg.HKEY_CURRENT_USER,keyval)
+        winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,0) # "REG_DWORD"
+        winreg.CloseKey(Registrykey)
+        
+    
+    def run(self):
+        logging.info(" [+] Generating MS Visio document...")
+        
+        self.enableVbom()
+
+        logging.info("   [-] Open document...")
+        # open up an instance of Word with the win32com driver
+        visio = win32com.client.Dispatch("Visio.InvisibleApp")
+        # do the operation in background without actually opening Excel
+        #visio.Visible = False
+        document = visio.Documents.Add("")
+
+        logging.info("   [-] Save document format...")        
+        document.SaveAs(self.outputFilePath)
+            
+        logging.info("   [-] Inject VBA...")
+        # Read generated files
+        for vbaFile in self.getVBAFiles():
+            if vbaFile == self.getMainVBAFile():       
+                with open (vbaFile, "r") as f:
+                    macro=f.read()
+                    visioModule = document.VBProject.VBComponents("ThisDocument")
+                    visioModule.CodeModule.AddFromString(macro)
+            else: # inject other vba files as modules
+                with open (vbaFile, "r") as f:
+                    macro=f.read()
+                    visioModule = document.VBProject.VBComponents.Add(1)
+                    visioModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
+                    visioModule.CodeModule.AddFromString(macro)
+        
+        # Remove Informations
+        logging.info("   [-] Remove hidden data and personal info...")
+        document.RemovePersonalInformation = True
+        
+        # save the document and close
+        document.Save()
+        document.Close()
+        visio.Application.Quit()
+        # garbage collection
+        del visio
+        self.disableVbom()
+
+        logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+        
