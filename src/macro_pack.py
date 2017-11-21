@@ -39,6 +39,7 @@ try:
     from pro_modules.excel_trojan import ExcelTrojan
     from pro_modules.word_trojan import WordTrojan
     from pro_modules.ppt_trojan import PptTrojan
+    from pro_modules.visio_trojan import VisioTrojan
     from pro_modules.stealth import Stealth
     from pro_modules.dcom_run import DcomGenerator
     from pro_modules.publisher_gen import PublisherGenerator
@@ -325,6 +326,13 @@ def main(argv):
                         generator.run()
                     else:
                         generator = PowerPointGenerator(mpSession)
+                        generator.run()
+                if MSTypes.VSD in mpSession.outputFileType:
+                    if os.path.isfile(mpSession.outputFilePath):
+                        generator = VisioTrojan(mpSession)
+                        generator.run()
+                    else:
+                        generator = VisioGenerator(mpSession)
                         generator.run()
 
             if mpSession.stealth == True:
