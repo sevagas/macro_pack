@@ -4,7 +4,7 @@
 # Only enabled on windows
 import sys
 import os
-from common.utils import MSTypes
+
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
@@ -20,7 +20,7 @@ class VisioGenerator(MpModule):
     def enableVbom(self):
         # Enable writing in macro (VBOM)
         # First fetch the application version
-        objVisio = win32com.client.Dispatch("Visio.InvisibleApp")
+        objVisio = win32com.client.Dispatch("Visio.InvisibleApp") 
         self.version = objVisio.Application.Version.replace(",", ".")
         # IT is necessary to exit office or value wont be saved
         objVisio.Application.Quit()
@@ -49,10 +49,9 @@ class VisioGenerator(MpModule):
         self.enableVbom()
 
         logging.info("   [-] Open document...")
-        # open up an instance of Word with the win32com driver
+        # open up an instance of Visio with the win32com driver
         visio = win32com.client.Dispatch("Visio.InvisibleApp")
-        # do the operation in background without actually opening Excel
-        #visio.Visible = False
+        # do the operation in background without actually opening Visio
         document = visio.Documents.Add("")
 
         logging.info("   [-] Save document format...")        

@@ -32,7 +32,6 @@ class MSProjectGenerator(MpModule):
         winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,1) # "REG_DWORD"
         winreg.CloseKey(Registrykey)
         
-    
     def disableVbom(self):
         # Disable writing in VBA project
         #  Change/set AccessVBOM registry value to 0
@@ -46,7 +45,7 @@ class MSProjectGenerator(MpModule):
     def run(self):
         logging.info(" [+] Generating MSProject project...")
         
-        #self.enableVbom()
+        self.enableVbom()
 
         logging.info("   [-] Open MSProject project...")
         # open up an instance of Word with the win32com driver
@@ -86,8 +85,8 @@ class MSProjectGenerator(MpModule):
         project.Close()
         MSProject.Quit()
         # garbage collection
-        #del MSProject
-        #self.disableVbom()
+        del MSProject
+        self.disableVbom()
 
         logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
         
