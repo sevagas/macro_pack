@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 # encoding: utf-8
 
@@ -57,8 +58,7 @@ class VisioGenerator(MpModule):
         logging.info("   [-] Open document...")
         # open up an instance of Word with the win32com driver
         visio = win32com.client.Dispatch("Visio.InvisibleApp")
-        # do the operation in background without actually opening Excel
-        #visio.Visible = False
+        # do the operation in background without actually opening Visio
         document = visio.Documents.Add("")
 
         logging.info("   [-] Save document format...")        
@@ -94,3 +94,4 @@ class VisioGenerator(MpModule):
 
         logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
         
+
