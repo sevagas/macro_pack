@@ -17,6 +17,12 @@ from modules.mp_module import MpModule
 class VisioGenerator(MpModule):
     """ Module used to generate MS Visio file from working dir content"""
     
+    def getAutoOpenVbaFunction(self):
+        return "Document_DocumentOpened"
+    
+    def getAutoOpenVbaSignature(self):
+        return "Private Sub Document_DocumentOpened(ByVal doc As IVDocument)" 
+    
     def enableVbom(self):
         # Enable writing in macro (VBOM)
         # First fetch the application version
@@ -58,6 +64,7 @@ class VisioGenerator(MpModule):
         logging.info("   [-] Save document format...")        
         document.SaveAs(self.outputFilePath)
             
+        self.resetVBAEntryPoint()
         logging.info("   [-] Inject VBA...")
         # Read generated files
         for vbaFile in self.getVBAFiles():

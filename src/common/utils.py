@@ -54,7 +54,7 @@ class MSTypes():
     VBA="VBA"
     HTA="HTA"
     UNKNOWN = "Unknown"
-    
+        
     @classmethod
     def guessApplicationType(self, documentPath):
         """ Guess MS office application type based on extension """

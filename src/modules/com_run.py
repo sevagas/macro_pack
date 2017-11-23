@@ -37,6 +37,8 @@ class ComGenerator(MpModule):
             dcomApp = "Word.Application"
         elif MSTypes.PPT in targetApp:
             dcomApp = "PowerPoint.Application"
+        elif MSTypes.VSD in targetApp:
+            dcomApp = "Visio.InvisibleApp"
         else:
             logging.error("   [!] Could not recognize file extension for %s" % self.comTarget)
             return
@@ -59,7 +61,7 @@ class ComGenerator(MpModule):
         try:
             if MSTypes.XL in targetApp:
                 document = comObj.Workbooks.Open(self.comTarget)
-            elif MSTypes.WD in targetApp:
+            elif MSTypes.WD in targetApp or MSTypes.VSD in targetApp:
                 document = comObj.Documents.Open(self.comTarget)
             elif MSTypes.PPT in targetApp:
                 document = comObj.Presentations.Open(self.comTarget)
