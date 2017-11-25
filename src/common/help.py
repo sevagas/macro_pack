@@ -141,8 +141,8 @@ def printUsage(banner, currentApp, mpSession):
         Help for template usage: %s -t help
          
     -G, --generated=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
-        Supported extensions are: vba, hta, doc, docm, docx, xls, xlsm, pptm.
-        Note: Apart from vba and hta which are text files, all other extension requires Windows OS with genuine MS Office installed.
+        Supported extensions are: vba, hta, doc, docm, docx, xls, xlsm, pptm, vsd, vsdm.
+        Note: Apart from vba and hta which are text files, all other extension requires Windows OS with right MS Office application installed.
     
     --dde \t Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
          DDE attack mode is not compatible with VBA Macro related options.
