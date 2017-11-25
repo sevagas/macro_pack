@@ -18,8 +18,15 @@ from modules.mp_module import MpModule
 
 
 class PowerPointGenerator(MpModule):
-    """ Module used to generate MS Powerpoint file from working dir content"""
-        
+    """ Module used to generate MS PowerPoint file from working dir content"""
+    
+    def getAutoOpenVbaFunction(self):
+        return "AutoOpen"
+    
+    def getAutoOpenVbaSignature(self):
+        return "Sub AutoOpen()"
+    
+    
     def enableVbom(self):
         # Enable writing in macro (VBOM)
         # First fetch the application version
@@ -87,6 +94,8 @@ class PowerPointGenerator(MpModule):
 
         logging.info("   [-] Open presentation...")
         presentation = ppt.Presentations.Add(WithWindow = False)
+        
+        self.resetVBAEntryPoint()
         logging.info("   [-] Inject VBA...")
         # Read generated files
         for vbaFile in self.getVBAFiles():

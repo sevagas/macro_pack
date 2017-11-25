@@ -384,8 +384,6 @@ def main(argv):
     logging.info(" [+] Cleaning...")
     shutil.rmtree(WORKING_DIR)   
     
-    
-    
     logging.info(" Done!\n")
         
     

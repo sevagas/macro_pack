@@ -17,6 +17,12 @@ from modules.mp_module import MpModule
 class WordGenerator(MpModule):
     """ Module used to generate MS Word file from working dir content"""
     
+    def getAutoOpenVbaFunction(self):
+        return "AutoOpen"
+    
+    def getAutoOpenVbaSignature(self):
+        return "Sub AutoOpen()"
+    
     def enableVbom(self):
         # Enable writing in macro (VBOM)
         # First fetch the application version
@@ -68,7 +74,7 @@ class WordGenerator(MpModule):
         elif MSTypes.WD == self.outputFileType and ".docm" in self.outputFilePath:
             document.SaveAs(self.outputFilePath, FileFormat=wdFormatXMLDocumentMacroEnabled)
                     
-
+        self.resetVBAEntryPoint()
         logging.info("   [-] Inject VBA...")
         # Read generated files
         for vbaFile in self.getVBAFiles():

@@ -17,6 +17,12 @@ from modules.mp_module import MpModule
 class MSProjectGenerator(MpModule):
     """ Module used to generate MS Project file from working dir content"""
     
+    def getAutoOpenVbaFunction(self):
+        return "Auto_Open"
+    
+    def getAutoOpenVbaSignature(self):
+        return "Sub Auto_Open()"
+    
     def enableVbom(self):
         # Enable writing in macro (VBOM)
         # First fetch the application version
@@ -54,6 +60,7 @@ class MSProjectGenerator(MpModule):
         # do the operation in background 
         MSProject.ActiveWindow.Visible = False
         
+        self.resetVBAEntryPoint()
         logging.info("   [-] Inject VBA...")
         # Read generated files
         for vbaFile in self.getVBAFiles():

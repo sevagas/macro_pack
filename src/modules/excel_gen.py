@@ -16,6 +16,13 @@ from modules.mp_module import MpModule
 
 class ExcelGenerator(MpModule):
     """ Module used to generate MS excel file from working dir content"""
+    
+    def getAutoOpenVbaFunction(self):
+        return "Workbook_Open"
+    
+    def getAutoOpenVbaSignature(self):
+        return "Sub Workbook_Open()"
+    
         
     def enableVbom(self):
         # Enable writing in macro (VBOM)
@@ -57,6 +64,8 @@ class ExcelGenerator(MpModule):
         # open the excel workbook from the specified file or create if file does not exist
         logging.info("   [-] Open workbook...")
         workbook = excel.Workbooks.Add()
+        
+        self.resetVBAEntryPoint()
         logging.info("   [-] Inject VBA...")
         # Read generated files
         for vbaFile in self.getVBAFiles():

