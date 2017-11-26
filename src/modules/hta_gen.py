@@ -54,7 +54,7 @@ class HTAGenerator(MpModule):
     def vbScriptConvert(self):
         logging.info("   [-] Convert VBA to VBScript...")
         translators = [("Val(","CInt("),(" Chr$"," Chr"),(" Mid$"," Mid"),("On Error","//On Error"),("byebye:",""), ("Next ", "Next //")]
-        translators.extend([(" As String"," "),(" As Object"," "),(" As Long"," "),(" As Integer"," ")])
+        translators.extend([(" As String"," "),(" As Object"," "),(" As Long"," "),(" As Integer"," "), ("MsgBox ", "WScript.Echo ")])
         f = open(self.getMainVBAFile())
         content = f.readlines()
         f.close()

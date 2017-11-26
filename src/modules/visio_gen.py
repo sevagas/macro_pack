@@ -5,7 +5,7 @@
 # Only enabled on windows
 import sys
 import os
-from common.utils import MSTypes
+
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
