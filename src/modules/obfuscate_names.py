@@ -45,7 +45,7 @@ class ObfuscateNames(MpModule):
         self._findAllFunctions()
         
         # Different situation surrounding variables
-        varDelimitors=[(" "," "),("\t"," "),("\t","("),(" ","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
+        varDelimitors=[(" "," "),("\t"," "),("\t","("),(" ","("),("(","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
         
         # Replace functions and function calls by random string
         for keyWord in self.vbaFunctions:

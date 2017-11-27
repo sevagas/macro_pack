@@ -52,12 +52,13 @@ class MSTypes():
     VSD="Visio"
     VSD97="Visio97"
     VBA="VBA"
+    VBS="VBS"
     HTA="HTA"
     UNKNOWN = "Unknown"
         
     @classmethod
     def guessApplicationType(self, documentPath):
-        """ Guess MS office application type based on extension """
+        """ Guess MS application type based on extension """
         result = ""
         extension = os.path.splitext(documentPath)[1]
         if ".xls" == extension:
@@ -84,6 +85,8 @@ class MSTypes():
             result = self.PUB
         elif ".vba" ==  extension:
             result = self.VBA
+        elif ".vbs" ==  extension:
+            result = self.VBS
         else:
             result = self.UNKNOWN
         return result

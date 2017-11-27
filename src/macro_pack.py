@@ -15,6 +15,7 @@ from modules.ppt_gen import PowerPointGenerator
 from modules.msproject_gen import MSProjectGenerator
 from modules.template_gen import TemplateToVba
 from modules.vba_gen import VBAGenerator
+from modules.vbs_gen import VBSGenerator
 from modules.hta_gen import HTAGenerator
 from modules.word_dde import WordDDE
 from modules.visio_gen import VisioGenerator
@@ -346,13 +347,17 @@ def main(argv):
                 else:
                     logging.warn(" [!] Word and Word97 are only format supported for DDE attacks.")
              
-            if mpSession.runTarget: #run dcom attack
+            if mpSession.runTarget: #run com attack
                 generator = ComGenerator(mpSession)
                 generator.run()
                 
             if mpSession.dcom: #run dcom attack
                 generator = DcomGenerator(mpSession)
                 generator.run()
+                
+        if mpSession.outputFileType == MSTypes.VBS:
+            generator = VBSGenerator(mpSession)
+            generator.run()
     
         if mpSession.outputFileType == MSTypes.HTA:
             generator = HTAGenerator(mpSession)

