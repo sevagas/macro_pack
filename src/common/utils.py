@@ -54,6 +54,7 @@ class MSTypes():
     VBA="VBA"
     VBS="VBS"
     HTA="HTA"
+    SCT="SCT"
     UNKNOWN = "Unknown"
         
     @classmethod
@@ -87,6 +88,8 @@ class MSTypes():
             result = self.VBA
         elif ".vbs" ==  extension:
             result = self.VBS
+        elif ".sct" ==  extension:
+            result = self.SCT
         else:
             result = self.UNKNOWN
         return result

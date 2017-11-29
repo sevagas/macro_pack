@@ -77,19 +77,16 @@ class MSProjectGenerator(MpModule):
                     ProjectModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                     ProjectModule.CodeModule.AddFromString(macro)
 
+            
+        # Remove Informations
+        logging.info("   [-] Remove hidden data and personal info...")
+        project.RemoveFileProperties = True 
+        
         logging.info("   [-] Save MSProject project...")
         pjMPP = 0 # The file was saved with the current version of Microsoft Office MSProject.        
         project.SaveAs(self.outputFilePath,Format = pjMPP)
-                    
-        
-        #MSProject.DisplayAlerts=False
-        # Remove Informations
-        logging.info("   [-] Remove hidden data and personal info...")
-        project.RemovePersonalInformation = True 
         
         # save the project and close
-        project.Save()
-        project.Close()
         MSProject.Quit()
         # garbage collection
         del MSProject

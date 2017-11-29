@@ -32,13 +32,15 @@ class ComGenerator(MpModule):
         
         targetApp = MSTypes.guessApplicationType(self.comTarget)
         if MSTypes.XL in targetApp:
-            dcomApp = "Excel.Application"
+            comApp = "Excel.Application"
         elif MSTypes.WD in targetApp:
-            dcomApp = "Word.Application"
+            comApp = "Word.Application"
         elif MSTypes.PPT in targetApp:
-            dcomApp = "PowerPoint.Application"
+            comApp = "PowerPoint.Application"
         elif MSTypes.VSD in targetApp:
-            dcomApp = "Visio.InvisibleApp"
+            comApp = "Visio.InvisibleApp"
+        elif MSTypes.MPP in targetApp:
+            comApp = "MSProject.Application"
         else:
             logging.error("   [!] Could not recognize file extension for %s" % self.comTarget)
             return
@@ -46,7 +48,7 @@ class ComGenerator(MpModule):
         
         try:
             logging.info("   [-] Create handler...")
-            comObj = win32com.client.Dispatch(dcomApp)
+            comObj = win32com.client.Dispatch(comApp)
         except:
             logging.exception("   [!] Cannot access COM!")
             return 
@@ -65,6 +67,8 @@ class ComGenerator(MpModule):
                 document = comObj.Documents.Open(self.comTarget)
             elif MSTypes.PPT in targetApp:
                 document = comObj.Presentations.Open(self.comTarget)
+            elif MSTypes.MPP in targetApp:
+                document = comObj.FileOpenEx(self.comTarget, False)
             if self.startFunction and self.startFunction not in self.potentialStartFunctions:
                 document = comObj.run(self.startFunction)
         except Exception:
