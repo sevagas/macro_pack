@@ -86,9 +86,9 @@ class MSTypes():
             result = self.PUB
         elif ".vba" ==  extension:
             result = self.VBA
-        elif ".vbs" ==  extension:
+        elif ".vbs" ==  extension or extension == ".wsh":
             result = self.VBS
-        elif ".sct" ==  extension:
+        elif ".sct" ==  extension or extension == ".wsc":
             result = self.SCT
         else:
             result = self.UNKNOWN
