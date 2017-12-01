@@ -130,8 +130,7 @@ def main(argv):
                 mpSession.runTarget = os.path.abspath(arg)
         elif opt in ("-G", "--generate"): 
             # Document generation enabled only on windows
-            if sys.platform == "win32":
-                mpSession.outputFilePath = os.path.abspath(arg)
+            mpSession.outputFilePath = os.path.abspath(arg)
         elif opt=="-h" or opt=="--help": 
             help.printUsage(BANNER, sys.argv[0], mpSession)                         
             sys.exit(0)
