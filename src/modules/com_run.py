@@ -68,7 +68,7 @@ class ComGenerator(MpModule):
             elif MSTypes.PPT in targetApp:
                 document = comObj.Presentations.Open(self.comTarget)
             elif MSTypes.MPP in targetApp:
-                document = comObj.FileOpenEx(self.comTarget, False)
+                document = comObj.FileOpen(self.comTarget, True)
             if self.startFunction and self.startFunction not in self.potentialStartFunctions:
                 document = comObj.run(self.startFunction)
         except Exception:
@@ -78,6 +78,10 @@ class ComGenerator(MpModule):
         try:
             document.close()
             comObj.Application.Quit()
+        except:
+            pass
+        try:
+            comObj.FileClose ()
         except:
             pass
         try:

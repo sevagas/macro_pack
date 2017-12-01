@@ -87,6 +87,7 @@ class MSProjectGenerator(MpModule):
         project.SaveAs(self.outputFilePath,Format = pjMPP)
         
         # save the project and close
+        MSProject.FileClose ()
         MSProject.Quit()
         # garbage collection
         del MSProject

@@ -42,6 +42,7 @@ try:
     from pro_modules.word_trojan import WordTrojan
     from pro_modules.ppt_trojan import PptTrojan
     from pro_modules.visio_trojan import VisioTrojan
+    from pro_modules.msproject_trojan import MsProjectTrojan
     from pro_modules.stealth import Stealth
     from pro_modules.dcom_run import DcomGenerator
     from pro_modules.publisher_gen import PublisherGenerator
@@ -82,11 +83,12 @@ def main(argv):
         # only for Pro release
         if MP_TYPE == "Pro":
             longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom="])
-            shortOptions += "T:"
+            shortOptions += "T:" 
         # Only enabled on windows
         if sys.platform == "win32":
             longOptions.extend([ "generate=", "run="])
-            
+        
+        print( shortOptions)
         opts, args = getopt.getopt(argv, shortOptions, longOptions) # @UnusedVariable
     except getopt.GetoptError:          
         help.printUsage(BANNER, sys.argv[0], mpSession)                     
@@ -134,7 +136,7 @@ def main(argv):
             help.printUsage(BANNER, sys.argv[0], mpSession)                         
             sys.exit(0)
         else:
-            if MP_TYPE == "Pro":  
+            if MP_TYPE == "Pro": 
                 if opt=="--vbom-encode":      
                     mpSession.vbomEncode = True               
                 elif opt=="--persist": 
@@ -143,7 +145,7 @@ def main(argv):
                     mpSession.keepAlive = True  
                 elif opt=="--av-bypass":
                     mpSession.avBypass = True
-                elif opt == "T" or opt=="--trojan":
+                elif opt == "-T" or opt=="--trojan":
                     # Document generation enabled only on windows
                     if sys.platform == "win32":
                         mpSession.outputFilePath = os.path.abspath(arg)
@@ -335,6 +337,14 @@ def main(argv):
                         generator.run()
                     else:
                         generator = VisioGenerator(mpSession)
+                        generator.run()
+                        
+                if MSTypes.MPP in mpSession.outputFileType:
+                    if os.path.isfile(mpSession.outputFilePath):
+                        generator = MsProjectTrojan(mpSession)
+                        generator.run()
+                    else:
+                        generator = MSProjectGenerator(mpSession)
                         generator.run()
 
             if mpSession.stealth == True:
