@@ -53,6 +53,8 @@ class SCTGenerator(VBSGenerator):
         f.writelines(sctContent)
         f.close()
         logging.info("   [-] Generated Scriptlet file: %s" % self.outputFilePath)
+        logging.info("   [-] Test with : \nregsvr32 /u /n /s /i:%s scrobj.dll\n" % self.outputFilePath)
+        
         
     
     def run(self):

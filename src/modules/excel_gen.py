@@ -104,5 +104,6 @@ class ExcelGenerator(MpModule):
         self.disableVbom()
 
         logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+        logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
 
         

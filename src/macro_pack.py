@@ -46,6 +46,7 @@ try:
     from pro_modules.stealth import Stealth
     from pro_modules.dcom_run import DcomGenerator
     from pro_modules.publisher_gen import PublisherGenerator
+    from pro_modules.template_gen import TemplateGeneratorPro
 except:
     MP_TYPE="Community"
 
@@ -230,8 +231,12 @@ def main(argv):
               
         # Generate template
         if mpSession.template:
-            generator = TemplateToVba(mpSession)
-            generator.run()
+            if MP_TYPE == "Pro":
+                generator = TemplateGeneratorPro(mpSession)
+                generator.run()
+            else:
+                generator = TemplateToVba(mpSession)
+                generator.run()
             
         # Macro obfuscation
         if mpSession.obfuscateNames:

