@@ -159,7 +159,7 @@ def printUsage(banner, currentApp, mpSession):
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
         
     -t, --template=TEMPLATE_NAME    Use VBA template already included in %s.
-        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, EMBED_EXE 
+        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, WEBMETER, EMBED_EXE 
         Help for template usage: %s -t help
          
     -G, --generated=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
