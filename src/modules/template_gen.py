@@ -295,7 +295,6 @@ class TemplateToVba(MpModule):
         if self.template is None:
             logging.info("   [!] No template defined")
             return
-        
         if self.template == "HELLO":
             content = vbLib.templates.HELLO
         elif self.template == "DROPPER":
@@ -307,7 +306,7 @@ class TemplateToVba(MpModule):
         elif self.template == "METERPRETER":
             self._processMeterpreterTemplate()
             return
-        if self.template == "WEBMETER":
+        elif self.template == "WEBMETER":
             self._processWebMeterTemplate()
             return
         elif self.template == "CMD":
@@ -325,7 +324,7 @@ class TemplateToVba(MpModule):
                 content = f.read()
                 f.close()
             else:
-                logging.info("   [!] Template is not recognized as file or default template.")
+                logging.info("   [!] Template %s is not recognized as file or default template." % self.template)
                 return
          
         # open file containing template values       
