@@ -2,16 +2,19 @@
 # encoding: utf-8
 
 import logging
-from modules.mp_module import MpModule
+from modules.mp_generator import Generator
 import shutil
 import os
 from common.utils import MSTypes
 
 
-class VBAGenerator(MpModule):
+class VBAGenerator(Generator):
     """ Module used to generate VBA file from working dir content"""
     
-    def run(self):
+    def check(self):
+        return True
+    
+    def generate(self):
         if len(self.getVBAFiles())>0:
             logging.info(" [+] Analyzing generated VBA files...")
             if self.outputFilePath is not None and self.outputFileType == MSTypes.VBA:
