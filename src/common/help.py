@@ -161,7 +161,7 @@ def printUsage(banner, currentApp, mpSession):
         Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, WEBMETER, EMBED_EXE 
         Help for template usage: %s -t help
          
-    -G, --generated=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
+    -G, --generate=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
         Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, pptm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
         Supported scripts extensions are: vba, vbs, wsh, wsc, sct, hta.

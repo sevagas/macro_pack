@@ -73,7 +73,7 @@ def main(argv):
     mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
          
     try:
-        longOptions = ["embed=", "listen=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
+        longOptions = ["embed=", "listen=","generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
         shortOptions= "e:l:s:f:t:G:hqmo"
         # only for Pro release
         if MP_TYPE == "Pro":
@@ -81,9 +81,8 @@ def main(argv):
             shortOptions += "T:" 
         # Only enabled on windows
         if sys.platform == "win32":
-            longOptions.extend([ "generate=", "run="])
+            longOptions.extend([ "run="])
         
-        print( shortOptions)
         opts, args = getopt.getopt(argv, shortOptions, longOptions) # @UnusedVariable
     except getopt.GetoptError:          
         help.printUsage(BANNER, sys.argv[0], mpSession)                     
@@ -123,7 +122,6 @@ def main(argv):
             if sys.platform == "win32":
                 mpSession.runTarget = os.path.abspath(arg)
         elif opt in ("-G", "--generate"): 
-            # Document generation enabled only on windows
             mpSession.outputFilePath = os.path.abspath(arg)
         elif opt=="-h" or opt=="--help": 
             help.printUsage(BANNER, sys.argv[0], mpSession)                         
