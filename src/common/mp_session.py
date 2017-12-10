@@ -35,6 +35,7 @@ class MpSession:
         
         self.listen = False
         self.listenPort = 80
+        self.embeddedFilePath = None
     
     @property
     def outputFileType(self):

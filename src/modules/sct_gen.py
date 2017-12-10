@@ -33,8 +33,9 @@ class SCTGenerator(VBSGenerator):
     """
         
         
-    def genSCT(self):
-        logging.info("   [-] Generating Scriptlet file...")
+    def generate(self):
+        logging.info(" [+] Generating %s file..." % self.outputFileType)
+        self.vbScriptConvert()
         f = open(self.getMainVBAFile()+".vbs")
         vbsContent = f.read()
         f.close()
@@ -56,13 +57,6 @@ class SCTGenerator(VBSGenerator):
         logging.info("   [-] Test with : \nregsvr32 /u /n /s /i:%s scrobj.dll\n" % self.outputFilePath)
         
         
-    
-    def run(self):
-        logging.info(" [+] Generating Scriptlet file from VBA...")
-        if not self.vbScriptCheck():
-            return 
-        self.vbScriptConvert()
-        self.genSCT()
         
         
         

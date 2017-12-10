@@ -11,10 +11,10 @@ if sys.platform == "win32":
     import winreg # @UnresolvedImport
 
 import logging
-from modules.mp_module import MpModule
+from modules.mp_generator import Generator
 
 
-class ExcelGenerator(MpModule):
+class ExcelGenerator(Generator):
     """ Module used to generate MS excel file from working dir content"""
     
     def getAutoOpenVbaFunction(self):
@@ -51,10 +51,21 @@ class ExcelGenerator(MpModule):
         winreg.CloseKey(Registrykey)
     
     
+    def check(self):
+        logging.info("   [-] Check feasibility...")
+        try:
+            objExcel = win32com.client.Dispatch("Excel.Application")
+            objExcel.Application.Quit()
+            del objExcel
+        except:
+            logging.error("   [!] Cannot access Excel.Application object. Is software installed on machine? Abort.")
+            return False  
+        return True
     
-    def run(self):
-        logging.info(" [+] Generating MS Excel document...")
+    
+    def generate(self):
         
+        logging.info(" [+] Generating MS Excel document...")
         self.enableVbom()
         
         # open up an instance of Excel with the win32com driver\        \\

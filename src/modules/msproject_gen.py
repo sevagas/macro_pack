@@ -11,10 +11,10 @@ if sys.platform == "win32":
     import winreg # @UnresolvedImport
 
 import logging
-from modules.mp_module import MpModule
+from modules.mp_generator import Generator
 
 
-class MSProjectGenerator(MpModule):
+class MSProjectGenerator(Generator):
     """ Module used to generate MS Project file from working dir content"""
     
     def getAutoOpenVbaFunction(self):
@@ -46,9 +46,22 @@ class MSProjectGenerator(MpModule):
         Registrykey = winreg.CreateKey(winreg.HKEY_CURRENT_USER,keyval)
         winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,0) # "REG_DWORD"
         winreg.CloseKey(Registrykey)
+       
         
+    def check(self):
+        logging.info("   [-] Check feasibility...")
+        try:
+            objProject = win32com.client.Dispatch("MSProject.Application")
+            objProject.Application.Quit()
+            del objProject
+        except:
+            logging.error("   [!] Cannot access MSProject.Application object. Is software installed on machine? Abort.")
+            return False  
+        return True
     
-    def run(self):
+    
+    def generate(self):
+        
         logging.info(" [+] Generating MSProject project...")
         
         self.enableVbom()
@@ -94,4 +107,5 @@ class MSProjectGenerator(MpModule):
         self.disableVbom()
 
         logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+        logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
         

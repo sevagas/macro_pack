@@ -11,10 +11,10 @@ if sys.platform == "win32":
     import winreg # @UnresolvedImport
 
 import logging
-from modules.mp_module import MpModule
+from modules.mp_generator import Generator
 
 
-class WordGenerator(MpModule):
+class WordGenerator(Generator):
     """ Module used to generate MS Word file from working dir content"""
     
     def getAutoOpenVbaFunction(self):
@@ -49,10 +49,22 @@ class WordGenerator(MpModule):
         winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,0) # "REG_DWORD"
         winreg.CloseKey(Registrykey)
         
-    
-    def run(self):
-        logging.info(" [+] Generating MS Word document...")
         
+    def check(self):
+        logging.info("   [-] Check feasibility...")
+        try:
+            objWord = win32com.client.Dispatch("Word.Application")
+            objWord.Application.Quit()
+            del objWord
+        except:
+            logging.error("   [!] Cannot access Word.Application object. Is software installed on machine? Abort.")
+            return False  
+        return True
+        
+    
+    def generate(self):
+        
+        logging.info(" [+] Generating MS Word document...")
         self.enableVbom()
 
         logging.info("   [-] Open document...")
@@ -113,4 +125,5 @@ class WordGenerator(MpModule):
         self.disableVbom()
 
         logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+        logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
         

@@ -5,9 +5,9 @@ import os, mmap, logging
 from common import utils
 from common.utils import MSTypes
 
-
 class MpModule():
     def __init__(self,mpSession):
+        self.mpSession = mpSession
         self.workingPath = mpSession.workingPath
         self._startFunction = mpSession.startFunction
         self.outputFilePath = mpSession.outputFilePath
@@ -146,4 +146,8 @@ class MpModule():
         """ Run the module """
         raise NotImplementedError
     
+
+
+    
+
     

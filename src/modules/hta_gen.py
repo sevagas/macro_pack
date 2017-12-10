@@ -26,11 +26,15 @@ class HTAGenerator(VBSGenerator):
     """ Module used to generate HTA file from working dir content"""
         
         
-    def genHTA(self):
-        logging.info("   [-] Generating HTA file...")
+    def generate(self):
+        logging.info(" [+] Generating %s file..." % self.outputFileType)
+        self.vbScriptConvert()
         f = open(self.getMainVBAFile()+".vbs")
         vbsContent = f.read()
         f.close()
+        
+        vbsContent = vbsContent.replace("WScript.Echo ", "MsgBox ")
+        
         # Write VBS in template
         htaContent = HTA_TEMPLATE
         htaContent = htaContent.replace("<<<VBS>>>", vbsContent)
@@ -40,14 +44,9 @@ class HTAGenerator(VBSGenerator):
         f.writelines(htaContent)
         f.close()
         logging.info("   [-] Generated HTA file: %s" % self.outputFilePath)
+        logging.info("   [-] Test with : \nmshta %s\n" % self.outputFilePath)
         
-    
-    def run(self):
-        logging.info(" [+] Generating HTA file from VBA...")
-        if not self.vbScriptCheck():
-            return 
-        self.vbScriptConvert()
-        self.genHTA()
+
         
         
         

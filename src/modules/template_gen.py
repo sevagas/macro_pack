@@ -50,21 +50,7 @@ class TemplateToVba(MpModule):
         str2 = str2 + "\""
         str1 = str1 + "\n"+str2
         return str1
-    """
-    
-    def _formStr(self, varstr, instr):
-        holder = []
-        str2 = ''
-        str1 = '\n ' + varstr + ' = "' + instr[:857] + '"' 
-        for i in range(857, len(instr), 851):
-            holder.append(varstr + ' = '+ varstr +' + "'+instr[i:i+851])
-            str2 = '"\n '.join(holder)
-        
-        str2 = str2 + "\""
-        str1 = str1 + "\n "+str2
-        return str1
 
-    """
     def _processEmbedExeTemplate(self):
         # open file containing template values       
         cmdFile = self.getCMDFile()
@@ -142,56 +128,19 @@ class TemplateToVba(MpModule):
     def _processEmbedExeTemplate(self):
         # open file containing template values       
         cmdFile = self.getCMDFile()
-        if cmdFile is None or cmdFile == "":
-            logging.error("   [!] Could not find template parameters!")
-            return
-        f = open(cmdFile, 'r')
-        valuesFileContent = f.read()
-        f.close()
-        params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
-        inputExe = params[0]
-        outputPath=None
-        if len(params) > 1:
-            outputPath = params[1]
+        if cmdFile is None or cmdFile == "":         
+            extractedFilePath = utils.randomAlpha(5)+os.path.splitext(self.mpSession.embeddedFilePath)[1]
         else:
-            outputPath = utils.randomAlpha(5)+os.path.splitext(inputExe)[1]
-        logging.info("   [-] Output path when exe is extracted: %s" % outputPath)
+            f = open(cmdFile, 'r')
+            params = shlex.split(f.read())
+            extractedFilePath = params[0]
+            f.close()
             
-        #OPEN THE FILE
-        if os.path.isfile(inputExe): 
-            todo = open(inputExe, 'rb').read()
-        else: 
-            logging.error("    [!] Could not find %s" % inputExe)
-            return
-        
-        #ENCODE THE FILE
-        logging.info("   [-] Encoding %d bytes" % (len(todo), ))
-        b64 = base64.b64encode(todo).decode()    
-        logging.info("   [-] Encoded data is %d bytes" % (len(b64), ))
-        b64 = b64.replace("\n","")
-
-        x=50000
-        strs = [b64[i:i+x] for i in range(0, len(b64), x)]
-        for j in range(len(strs)):
-            ##### Avoids "Procedure too large error with large executables" #####
-            strs[j] = self._formStr("var"+str(j),strs[j])
-        
-        sub_proc=""
-        for i in range(len(strs)):
-            sub_proc = sub_proc + "Private Function var"+str(i)+" As String\n"
-            sub_proc = sub_proc + ""+strs[i]
-            sub_proc = sub_proc + "\nEnd Function\n"
-        
-        chunksDecode = ""
-        for l in range (len(strs) ):
-            chunksDecode += "\tDim chunk"+str(l)+" As String\n"
-            chunksDecode += "\tchunk"+str(l)+" = var"+str(l)+"()\n"
-            chunksDecode += "\tout1 = out1 + chunk"+str(l)+"\n"
+            
+        logging.info("   [-] Output path when file is extracted: %s" % extractedFilePath)
 
         content = vbLib.templates.EMBED_EXE
-        content = content.replace("<<<STRINGS>>>", sub_proc)
-        content = content.replace("<<<DECODE_CHUNKS>>>", chunksDecode)
-        content = content.replace("<<<OUT_FILE>>>", outputPath)
+        content = content.replace("<<<OUT_FILE>>>", extractedFilePath)
         #top + next + then1 + sub_proc+ sub_open
         # generate random file name
         vbaFile = os.path.abspath(os.path.join(self.workingPath,utils.randomAlpha(9)+".vba"))
@@ -200,7 +149,8 @@ class TemplateToVba(MpModule):
         f = open(vbaFile, 'w')
         f.write(content)
         f.close()
-        os.remove(cmdFile)
+        if os.path.isfile(cmdFile):
+            os.remove(cmdFile)
         logging.info("   [-] OK!")
     
     

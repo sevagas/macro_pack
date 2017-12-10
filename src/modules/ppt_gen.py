@@ -14,10 +14,10 @@ if sys.platform == "win32":
 
 import logging
 from common import utils
-from modules.mp_module import MpModule
+from modules.mp_generator import Generator
 
 
-class PowerPointGenerator(MpModule):
+class PowerPointGenerator(Generator):
     """ Module used to generate MS PowerPoint file from working dir content"""
     
     def getAutoOpenVbaFunction(self):
@@ -84,7 +84,20 @@ class PowerPointGenerator(MpModule):
         shutil.copy2(os.path.join(self.workingPath,"rezipped_archive.zip"), generatedFile)
     
     
-    def run(self):
+    def check(self):
+        logging.info("   [-] Check feasibility...")
+        try:
+            ppt = win32com.client.Dispatch("PowerPoint.Application")
+            ppt.Quit()
+            del ppt
+        except:
+            logging.error("   [!] Cannot access PowerPoint.Application object. Is software installed on machine? Abort.")
+            return False  
+        return True
+    
+    
+    def generate(self):
+        
         logging.info(" [+] Generating MS PowerPoint document...")
         
         self.enableVbom()
@@ -127,4 +140,5 @@ class PowerPointGenerator(MpModule):
         self._injectCustomUi()
            
         logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+        logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
         

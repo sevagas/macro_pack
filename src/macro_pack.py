@@ -6,9 +6,6 @@ import sys
 import getopt
 import logging
 import shutil
-from modules.obfuscate_names import ObfuscateNames
-from modules.obfuscate_form import ObfuscateForm
-from modules.obfuscate_strings import ObfuscateStrings
 from modules.excel_gen import ExcelGenerator
 from modules.word_gen import WordGenerator
 from modules.ppt_gen import PowerPointGenerator
@@ -35,9 +32,6 @@ if sys.platform == "win32":
         sys.exit(1)
 MP_TYPE="Pro"
 try:
-    from pro_modules.vbom_encode import VbomEncoder
-    from pro_modules.persistance import Persistance
-    from pro_modules.av_bypass import AvBypass
     from pro_modules.excel_trojan import ExcelTrojan
     from pro_modules.word_trojan import WordTrojan
     from pro_modules.ppt_trojan import PptTrojan
@@ -79,8 +73,8 @@ def main(argv):
     mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
          
     try:
-        longOptions = ["listen=", "quiet", "input-file=","vba-output=", "mask-strings", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
-        shortOptions= "l:s:f:t:v:x:X:w:W:P:G:hqmo"
+        longOptions = ["embed=", "listen=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
+        shortOptions= "e:l:s:f:t:G:hqmo"
         # only for Pro release
         if MP_TYPE == "Pro":
             longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom="])
@@ -112,6 +106,8 @@ def main(argv):
             mpSession.listenPort = int(arg)         
         elif opt == "-f" or opt== "--input-file": 
             mpSession.vbaInput = arg
+        elif opt == "-e" or opt== "--embed": 
+            mpSession.embeddedFilePath = os.path.abspath(arg)
         elif opt=="-t" or opt=="--template": 
             if arg is None or arg.startswith("-") or  arg == "help" or arg == "HELP":
                 help.printTemplatesUsage(BANNER, sys.argv[0])
@@ -120,9 +116,6 @@ def main(argv):
                 mpSession.template = arg
         elif opt=="-q" or opt=="--quiet": 
             logLevel = "ERROR"
-        elif opt=="-v" or opt=="--vba-output": 
-            mpSession.vbaFilePath = os.path.abspath(arg)
-            mpSession.fileOutput = True
         elif opt == "--dde":
             if sys.platform == "win32":
                 mpSession.ddeMode = True
@@ -238,52 +231,7 @@ def main(argv):
                 generator = TemplateToVba(mpSession)
                 generator.run()
             
-        # Macro obfuscation
-        if mpSession.obfuscateNames:
-            obfuscator = ObfuscateNames(mpSession)
-            obfuscator.run()
-        # Mask strings
-        if mpSession.obfuscateStrings:
-            obfuscator = ObfuscateStrings(mpSession)
-            obfuscator.run()
-        # Macro obfuscation
-        if mpSession.obfuscateForm:
-            obfuscator = ObfuscateForm(mpSession)
-            obfuscator.run()     
-        
-        if MP_TYPE == "Pro":
-                
-            # MAcro encoding    
-            if mpSession.vbomEncode:
-                obfuscator = VbomEncoder(mpSession)
-                obfuscator.run() 
-                    
-                # PErsistance management
-                if mpSession.persist:
-                    obfuscator = Persistance(mpSession)
-                    obfuscator.run() 
-                # Macro obfuscation
-                if mpSession.obfuscateNames:
-                    obfuscator = ObfuscateNames(mpSession)
-                    obfuscator.run()
-                # Mask strings
-                if mpSession.obfuscateStrings:
-                    obfuscator = ObfuscateStrings(mpSession)
-                    obfuscator.run()
-                # Macro obfuscation
-                if mpSession.obfuscateForm:
-                    obfuscator = ObfuscateForm(mpSession)
-                    obfuscator.run()  
-            else:
-                # PErsistance management
-                if mpSession.persist:
-                    obfuscator = Persistance(mpSession)
-                    obfuscator.run() 
-            
-            #macro split
-            if mpSession.avBypass:
-                obfuscator = AvBypass(mpSession)
-                obfuscator.run() 
+   
                                       
         # MS Office generation/trojan is only enabled on windows
         if sys.platform == "win32":

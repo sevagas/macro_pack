@@ -12,10 +12,10 @@ if sys.platform == "win32":
     import winreg # @UnresolvedImport
 
 import logging
-from modules.mp_module import MpModule
+from modules.mp_generator import Generator
 
 
-class VisioGenerator(MpModule):
+class VisioGenerator(Generator):
     """ Module used to generate MS Visio file from working dir content"""
     
     def getAutoOpenVbaFunction(self):
@@ -49,8 +49,20 @@ class VisioGenerator(MpModule):
         winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,0) # "REG_DWORD"
         winreg.CloseKey(Registrykey)
         
+    def check(self):
+        logging.info("   [-] Check feasibility...")
+        # Check nb of source file
+        try:
+            objVisio = win32com.client.Dispatch("Visio.InvisibleApp")
+            objVisio.Application.Quit()
+            del objVisio
+        except:
+            logging.error("   [!] Cannot access Visio.InvisibleApp object. Is software installed on machine? Abort.")
+            return False  
+        return True
     
-    def run(self):
+    def generate(self):
+
         logging.info(" [+] Generating MS Visio document...")
         
         self.enableVbom()
