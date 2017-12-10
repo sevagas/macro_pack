@@ -421,8 +421,8 @@ exploit -j
 Combine with --embed option, it will drop and execute (hidden) the embedded file.  
 Optionaly you can give to the template the path where file should be extracted  
 If extraction path is not given, file will be extracted with random name in current path.   
- -> Example1: ``` macro_pack.ex  -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
- -> Example2: ```echo "path\\to\newcalc.exe" | macro_pack.ex -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
+ -> Example1: ``` macro_pack.exe  -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
+ -> Example2: ```echo "path\\to\newcalc.exe" | macro_pack.exe -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
 
 
 
