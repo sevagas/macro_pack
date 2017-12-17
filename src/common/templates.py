@@ -279,12 +279,10 @@ End Sub
 
 EMBED_EXE = \
 r"""
-' orininally inspired from https://github.com/khr0x40sh/MacroShop
-
 'Option Explicit
 
 Private Sub executeEmbed()
-    CreateBinFile "<<<OUT_FILE>>>", readEmbed
+    DumpFile "<<<OUT_FILE>>>"
     CreateObject("WScript.Shell").Run "<<<OUT_FILE>>>", 0
 End Sub
 

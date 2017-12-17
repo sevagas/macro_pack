@@ -14,6 +14,7 @@ import logging
 from modules.mp_generator import Generator
 
 
+
 class WordGenerator(Generator):
     """ Module used to generate MS Word file from working dir content"""
     
@@ -60,7 +61,10 @@ class WordGenerator(Generator):
             logging.error("   [!] Cannot access Word.Application object. Is software installed on machine? Abort.")
             return False  
         return True
-        
+    
+ 
+    
+    
     
     def generate(self):
         

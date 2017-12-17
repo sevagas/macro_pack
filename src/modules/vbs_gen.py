@@ -77,19 +77,10 @@ class VBSGenerator(Generator):
         f.close()
         
     
-    def genExtractEmbeddedFileVBA(self, identificationTag):
-        """
-        Creates a new source file containing function to extract and return embedded content as a string
-        identificationTag is used to identify the embedded content. 
-        Returns name of generated method
-        """
-        raise NotImplementedError
     
-    
-    def embedFile(self, identificationTag):
+    def embedFile(self):
         """
         Embed the content of  self.embeddedFilePath inside the generated target file
-        identificationTag is used to identify the embedded content.
         """
         logging.info("   [-] Embedding file %s..." % self.embeddedFilePath)
         if not os.path.isfile(self.embeddedFilePath):
@@ -116,7 +107,11 @@ class VBSGenerator(Generator):
     
         newContent = Base64ToBin.VBA + "\n"
         newContent += CreateBinFile.VBA + "\n"
-        newContent += "Function readEmbed() \n Dim str \n str = %s \n readEmbed = Base64ToBin(str) \n End Function\n" % (packedMacro)        
+        newContent += "Sub DumpFile(strFilename)"
+        newContent += "\n Dim str \n str = %s \n readEmbed = Base64ToBin(str) \n CreateBinFile strFilename, readEmbed \n" % (packedMacro) 
+        newContent += "End Sub"       
+        
+        
         self.addVBAModule(newContent)
         return  
     
@@ -143,20 +138,7 @@ class VBSGenerator(Generator):
         logging.info("   [-] Generated VBS file: %s" % self.outputFilePath)
         logging.info("   [-] Test with : \nwscript %s\n" % self.outputFilePath)
         
-    
-    def run(self):
-        
-        logging.info(" [+] Prepare %s file generation..." % self.outputFileType)
-        if not self.check():
-            return 
-        # Embed file if asked
-        if self.embeddedFilePath:
-            idTag = utils.randomAlpha(10)
-            self.embedFile(idTag)
-        self.runObfuscators()
-        
-        
-        self.generate()
+
         
         
         
