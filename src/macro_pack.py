@@ -52,7 +52,7 @@ init()
 
 
 WORKING_DIR = "temp"
-VERSION="1.3"
+VERSION="1.4-dev"
 BANNER = """\
 
   _  _   __    ___  ____   __     ____   __    ___  __ _ 
