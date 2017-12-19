@@ -4,8 +4,8 @@
 
 ## Short description
 
-The macro\_pack is a tool used to automatize obfuscation and generation of retro formats such as MS Office documents or VBS like format.  
-This tool can be used for pentest, demo, and social engineering assessments.
+The macro\_pack is a tool used to automatize obfuscation and generation of retro formats such as MS Office documents or VBS like format.
+This tool can be used for redteaming, pentests, demos, and social engineering assessments.
 macro\_pack will simplify antimalware solutions bypass and automatize the process from vba generation to final Office document generation.  
 It is very simple to use:
 * No configuration
@@ -78,10 +78,11 @@ The pro mode includes features such as:
 * Self decoding VBA
 * MS Office persistance
 * Trojan existing MS Office documents
+* Lateral movement using DCOM objects
 * Anti-debug using http://seclists.org/fulldisclosure/2017/Mar/90
 
 For now I do not plan to release or sell this pro version however if you are really interrested I can share pro binary in the next case:
-* You resolve one or more opened issue (bug or enhancement) + I need to know your real identity
+* You significally contribute to macro\_pack on GitHub + I need to know your identity
 
 
 
