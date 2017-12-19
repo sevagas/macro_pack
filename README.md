@@ -4,8 +4,9 @@
 
 ## Short description
 
-The macro\_pack is a tool used to automatize obfuscation and generation of MS Office documents for pentest, demo,  and social engineering assessments.
-The goal of macro\_pack is to simplify antimalware solutions bypass and automatize the process from vba generation to final Office document generation.  
+The macro\_pack is a tool used to automatize obfuscation and generation of retro formats such as MS Office documents or VBS like format.  
+This tool can be used for pentest, demo, and social engineering assessments.
+macro\_pack will simplify antimalware solutions bypass and automatize the process from vba generation to final Office document generation.  
 It is very simple to use:
 * No configuration
 * Everything can be done using a single line of code
@@ -426,7 +427,7 @@ Combine with --embed option, it will drop and execute (hidden) the embedded file
 Optionaly you can give to the template the path where file should be extracted  
 If extraction path is not given, file will be extracted with random name in current path.   
  -> Example1: ``` macro_pack.exe  -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
- -> Example2: ```echo "path\\to\newcalc.exe" | macro_pack.exe -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
+ -> Example2: ```echo "path\\to\newcalc.exe" | macro_pack.exe -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.doc```  
 
 
 
