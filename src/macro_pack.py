@@ -52,7 +52,7 @@ init()
 
 
 WORKING_DIR = "temp"
-VERSION="1.3-dev"
+VERSION="1.3"
 BANNER = """\
 
   _  _   __    ___  ____   __     ____   __    ___  __ _ 
@@ -61,7 +61,7 @@ BANNER = """\
  \_)(_/\_/\_/ \___)(__\_) \__/   (__)  \_/\_/ \___)(__\_)
     
 
-   Pentest with MS Office VBA - Version:%s Release:%s 
+   Pentest with VBA macros and other retro friends - Version:%s Release:%s 
                                                                                            
 """ % (VERSION, MP_TYPE)
     

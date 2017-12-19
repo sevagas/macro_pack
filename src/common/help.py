@@ -110,7 +110,7 @@ r"""
         Optionaly you can give to the template the path where file should be extracted
         If extraction path is not given, file will be extracted with random name in current path. 
          -> Example1:  %s  -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs
-         -> Example2: echo "path\\to\newcalc.exe" | %s -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs
+         -> Example2: echo "path\\to\newcalc.exe" | %s -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.doc
 
                 --------------------  
 """ % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp, currentApp)

@@ -110,8 +110,12 @@ python3 macro_pack.py  --help
 # or
 python macro_pack.py --help # if python3 is default install
 ```
-If you want to produce a standalone exe using pyinstaller, double-click on the "build.bat" script on a Windows machine.
-The resulted macro\_pack.exe will be inside the **bin** directory.
+  
+If you want to produce a standalone exe using pyinstaller:  
+* Install PyCrypto at http://www.voidspace.org.uk/python/pycrypto-2.6.1/  
+* Double-click on the "build.bat" script on a Windows machine.  
+
+The resulted macro\_pack.exe will be inside the **bin** directory.  
 
 
 ## Some examples
