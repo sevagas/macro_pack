@@ -1,7 +1,7 @@
 VBA = \
-"""
+r"""
 ' Exec process using WMI
-Private Sub WmiExec(targetPath As String)
+Sub WmiExec(targetPath As String)
     Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
     Set objStartup = objWMIService.Get("Win32_ProcessStartup")
     Set objConfig = objStartup.SpawnInstance_

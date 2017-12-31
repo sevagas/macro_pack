@@ -64,7 +64,7 @@ class ObfuscateNames(MpModule):
                     for n,line in enumerate(content):
                         matchObj = re.match( r'.*".*%s.*".*' %keyWord, line, re.M|re.I) # check if word is inside a string
                         if matchObj:
-                            if "Application.Run" in line: # dynamic function call detected
+                            if "Application.Run" in line or "Application.OnTime" in line: # dynamic function call detected
                                 content[n] = line.replace(keywordTmp, newKeyWord)
                         else:
                             
@@ -205,3 +205,4 @@ class ObfuscateNames(MpModule):
             f.writelines(content)
             f.close()
         logging.info("   [-] OK!") 
+        

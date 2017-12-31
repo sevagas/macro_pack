@@ -10,7 +10,6 @@ import vbLib.Meterpreter
 import vbLib.WebMeter
 import vbLib.templates
 from common import  utils
-import base64
 from common.utils import MSTypes
 
 
@@ -18,17 +17,26 @@ from common.utils import MSTypes
 class TemplateToVba(MpModule):
     """ Generate a VBA document from a given template """
         
-    def _fillGenericTemplate(self, content, values):
-        for value in values:
-            content = content.replace("<<<TEMPLATE>>>", value, 1)
+    def _fillGenericTemplate(self, content):
+        # open file containing template values       
+        cmdFile = self.getCMDFile()
+        if os.path.isfile(cmdFile):
+            f = open(cmdFile, 'r')
+            valuesFileContent = f.read()
+            f.close()
+            values = shlex.split(valuesFileContent) # split on space but preserve what is between quotes
+            for value in values:
+                content = content.replace("<<<TEMPLATE>>>", value, 1)
+            # remove file containing template values
+            os.remove(cmdFile)
+            logging.info("   [-] OK!") 
+        else:
+            logging.warn("   [!] No input value was provided for this template.\n       Use \"-t help\" option for help on templates.")
         
-        # generate random file name
-        vbaFile = os.path.abspath(os.path.join(self.workingPath,utils.randomAlpha(9)+".vba"))
+        # Create module
+        vbaFile = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
-        # Write in new file 
-        f = open(vbaFile, 'w')
-        f.write(content)
-        f.close()
+
 
     
     def _processEmbedExeTemplate(self):
@@ -42,19 +50,12 @@ class TemplateToVba(MpModule):
             extractedFilePath = params[0]
             f.close()
             
-            
         logging.info("   [-] Output path when file is extracted: %s" % extractedFilePath)
 
         content = vbLib.templates.EMBED_EXE
         content = content.replace("<<<OUT_FILE>>>", extractedFilePath)
-        #top + next + then1 + sub_proc+ sub_open
-        # generate random file name
-        vbaFile = os.path.abspath(os.path.join(self.workingPath,utils.randomAlpha(9)+".vba"))
+        vbaFile = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
-        # Write in new file 
-        f = open(vbaFile, 'w')
-        f.write(content)
-        f.close()
         if os.path.isfile(cmdFile):
             os.remove(cmdFile)
         logging.info("   [-] OK!")
@@ -183,18 +184,9 @@ class TemplateToVba(MpModule):
                 logging.info("   [!] Template %s is not recognized as file or default template." % self.template)
                 return
          
-        # open file containing template values       
-        cmdFile = self.getCMDFile()
-        if os.path.isfile(cmdFile):
-            f = open(cmdFile, 'r')
-            valuesFileContent = f.read()
-            f.close()
-            self._fillGenericTemplate(content, shlex.split(valuesFileContent)) # split on space but preserve what is between quotes
-            # remove file containing template values
-            os.remove(cmdFile)
-            logging.info("   [-] OK!") 
-        else:
-            logging.error("   [!] Could not find template input! Use \"-t help\" option for help on templates.")       
+
+        self._fillGenericTemplate(content) 
+   
     
     def run(self):
         logging.info(" [+] Generating VBA document from template...")

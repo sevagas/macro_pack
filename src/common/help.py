@@ -126,6 +126,7 @@ def printUsage(banner, currentApp, mpSession):
     if mpSession.mpType == "Pro":
         proDetails = \
 """
+    -b, --background    Run the macro in background (in another instance of office application)
     --vbom-encode   Use VBA self encoding to bypass antimalware detection and enable VBOM access (will exploit VBOM self activation vuln). 
                   --start-function option may be needed.
     --av-bypass  Use various tricks  efficient to bypass most av (combine with -o for best result)

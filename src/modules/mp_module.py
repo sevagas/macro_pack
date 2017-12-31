@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import os, mmap, logging
+import os, mmap, logging,re
 from common import utils
 from common.utils import MSTypes
 
@@ -98,6 +98,26 @@ class MpModule():
         f.write(moduleContent)
         f.close()
         return newModuleName
+    
+    
+    def insertVbaCode(self, targetModule, targetFunction,targetLine, vbaCode):
+        """
+        Insert some code at targetLine (number) at targetFunction in targetModule
+        """
+        f = open(targetModule)
+        content = f.readlines()
+        f.close()
+        
+        for n,line in enumerate(content):
+            matchObj = re.match( r'.*(Sub|Function)\s+%s\s*\(.*\).*'%targetFunction, line, re.M|re.I) 
+            if matchObj:  
+                
+                content[n+targetLine] = content[n+targetLine]+"\n"+vbaCode+"\n"
+                break
+        
+        f = open(targetModule, 'w')
+        f.writelines(content)
+        f.close()
     
     
     @classmethod

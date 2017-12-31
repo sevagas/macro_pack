@@ -77,8 +77,8 @@ def main(argv):
         shortOptions= "e:l:s:f:t:G:hqmo"
         # only for Pro release
         if MP_TYPE == "Pro":
-            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom="])
-            shortOptions += "T:" 
+            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom=", "background"])
+            shortOptions += "T:b" 
         # Only enabled on windows
         if sys.platform == "win32":
             longOptions.extend([ "run="])
@@ -141,6 +141,8 @@ def main(argv):
                     if sys.platform == "win32":
                         mpSession.outputFilePath = os.path.abspath(arg)
                         mpSession.trojan = True
+                elif opt == "-b" or opt=="--background":
+                    mpSession.background = True
                 elif opt == "--stealth":
                     mpSession.stealth = True
                 elif opt == "--dcom":

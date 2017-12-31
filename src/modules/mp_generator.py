@@ -6,6 +6,7 @@ from modules.obfuscate_strings import ObfuscateStrings
 try:
     from pro_modules.vbom_encode import VbomEncoder
     from pro_modules.persistance import Persistance
+    from pro_modules.background import Background
     from pro_modules.av_bypass import AvBypass
 except:
     pass
@@ -91,7 +92,14 @@ class Generator(MpModule):
         
     
     def runObfuscators(self):
-        """ Call this method whenever you need to obfuscate the content of temp directory """
+        """ Call this method to apply transformation and obfuscation on the content of temp directory """
+        
+        if self.mpSession.mpType == "Pro":
+            # MAcro to run in background    
+            if self.mpSession.background:
+                transformator = Background(self.mpSession)
+                transformator.run() 
+        
         # Macro obfuscation
         if self.mpSession.obfuscateNames:
             obfuscator = ObfuscateNames(self.mpSession)
