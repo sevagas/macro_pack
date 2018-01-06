@@ -109,7 +109,7 @@ class VBSGenerator(Generator):
         newContent += CreateBinFile.VBA + "\n"
         newContent += "Sub DumpFile(strFilename)"
         newContent += "\n Dim str \n str = %s \n readEmbed = Base64ToBin(str) \n CreateBinFile strFilename, readEmbed \n" % (packedMacro) 
-        newContent += "End Sub"       
+        newContent += "End Sub \n \n"       
         
         
         self.addVBAModule(newContent)
