@@ -24,7 +24,7 @@ r"""<?XML version="1.0"?>
 """
 
 class SCTGenerator(VBSGenerator):
-    """ Module used to generate HTA file from working dir content
+    """ Module used to generate SCT file from working dir content
     To execute: 
     regsvr32 /u /n /s /i:hello.sct scrobj.dll
     Also work on remote files

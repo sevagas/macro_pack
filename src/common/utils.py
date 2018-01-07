@@ -55,6 +55,7 @@ class MSTypes():
     VBS="VBS"
     HTA="HTA"
     SCT="SCT"
+    WSF="WSF"
     UNKNOWN = "Unknown"
         
     @classmethod
@@ -62,7 +63,7 @@ class MSTypes():
         """ Guess MS application type based on extension """
         result = ""
         extension = os.path.splitext(documentPath)[1]
-        if ".xls" == extension:
+        if ".xls" == extension.lower():
             result = self.XL97
         elif ".xlsx" == extension or extension == ".xlsm":
             result = self.XL
@@ -82,14 +83,16 @@ class MSTypes():
             result = self.VSD97
         elif ".vsdm" ==  extension or extension == ".vsdx":
             result = self.VSD
-        elif ".pub" ==  extension:
+        elif ".pub" ==  extension.lower():
             result = self.PUB
-        elif ".vba" ==  extension:
+        elif ".vba" ==  extension.lower():
             result = self.VBA
-        elif ".vbs" ==  extension:
+        elif ".vbs" ==  extension.lower():
             result = self.VBS
-        elif ".sct" ==  extension or extension == ".wsc":
+        elif ".sct" ==  extension.lower() or extension.lower() == ".wsc":
             result = self.SCT
+        elif ".wsf" == extension.lower():
+            result = self.WSF
         else:
             result = self.UNKNOWN
         return result

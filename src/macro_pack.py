@@ -15,6 +15,7 @@ from modules.vba_gen import VBAGenerator
 from modules.vbs_gen import VBSGenerator
 from modules.hta_gen import HTAGenerator
 from modules.sct_gen import SCTGenerator
+from modules.wsf_gen import WSFGenerator
 from modules.word_dde import WordDDE
 from modules.visio_gen import VisioGenerator
 from modules.com_run import ComGenerator
@@ -328,6 +329,10 @@ def main(argv):
             
         if mpSession.outputFileType == MSTypes.SCT:
             generator = SCTGenerator(mpSession)
+            generator.run()
+        
+        if mpSession.outputFileType == MSTypes.WSF:
+            generator = WSFGenerator(mpSession)
             generator.run()
     
         if mpSession.outputFileType == MSTypes.VBA or mpSession.outputFilePath == None:
