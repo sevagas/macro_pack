@@ -121,7 +121,7 @@ r"""
         -> Example2 : echo "main log privilege::debug sekurlsa::logonpasswords exit" | %s -t EMBED_DLL --embed=mimikatz.dll -o -G mimidropper.hta
 
                 --------------------  
-""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp, currentApp)
+""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp, currentApp)
     print(templatesInfo)
     
     
