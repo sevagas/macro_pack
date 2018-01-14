@@ -89,6 +89,10 @@ class TemplateToVba(MpModule):
             msApp = MSTypes.WD
         elif MSTypes.PPT in self.outputFileType:
             msApp = "PowerPoint"
+        elif MSTypes.VSD in self.outputFileType:
+            msApp = "Visio"
+        elif MSTypes.MPP in self.outputFileType:
+            msApp = "Project"
         else:
             msApp = MSTypes.UNKNOWN
         content = content.replace("<<<APPLICATION>>>", msApp)
@@ -97,6 +101,57 @@ class TemplateToVba(MpModule):
         logging.info("   [-] Second part of Template %s VBA generated in %s" % (self.template, vbaFile))
 
         os.remove(cmdFile)
+        logging.info("   [-] OK!")
+    
+    
+    def _processEmbedDllTemplate(self):
+        # open file containing template values       
+        cmdFile = self.getCMDFile()
+        if cmdFile is None or cmdFile == "":
+            logging.error("   [!] Could not find template parameters!")
+            return
+        f = open(cmdFile, 'r')
+        valuesFileContent = f.read()
+        f.close()
+        params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
+        dllFct = params[0]
+            
+        #logging.info("   [-] Dll will be dropped at: %s" % extractedFilePath)
+        if self.outputFileType in [ MSTypes.HTA, MSTypes.VBS, MSTypes.WSF, MSTypes.SCT]:
+            # for VBS based file
+            content = vbLib.templates.EMBED_DLL_VBS
+            content = content.replace("<<<DLL_FUNCTION>>>", dllFct)
+            vbaFile = self.addVBAModule(content)
+            logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile))
+        else:
+            # for VBA based files
+            # generate main module 
+            content = vbLib.templates.DROPPER_DLL2
+            content = content.replace("<<<DLL_FUNCTION>>>", dllFct)
+            invokerModule = self.addVBAModule(content)
+            logging.info("   [-] Template %s VBA generated in %s" % (self.template, invokerModule)) 
+            
+            # second module
+            content = vbLib.templates.EMBED_DLL_VBA
+            if MSTypes.XL in self.outputFileType:
+                msApp = MSTypes.XL
+            elif MSTypes.WD in self.outputFileType:
+                msApp = MSTypes.WD
+            elif MSTypes.PPT in self.outputFileType:
+                msApp = "PowerPoint"
+            elif MSTypes.VSD in self.outputFileType:
+                msApp = "Visio"
+            elif MSTypes.MPP in self.outputFileType:
+                msApp = "Project"
+            else:
+                msApp = MSTypes.UNKNOWN
+            content = content.replace("<<<APPLICATION>>>", msApp)
+            content = content.replace("<<<MODULE_2>>>", os.path.splitext(os.path.basename(invokerModule))[0])
+            vbaFile = self.addVBAModule(content)
+            logging.info("   [-] Second part of Template %s VBA generated in %s" % (self.template, vbaFile))
+            
+        if os.path.isfile(cmdFile):
+            os.remove(cmdFile)
         logging.info("   [-] OK!")
     
     
@@ -169,8 +224,10 @@ class TemplateToVba(MpModule):
         elif self.template == "CMD":
             content = vbLib.templates.CMD
         elif self.template == "EMBED_EXE":
-            # More complexe template, not the usual treatment
             self._processEmbedExeTemplate()
+            return
+        elif self.template == "EMBED_DLL":
+            self._processEmbedDllTemplate()
             return
         elif self.template == "DROPPER_DLL":
             self._processDropperDllTemplate()
