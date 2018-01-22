@@ -107,14 +107,15 @@ class TemplateToVba(MpModule):
     def _processEmbedDllTemplate(self):
         # open file containing template values       
         cmdFile = self.getCMDFile()
-        if cmdFile is None or cmdFile == "":
-            logging.error("   [!] Could not find template parameters!")
-            return
-        f = open(cmdFile, 'r')
-        valuesFileContent = f.read()
-        f.close()
-        params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
-        dllFct = params[0]
+        if os.path.isfile(cmdFile):
+            f = open(cmdFile, 'r')
+            valuesFileContent = f.read()
+            f.close()
+            params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
+            dllFct = params[0] 
+        else:
+            logging.warn("   [!] No input value was provided for this template.\n       Will call 'main' function in DLL .\n       Use \"-t help\" option for help on templates.")
+            dllFct = "main"
             
         #logging.info("   [-] Dll will be dropped at: %s" % extractedFilePath)
         if self.outputFileType in [ MSTypes.HTA, MSTypes.VBS, MSTypes.WSF, MSTypes.SCT]:
