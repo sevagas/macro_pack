@@ -37,7 +37,8 @@ def getRunningApp():
     if getattr(sys, 'frozen', False):
         return sys.executable
     else:
-        return os.path.abspath(__file__)
+        import __main__ as main # To get the real origin of the script not the location of current file
+        return os.path.abspath(main.__file__)
 
 class MSTypes():
     
