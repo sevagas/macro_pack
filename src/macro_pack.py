@@ -17,6 +17,7 @@ from modules.hta_gen import HTAGenerator
 from modules.sct_gen import SCTGenerator
 from modules.wsf_gen import WSFGenerator
 from modules.word_dde import WordDDE
+from modules.excel_dde import ExcelDDE
 from modules.visio_gen import VisioGenerator
 from modules.com_run import ComGenerator
 from modules.listen_server import ListenServer
@@ -307,6 +308,9 @@ def main(argv):
             if mpSession.ddeMode: # DDE Attack mode
                 if MSTypes.WD in mpSession.outputFileType:
                     generator = WordDDE(mpSession)
+                    generator.run()
+                elif MSTypes.XL in mpSession.outputFileType:
+                    generator = ExcelDDE(mpSession)
                     generator.run()
                 else:
                     logging.warn(" [!] Word and Word97 are only format supported for DDE attacks.")

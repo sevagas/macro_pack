@@ -171,7 +171,7 @@ def printUsage(banner, currentApp, mpSession):
         Help for template usage: %s -t help
          
     -G, --generate=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
-        Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, pptm, vsd, vsdm, mpp.
+        Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, xslx, pptm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
         Supported scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
     

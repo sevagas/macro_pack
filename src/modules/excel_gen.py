@@ -102,9 +102,12 @@ class ExcelGenerator(Generator):
         logging.info("   [-] Save workbook...")
         xlOpenXMLWorkbookMacroEnabled = 52
         xlExcel8 = 56
+        xlOpenXMLWorkbook = 51
         if self.outputFileType == MSTypes.XL97:
             workbook.SaveAs(self.outputFilePath, FileFormat=xlExcel8)
-        elif self.outputFileType == MSTypes.XL:
+        elif MSTypes.XL == self.outputFileType and ".xlsx" in self.outputFilePath:
+            workbook.SaveAs(self.outputFilePath, FileFormat=xlOpenXMLWorkbook)
+        elif self.outputFileType == MSTypes.XL and ".xlsm" in self.outputFilePath:
             workbook.SaveAs(self.outputFilePath, FileFormat=xlOpenXMLWorkbookMacroEnabled)
         # save the workbook and close
         excel.Workbooks(1).Close(SaveChanges=1)
