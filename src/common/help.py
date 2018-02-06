@@ -176,7 +176,7 @@ def printUsage(banner, currentApp, mpSession):
         Supported scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
     
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
-         Use with EMBED_EXE template to auto drop and exec the file.
+         Use with EMBED_EXE template to auto drop and exec the file or with EMBED_DLL to drop/load the embedded dll.
     
     --dde  Dynamic Data Exchange attack mode. Input will be inserted as a cmd command and executed via DDE
          DDE attack mode is not compatible with VBA Macro related options.
