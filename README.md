@@ -467,6 +467,7 @@ If you have an issue with macro\_pack AV detection you can write to us for advic
 
 Blog posts about MS Office security:
  - http://blog.sevagas.com/?My-VBA-Bot (write a full VBA RAT, includes how to bypass VBOM protection)
+ - http://blog.sevagas.com/?Hacking-around-HTA-files  (run hta code in non-hta files and hta polyglots)
  - http://pwndizzle.blogspot.fr/2017/03/office-document-macros-ole-actions-dde.html
  - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
  - https://enigma0x3.net/2017/09/11/lateral-movement-using-excel-application-and-dcom/
