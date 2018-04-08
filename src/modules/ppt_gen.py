@@ -14,10 +14,10 @@ if sys.platform == "win32":
 
 import logging
 from common import utils
-from modules.mp_generator import Generator
+from modules.vba_gen import VBAGenerator
 
 
-class PowerPointGenerator(Generator):
+class PowerPointGenerator(VBAGenerator):
     """ Module used to generate MS PowerPoint file from working dir content"""
     
     def getAutoOpenVbaFunction(self):
