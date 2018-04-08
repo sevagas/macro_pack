@@ -11,7 +11,7 @@ class MpSession:
         self.mpType = mpType
         
         # Attrs depending on getter/setter
-        self._outputFilePath = None
+        self._outputFilePath = ""
         self._outputFileType = MSTypes.UNKNOWN
         
         # regular Attrs
@@ -33,6 +33,7 @@ class MpSession:
         self.dcom = False
         self.dcomTarget = None
         self.runTarget = None
+        self.printFile = False
         
         self.listen = False
         self.listenPort = 80

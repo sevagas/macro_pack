@@ -37,11 +37,10 @@ def getRunningApp():
     if getattr(sys, 'frozen', False):
         return sys.executable
     else:
-        import __main__ as main # To get the real origin of the script not the location of current file
+        import __main__ as main # @UnresolvedImport To get the real origin of the script not the location of current file 
         return os.path.abspath(main.__file__)
 
 class MSTypes():
-    
     XL="Excel"
     XL97="Excel97"
     WD="Word"
@@ -53,12 +52,20 @@ class MSTypes():
     VSD="Visio"
     VSD97="Visio97"
     VBA="VBA"
-    VBS="VBS"
-    HTA="HTA"
-    SCT="SCT"
-    WSF="WSF"
+    VBS="Visual Basic Script"
+    HTA="HTML Application"
+    SCT="Windows Script Component"
+    WSF="Windows Script File"
+    LNK="Shell Link"
+    GLK = "Groove Shortcut"
+    SCF="Explorer Command File"
+    URL="URL Shortcut"
     UNKNOWN = "Unknown"
-        
+    
+    MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, PPT97, MPP, PUB, VSD, VSD97]
+    VB_FORMATS = [VBA, VBS, HTA, SCT, WSF ]
+    VB_FORMATS.extend(MS_OFFICE_FORMATS)
+    
     @classmethod
     def guessApplicationType(self, documentPath):
         """ Guess MS application type based on extension """
@@ -66,23 +73,23 @@ class MSTypes():
         extension = os.path.splitext(documentPath)[1]
         if ".xls" == extension.lower():
             result = self.XL97
-        elif ".xlsx" == extension or extension == ".xlsm":
+        elif ".xlsx" == extension.lower() or extension.lower() == ".xlsm":
             result = self.XL
-        elif ".doc" ==  extension:
+        elif ".doc" ==  extension.lower():
             result = self.WD97
-        elif ".docx" ==  extension or extension == ".docm":
+        elif ".docx" ==  extension.lower() or extension.lower() == ".docm":
             result = self.WD
-        elif ".hta" ==  extension:
+        elif ".hta" ==  extension.lower():
             result = self.HTA
-        elif ".mpp" ==  extension:
+        elif ".mpp" ==  extension.lower():
             result = self.MPP
-        elif ".ppt" ==  extension:
+        elif ".ppt" ==  extension.lower():
             result = self.PPT97
-        elif ".pptm" ==  extension or extension == ".pptx":
+        elif ".pptm" ==  extension.lower() or extension.lower() == ".pptx":
             result = self.PPT
-        elif ".vsd" ==  extension:
+        elif ".vsd" ==  extension.lower():
             result = self.VSD97
-        elif ".vsdm" ==  extension or extension == ".vsdx":
+        elif ".vsdm" ==  extension.lower() or extension.lower() == ".vsdx":
             result = self.VSD
         elif ".pub" ==  extension.lower():
             result = self.PUB
@@ -94,6 +101,14 @@ class MSTypes():
             result = self.SCT
         elif ".wsf" == extension.lower():
             result = self.WSF
+        elif ".url" ==  extension.lower():
+            result = self.URL
+        elif ".glk" ==  extension.lower():
+            result = self.GLK    
+        elif ".lnk" ==  extension.lower():
+            result = self.LNK
+        elif ".scf" ==  extension.lower():
+            result = self.SCF
         else:
             result = self.UNKNOWN
         return result

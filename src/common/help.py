@@ -158,6 +158,10 @@ def printUsage(banner, currentApp, mpSession):
         
     -q, --quiet \tDo not display anything on screen, just process request. 
     
+    -p, --print \tDisplay result file on stdout (will display VBA for Office formats)
+        Combine this option with -q option to pipe result into another program
+        ex: cat input_file.vba | %s -o -G obfuscated.vba -q -p | another_app
+    
     -o, --obfuscate \tSame as '--obfuscate-form --obfuscate-names --obfuscate-strings'
     --obfuscate-form\tModify readability by removing all spaces and comments in VBA
     --obfuscate-strings\tRandomly split strings and encode them
@@ -170,10 +174,11 @@ def printUsage(banner, currentApp, mpSession):
         Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, WEBMETER, EMBED_EXE, EMBED_DLL 
         Help for template usage: %s -t help
          
-    -G, --generate=OUTPUT_FILE_PATH. Generates a file containing the macro. Will guess the format based on extension.
+    -G, --generate=OUTPUT_FILE_PATH. Generates a file. Will guess the format based on extension.
         Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, xslx, pptm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
-        Supported scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
+        Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
+        Supported shortcuts extensions are: scf, url, glk
     
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
          Use with EMBED_EXE template to auto drop and exec the file or with EMBED_DLL to drop/load the embedded dll.
@@ -186,24 +191,22 @@ def printUsage(banner, currentApp, mpSession):
     --run=FILE_PATH Open document using COM to run macro. Can be useful to bypass whitelisting situations.
            This will trigger AutoOpen/Workbook_Open automatically. 
            If no auto start function, use --start-function option to indicate which macro to run. 
+           This option is only compatible with Ms Office formats.
            
     -l, --listen=PORT Open an HTTP server listening on defined port.
                
-""" % (currentApp,currentApp, currentApp)   
+""" % (currentApp,currentApp, currentApp, currentApp)   
 
     details +=proDetails
     details +="    -h, --help   Displays help and exit"
     details += \
 """
 
- Notes:
-    If no output file is provided, the result will be displayed on stdout.
-    Combine this with -q option to pipe only processed result into another program
-    ex: %s -f my_vba.vba -o -q | another_app
-    Another valid usage is:
-    cat input_file.vba | %s -o -q  > output_file.vba 
+ Notes:   
+    Have a look at README.md file for more details and usage!
+    Homes: www.github.com/sevagas && blog.sevagas.com 
     
-  Have a look at README.md file for more details and usage!
-    
-""" % (currentApp,currentApp)   
+"""  
     print(details)
+    
+    

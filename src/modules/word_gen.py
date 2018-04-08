@@ -11,11 +11,11 @@ if sys.platform == "win32":
     import winreg # @UnresolvedImport
 
 import logging
-from modules.mp_generator import Generator
+from modules.vba_gen import VBAGenerator
 
 
 
-class WordGenerator(Generator):
+class WordGenerator(VBAGenerator):
     """ Module used to generate MS Word file from working dir content"""
     
     def getAutoOpenVbaFunction(self):

@@ -2,9 +2,8 @@
 # encoding: utf-8
 
 import logging
-from modules.mp_generator import Generator
+from modules.vba_gen import VBAGenerator
 import re, os
-from common import utils
 from vbLib import Base64ToBin, CreateBinFile
 import base64
 
@@ -14,7 +13,7 @@ r"""
 <<<MAIN>>>
 """
 
-class VBSGenerator(Generator):
+class VBSGenerator(VBAGenerator):
     """ Module used to generate VBS file from working dir content"""
     
     def check(self):

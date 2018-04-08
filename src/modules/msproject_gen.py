@@ -11,10 +11,10 @@ if sys.platform == "win32":
     import winreg # @UnresolvedImport
 
 import logging
-from modules.mp_generator import Generator
+from modules.vba_gen import VBAGenerator
 
 
-class MSProjectGenerator(Generator):
+class MSProjectGenerator(VBAGenerator):
     """ Module used to generate MS Project file from working dir content"""
     
     def getAutoOpenVbaFunction(self):

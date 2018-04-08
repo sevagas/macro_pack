@@ -21,6 +21,9 @@ from modules.excel_dde import ExcelDDE
 from modules.visio_gen import VisioGenerator
 from modules.com_run import ComGenerator
 from modules.listen_server import ListenServer
+from modules.scf_gen import SCFGenerator
+from modules.url_gen import UrlShortcutGenerator
+from modules.glk_gen import GlkGenerator
 
 from common import utils, mp_session, help
 from common.utils import MSTypes
@@ -66,7 +69,102 @@ BANNER = """\
    Pentest with VBA macros and other retro friends - Version:%s Release:%s 
                                                                                            
 """ % (VERSION, MP_TYPE)
-    
+
+
+def handleOfficeFormats(mpSession):
+    """
+    Handle MS Office output formats generation
+    """
+    if mpSession.stealth == True:
+        if mpSession.outputFileType in MSTypes.MS_OFFICE_FORMATS:
+            # Add a new empty module to keep VBA library if we hide other modules
+            # See http://seclists.org/fulldisclosure/2017/Mar/90
+            genericModule = mp_module.MpModule(mpSession)
+            genericModule.addVBAModule("")
+        else:
+            logging.warn(" [!] Stealth option is not available for the format %s" % mpSession.outputFileType)
+                    
+                    
+    # Shall we trojan existing file?
+    if mpSession.trojan == False:
+        if MSTypes.XL in mpSession.outputFileType:
+            generator = ExcelGenerator(mpSession)
+            generator.run()
+        elif MSTypes.WD in mpSession.outputFileType:
+            generator = WordGenerator(mpSession)
+            generator.run()
+        elif MSTypes.PPT in mpSession.outputFileType:
+            generator = PowerPointGenerator(mpSession)
+            generator.run()
+        elif MSTypes.MPP == mpSession.outputFileType:
+            generator = MSProjectGenerator(mpSession)
+            generator.run()
+        elif MSTypes.VSD in mpSession.outputFileType:
+            generator = VisioGenerator(mpSession)
+            generator.run()
+        elif MSTypes.PUB == mpSession.outputFileType and MP_TYPE == "Pro":
+            generator = PublisherGenerator(mpSession)
+            generator.run()
+    else:
+        if MSTypes.XL in mpSession.outputFileType:
+            if os.path.isfile(mpSession.outputFilePath):
+                generator = ExcelTrojan(mpSession)
+                generator.run()
+            else:
+                generator = ExcelGenerator(mpSession)
+                generator.run()
+        if MSTypes.WD in mpSession.outputFileType:
+            if os.path.isfile(mpSession.outputFilePath):
+                generator = WordTrojan(mpSession)
+                generator.run()
+            else:
+                generator = WordGenerator(mpSession)
+                generator.run()
+        if MSTypes.PPT in mpSession.outputFileType:
+            if os.path.isfile(mpSession.outputFilePath):
+                generator = PptTrojan(mpSession)
+                generator.run()
+            else:
+                generator = PowerPointGenerator(mpSession)
+                generator.run()
+        if MSTypes.VSD in mpSession.outputFileType:
+            if os.path.isfile(mpSession.outputFilePath):
+                generator = VisioTrojan(mpSession)
+                generator.run()
+            else:
+                generator = VisioGenerator(mpSession)
+                generator.run()
+                
+        if MSTypes.MPP in mpSession.outputFileType:
+            if os.path.isfile(mpSession.outputFilePath):
+                generator = MsProjectTrojan(mpSession)
+                generator.run()
+            else:
+                generator = MSProjectGenerator(mpSession)
+                generator.run()
+
+    if mpSession.stealth == True:
+        obfuscator = Stealth(mpSession)
+        obfuscator.run()
+        
+    if mpSession.ddeMode: # DDE Attack mode
+        if MSTypes.WD in mpSession.outputFileType:
+            generator = WordDDE(mpSession)
+            generator.run()
+        elif MSTypes.XL in mpSession.outputFileType:
+            generator = ExcelDDE(mpSession)
+            generator.run()
+        else:
+            logging.warn(" [!] Word and Word97 are only format supported for DDE attacks.")
+     
+    if mpSession.runTarget: #run com attack
+        generator = ComGenerator(mpSession)
+        generator.run()
+        
+    if mpSession.dcom: #run dcom attack
+        generator = DcomGenerator(mpSession)
+        generator.run()
+
 
 def main(argv):   
     
@@ -75,8 +173,8 @@ def main(argv):
     mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
          
     try:
-        longOptions = ["embed=", "listen=","generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde"] 
-        shortOptions= "e:l:s:f:t:G:hqmo"
+        longOptions = ["embed=", "listen=","generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde", "print"] 
+        shortOptions= "e:l:s:f:t:G:hqmop"
         # only for Pro release
         if MP_TYPE == "Pro":
             longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom=", "background"])
@@ -117,6 +215,8 @@ def main(argv):
                 mpSession.template = arg
         elif opt=="-q" or opt=="--quiet": 
             logLevel = "ERROR"
+        elif opt=="-p" or opt=="--print": 
+            mpSession.printFile = True
         elif opt == "--dde":
             if sys.platform == "win32":
                 mpSession.ddeMode = True
@@ -166,6 +266,14 @@ def main(argv):
     logging.info(colored(BANNER, 'green'))
 
     logging.info(" [+] Preparations...") 
+    
+    # Check output file format
+    if mpSession.outputFilePath:
+        logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
+    elif mpSession.listen == False:
+        logging.error("   [!] You need to provide an output file! (-G option)")
+        sys.exit(2)
+    
     # check input args
     if mpSession.vbaInput is None:
         # Argument not supplied, try to get file content from stdin
@@ -179,20 +287,19 @@ def main(argv):
         else:
             logging.info("   [-] Input file path: %s" % mpSession.vbaInput)
     
+    
     if mpSession.trojan==False:
         # verify that output file does not already exist
-        if mpSession.outputFilePath is not None:
-            if os.path.isfile(mpSession.outputFilePath):
-                logging.error("   [!] ERROR: Output file %s already exist!" % mpSession.outputFilePath)
-                sys.exit(2)
+        if os.path.isfile(mpSession.outputFilePath):
+            logging.error("   [!] ERROR: Output file %s already exist!" % mpSession.outputFilePath)
+            sys.exit(2)
     else:
         # In trojan mod, file are tojane if they already exist and created if they dont.
-        # except for vba output which is not concerned by trojan feature
-        if mpSession.outputFilePath is not None and mpSession.outputFileType == MSTypes.VBA:
-            if mpSession.outputFilePath is not None:
-                if os.path.isfile(mpSession.outputFilePath):
-                    logging.error("   [!] ERROR: Output file %s already exist!" % mpSession.outputFilePath)
-                    sys.exit(2)
+        # Thid concerns only non OFfice documents for now
+        if  mpSession.outputFileType not in MSTypes.MS_OFFICE_FORMATS:
+            if os.path.isfile(mpSession.outputFilePath):
+                logging.error("   [!] ERROR: Trojan mode not supported for %s format. \nOutput file %s already exist!" % (mpSession.outputFileType,mpSession.outputFilePath))
+                sys.exit(2)
     
     
     #Create temporary folder
@@ -201,9 +308,8 @@ def main(argv):
         os.makedirs(WORKING_DIR)
     
     try:
-        
         # Create temporary work file.
-        if mpSession.ddeMode or mpSession.template:
+        if mpSession.ddeMode or mpSession.template or (mpSession.outputFileType not in MSTypes.VB_FORMATS):
             inputFile = os.path.join(WORKING_DIR,"command.cmd")
         else:
             inputFile = os.path.join(WORKING_DIR,utils.randomAlpha(9))+".vba"
@@ -219,9 +325,7 @@ def main(argv):
                 shutil.copy2(mpSession.vbaInput, inputFile)
         if os.path.isfile(inputFile):
             logging.info("   [-] Temporary input file: %s" %  inputFile)
-        # Check output file format
-        if mpSession.outputFilePath:
-            logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
+
         
               
         # Generate template
@@ -233,95 +337,11 @@ def main(argv):
                 generator = TemplateToVba(mpSession)
                 generator.run()
             
-   
                                       
         # MS Office generation/trojan is only enabled on windows
-        if sys.platform == "win32":
+        if sys.platform == "win32" and mpSession.outputFileType in MSTypes.MS_OFFICE_FORMATS:
+            handleOfficeFormats(mpSession)
             
-            if mpSession.stealth == True:
-                # Add a new empty module to keep VBA library if we hide other modules
-                # See http://seclists.org/fulldisclosure/2017/Mar/90
-                genericModule = mp_module.MpModule(mpSession)
-                genericModule.addVBAModule("")
-        
-            if mpSession.trojan == False:
-                if MSTypes.XL in mpSession.outputFileType:
-                    generator = ExcelGenerator(mpSession)
-                    generator.run()
-                elif MSTypes.WD in mpSession.outputFileType:
-                    generator = WordGenerator(mpSession)
-                    generator.run()
-                elif MSTypes.PPT in mpSession.outputFileType:
-                    generator = PowerPointGenerator(mpSession)
-                    generator.run()
-                elif MSTypes.MPP == mpSession.outputFileType:
-                    generator = MSProjectGenerator(mpSession)
-                    generator.run()
-                elif MSTypes.VSD in mpSession.outputFileType:
-                    generator = VisioGenerator(mpSession)
-                    generator.run()
-                elif MSTypes.PUB == mpSession.outputFileType and MP_TYPE == "Pro":
-                    generator = PublisherGenerator(mpSession)
-                    generator.run()
-            else:
-                if MSTypes.XL in mpSession.outputFileType:
-                    if os.path.isfile(mpSession.outputFilePath):
-                        generator = ExcelTrojan(mpSession)
-                        generator.run()
-                    else:
-                        generator = ExcelGenerator(mpSession)
-                        generator.run()
-                if MSTypes.WD in mpSession.outputFileType:
-                    if os.path.isfile(mpSession.outputFilePath):
-                        generator = WordTrojan(mpSession)
-                        generator.run()
-                    else:
-                        generator = WordGenerator(mpSession)
-                        generator.run()
-                if MSTypes.PPT in mpSession.outputFileType:
-                    if os.path.isfile(mpSession.outputFilePath):
-                        generator = PptTrojan(mpSession)
-                        generator.run()
-                    else:
-                        generator = PowerPointGenerator(mpSession)
-                        generator.run()
-                if MSTypes.VSD in mpSession.outputFileType:
-                    if os.path.isfile(mpSession.outputFilePath):
-                        generator = VisioTrojan(mpSession)
-                        generator.run()
-                    else:
-                        generator = VisioGenerator(mpSession)
-                        generator.run()
-                        
-                if MSTypes.MPP in mpSession.outputFileType:
-                    if os.path.isfile(mpSession.outputFilePath):
-                        generator = MsProjectTrojan(mpSession)
-                        generator.run()
-                    else:
-                        generator = MSProjectGenerator(mpSession)
-                        generator.run()
-
-            if mpSession.stealth == True:
-                obfuscator = Stealth(mpSession)
-                obfuscator.run()
-                
-            if mpSession.ddeMode: # DDE Attack mode
-                if MSTypes.WD in mpSession.outputFileType:
-                    generator = WordDDE(mpSession)
-                    generator.run()
-                elif MSTypes.XL in mpSession.outputFileType:
-                    generator = ExcelDDE(mpSession)
-                    generator.run()
-                else:
-                    logging.warn(" [!] Word and Word97 are only format supported for DDE attacks.")
-             
-            if mpSession.runTarget: #run com attack
-                generator = ComGenerator(mpSession)
-                generator.run()
-                
-            if mpSession.dcom: #run dcom attack
-                generator = DcomGenerator(mpSession)
-                generator.run()
                 
         if mpSession.outputFileType == MSTypes.VBS:
             generator = VBSGenerator(mpSession)
@@ -339,16 +359,32 @@ def main(argv):
             generator = WSFGenerator(mpSession)
             generator.run()
     
-        if mpSession.outputFileType == MSTypes.VBA or mpSession.outputFilePath == None:
+        if mpSession.outputFileType == MSTypes.VBA:
             generator = VBAGenerator(mpSession)
             generator.run()
-                
+            
+            
+        if mpSession.outputFileType == MSTypes.SCF:
+            generator = SCFGenerator(mpSession)
+            generator.run()
+               
+        if mpSession.outputFileType == MSTypes.URL:
+            generator = UrlShortcutGenerator(mpSession)
+            generator.run()
+        
+        if mpSession.outputFileType == MSTypes.GLK:
+            generator = GlkGenerator(mpSession)
+            generator.run()
+        
+        
+        # Activate Web server
         if mpSession.listen:
             listener = ListenServer(mpSession)
             listener.run()
                 
     except Exception:
         logging.exception(" [!] Exception caught!")
+        
         logging.error(" [!] Hints: Check if MS office is really closed and Antivirus did not catch the files")
         if sys.platform == "win32":
             logging.error(" [!] Attempt to force close MS Office applications...")

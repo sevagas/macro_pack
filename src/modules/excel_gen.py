@@ -11,10 +11,10 @@ if sys.platform == "win32":
     import winreg # @UnresolvedImport
 
 import logging
-from modules.mp_generator import Generator
+from modules.vba_gen import VBAGenerator
 
 
-class ExcelGenerator(Generator):
+class ExcelGenerator(VBAGenerator):
     """ Module used to generate MS excel file from working dir content"""
     
     def getAutoOpenVbaFunction(self):

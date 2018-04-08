@@ -63,7 +63,7 @@ def hello():
 @webapp.route('/a', methods=['GET', 'POST'])
 @secure_http_response
 def answer():
-    """ called by bot when responding to command """
+    """ called by client when responding to command """
     clientId = request.form['id']
     cmdOutput = request.form['cmdOutput']
     logging.info("   [-] From %s received:\n %s " % (clientId,cmdOutput))
@@ -104,15 +104,14 @@ class ListenServer(MpModule):
         self.listenPort = mpSession.listenPort
         MpModule.__init__(self, mpSession)
     
-
-    
     def run(self):
         """ Starts listening server"""
 
-        logging.info (" [+] Starting Macro_Pack web server (ctrl-c to exit)...")
+        logging.info (" [+] Starting Macro_Pack web server...")
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR) # Disable flask log if easier to debug
-
+        logging.info ("   [-] Files in current folder are accessible using http://<hostname>:%s/u/" % self.listenPort)
+        logging.info ("   [-] Listening on port %s (ctrl-c to exit)..." % self.listenPort)
         
         # Run web server in another thread
         webapp.run(
