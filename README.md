@@ -5,7 +5,7 @@
 ## Short description
 
 The macro\_pack is a tool used to automatize obfuscation and generation of retro formats such as MS Office documents or VBS like format.
-Now is also handles various shortcuts formats.
+Now it also handles various shortcuts formats.  
 This tool can be used for redteaming, pentests, demos, and social engineering assessments.
 macro\_pack will simplify antimalware solutions bypass and automatize the process from vba generation to final Office document generation.  
 It is very simple to use:
@@ -483,6 +483,7 @@ Blog posts about MS Office & retro stuff security:
  - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
  - https://enigma0x3.net/2017/09/11/lateral-movement-using-excel-application-and-dcom/
  - https://labs.mwrinfosecurity.com/blog/dll-tricks-with-vba-to-improve-offensive-macro-capability/
+ - https://blog.quarkslab.com/analysis-of-ms16-104-url-files-security-feature-bypass-cve-2016-3353.html
  
  Other useful links:
  - https://github.com/p3nt4/PowerShdll (Run PowerShell with dlls only)
