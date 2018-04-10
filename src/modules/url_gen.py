@@ -3,6 +3,7 @@
 
 import logging
 from modules.mp_generator import Generator
+from collections import OrderedDict
 
 """
 
@@ -66,20 +67,13 @@ class UrlShortcutGenerator(Generator):
     
     def generate(self):
                 
-        logging.info(" [+] Generating %s file..." % self.outputFileType)
+        logging.info(" [+] Generating %s file..." % self.outputFileType)        
+        paramDict = OrderedDict([("targetUrl",None)])      
+        self.fillInputParams(paramDict)
         
-        # Read command file
-        commandFile =self.getCMDFile()    
-        if commandFile == "":
-            logging.error("   [!] Could not find cmd input!")
-            return()
-        
-        with open (commandFile, "r") as f:
-            targetUrl=f.read()[:-1]
-        
-        # Complete template
+        # Fill template
         urlContent = URL_TEMPLATE
-        urlContent = urlContent.replace("<<<URL>>>", targetUrl)
+        urlContent = urlContent.replace("<<<URL>>>", paramDict["targetUrl"])
              
         # Write in new SCF file
         f = open(self.outputFilePath, 'w')

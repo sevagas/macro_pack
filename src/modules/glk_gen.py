@@ -3,6 +3,7 @@
 
 import logging
 from modules.mp_generator import Generator
+from collections import OrderedDict
 
 """
 See https://www.exploit-db.com/exploits/42994/
@@ -31,19 +32,12 @@ class GlkGenerator(Generator):
     def generate(self):
                 
         logging.info(" [+] Generating %s file..." % self.outputFileType)
-        
-        # Read command file
-        commandFile =self.getCMDFile()    
-        if commandFile == "":
-            logging.error("   [!] Could not find cmd input!")
-            return()
-        
-        with open (commandFile, "r") as f:
-            targetUrl=f.read()[:-1]
+        paramDict = OrderedDict([("targetUrl",None)])      
+        self.fillInputParams(paramDict)
         
         # Complete template
         glkContent = GLK_TEMPLATE
-        glkContent = glkContent.replace("<<<URL>>>", targetUrl)
+        glkContent = glkContent.replace("<<<URL>>>", paramDict["targetUrl"])
              
         # Write in new SCF file
         f = open(self.outputFilePath, 'w')

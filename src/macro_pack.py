@@ -280,6 +280,9 @@ def main(argv):
         if os.isatty(0) == False: # check if something is being piped
             logging.info("   [-] Waiting for piped input feed...")  
             mpSession.stdinContent = sys.stdin.readlines()
+            # Close Stdin pipe so we can call input() later without triggering EOF
+            #sys.stdin.close()
+            sys.stdin = sys.__stdin__
     else:
         if not os.path.isfile(mpSession.vbaInput):
             logging.error("   [!] ERROR: Could not find %s!" % mpSession.vbaInput)
@@ -385,18 +388,6 @@ def main(argv):
     except Exception:
         logging.exception(" [!] Exception caught!")
         
-        logging.error(" [!] Hints: Check if MS office is really closed and Antivirus did not catch the files")
-        if sys.platform == "win32":
-            logging.error(" [!] Attempt to force close MS Office applications...")
-            objExcel = win32com.client.Dispatch("Excel.Application")
-            objExcel.Application.Quit()
-            del objExcel
-            objWord = win32com.client.Dispatch("Word.Application")
-            objWord.Application.Quit()
-            del objWord
-            ppt = win32com.client.Dispatch("PowerPoint.Application")
-            ppt.Quit()
-            del ppt
      
     logging.info(" [+] Cleaning...")
     shutil.rmtree(WORKING_DIR)   

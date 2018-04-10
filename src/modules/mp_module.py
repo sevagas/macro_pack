@@ -4,6 +4,7 @@
 import os, mmap, logging,re
 from common import utils
 from common.utils import MSTypes
+import shlex
 
 class MpModule():
     def __init__(self,mpSession):
@@ -70,6 +71,38 @@ class MpModule():
         else:
             return ""
         
+    
+    def fillInputParams(self, paramDict):
+        """ 
+        Fill parameters dictionnary using given input. If input is missing, ask for input to user 
+        """
+        # Fill parameters based on input file
+        cmdFile = self.getCMDFile()
+        if cmdFile is not None and cmdFile != "":
+            f = open(cmdFile, 'r')
+            valuesFileContent = f.read()
+            f.close()
+            os.remove(cmdFile)
+            inputValues = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
+            if len(inputValues) == len(paramDict): 
+                i = 0  
+                # Fill entry parameterds
+                for key, value in paramDict.items():
+                    paramDict[key] = inputValues[i]
+                    i += 1
+            else:
+                logging.error("   [!] Incorrect number of provided input parameters (%d provided where this features needs %d).\n    Required parameters: %s\n" % (len(inputValues),len(paramDict), list(paramDict.keys())))
+                return
+        else:
+            # if input was not provided
+            logging.warn("   [!] Could not find input parameters. Please provide the next values:")
+            for key, value in paramDict.items():
+                if value is None or value == "" or value.isspace():
+                    newValue = None
+                    while newValue is None or newValue == "" or newValue.isspace():
+                        newValue = input("    %s:" % key)
+                    paramDict[key] = newValue
+                
     
     def getMainVBAFile(self):
         """ return main vba file (the one containing macro entry point) """

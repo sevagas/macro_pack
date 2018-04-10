@@ -99,46 +99,56 @@ class PowerPointGenerator(VBAGenerator):
     def generate(self):
         
         logging.info(" [+] Generating MS PowerPoint document...")
+        try:
+            self.enableVbom()
+            
+            # open up an instance of PowerPoint with the win32com driver
+            ppt = win32com.client.Dispatch("PowerPoint.Application")
+    
+            logging.info("   [-] Open presentation...")
+            presentation = ppt.Presentations.Add(WithWindow = False)
+            
+            self.resetVBAEntryPoint()
+            logging.info("   [-] Inject VBA...")
+            # Read generated files
+            for vbaFile in self.getVBAFiles():
+                # Inject all vba files as modules
+                with open (vbaFile, "r") as f:
+                    macro=f.read()
+                    pptModule = presentation.VBProject.VBComponents.Add(1)
+                    pptModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
+                    pptModule.CodeModule.AddFromString(macro)
+            
+            # Remove Informations
+            logging.info("   [-] Remove hidden data and personal info...")
+            ppRDIAll=99
+            presentation.RemoveDocumentInformation(ppRDIAll)
+            
+            logging.info("   [-] Save presentation...")
+            ppSaveAsOpenXMLPresentationMacroEnabled = 25 
+            if MSTypes.PPT == self.outputFileType:
+                presentation.SaveAs(self.outputFilePath, FileFormat=ppSaveAsOpenXMLPresentationMacroEnabled)
+            # save the presentation and close
+            ppt.Presentations(1).Close()
+            ppt.Quit()
+            # garbage collection
+            del ppt
+            
+            self.disableVbom()
+            
+            logging.info("   [-] Inject Custom UI...")
+            self._injectCustomUi()
+               
+            logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+            logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
         
-        self.enableVbom()
+        except Exception:
+            logging.exception(" [!] Exception caught!")
+            logging.error(" [!] Hints: Check if MS office is really closed and Antivirus did not catch the files")
+            logging.error(" [!] Attempt to force close MS Powerpoint application...")
+            ppt = win32com.client.Dispatch("PowerPoint.Application")
+            ppt.Quit()
+            del ppt
+     
         
-        # open up an instance of PowerPoint with the win32com driver
-        ppt = win32com.client.Dispatch("PowerPoint.Application")
-
-        logging.info("   [-] Open presentation...")
-        presentation = ppt.Presentations.Add(WithWindow = False)
-        
-        self.resetVBAEntryPoint()
-        logging.info("   [-] Inject VBA...")
-        # Read generated files
-        for vbaFile in self.getVBAFiles():
-            # Inject all vba files as modules
-            with open (vbaFile, "r") as f:
-                macro=f.read()
-                pptModule = presentation.VBProject.VBComponents.Add(1)
-                pptModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
-                pptModule.CodeModule.AddFromString(macro)
-        
-        # Remove Informations
-        logging.info("   [-] Remove hidden data and personal info...")
-        ppRDIAll=99
-        presentation.RemoveDocumentInformation(ppRDIAll)
-        
-        logging.info("   [-] Save presentation...")
-        ppSaveAsOpenXMLPresentationMacroEnabled = 25 
-        if MSTypes.PPT == self.outputFileType:
-            presentation.SaveAs(self.outputFilePath, FileFormat=ppSaveAsOpenXMLPresentationMacroEnabled)
-        # save the presentation and close
-        ppt.Presentations(1).Close()
-        ppt.Quit()
-        # garbage collection
-        del ppt
-        
-        self.disableVbom()
-        
-        logging.info("   [-] Inject Custom UI...")
-        self._injectCustomUi()
-           
-        logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
-        logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
         

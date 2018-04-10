@@ -69,65 +69,74 @@ class WordGenerator(VBAGenerator):
     def generate(self):
         
         logging.info(" [+] Generating MS Word document...")
-        self.enableVbom()
+        try:
+            self.enableVbom()
+    
+            logging.info("   [-] Open document...")
+            # open up an instance of Word with the win32com driver
+            word = win32com.client.Dispatch("Word.Application")
+            # do the operation in background without actually opening Excel
+            word.Visible = False
+            document = word.Documents.Add()
+    
+            logging.info("   [-] Save document format...")
+            wdFormatDocument = 0
+            wdFormatXMLDocument = 12
+            wdFormatXMLDocumentMacroEnabled = 13
+            
+            if MSTypes.WD97 == self.outputFileType:
+                document.SaveAs(self.outputFilePath, FileFormat=wdFormatDocument)
+            elif MSTypes.WD == self.outputFileType and ".docx" in self.outputFilePath:
+                document.SaveAs(self.outputFilePath, FileFormat=wdFormatXMLDocument)
+            elif MSTypes.WD == self.outputFileType and ".docm" in self.outputFilePath:
+                document.SaveAs(self.outputFilePath, FileFormat=wdFormatXMLDocumentMacroEnabled)
+                        
+            self.resetVBAEntryPoint()
+            logging.info("   [-] Inject VBA...")
+            # Read generated files
+            for vbaFile in self.getVBAFiles():
+                if vbaFile == self.getMainVBAFile():       
+                    with open (vbaFile, "r") as f:
+                        # Add the main macro- into ThisDocument part of Word document
+                        wordModule = document.VBProject.VBComponents("ThisDocument")
+                        macro=f.read()
+                        wordModule.CodeModule.AddFromString(macro)
+                else: # inject other vba files as modules
+                    with open (vbaFile, "r") as f:
+                        macro=f.read()
+                        wordModule = document.VBProject.VBComponents.Add(1)
+                        wordModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
+                        wordModule.CodeModule.AddFromString(macro)
+                        document.Application.Options.Pagination = False
+                        document.UndoClear()
+                        document.Repaginate()
+                        document.Application.ScreenUpdating = True 
+                        document.Application.ScreenRefresh()
+                        #logging.info("   [-] Saving module %s..." %  wordModule.Name)
+                        document.Save()
+            
+            #word.DisplayAlerts=False
+            # Remove Informations
+            logging.info("   [-] Remove hidden data and personal info...")
+            wdRDIAll=99
+            document.RemoveDocumentInformation(wdRDIAll)
+            
+            # save the document and close
+            document.Save()
+            document.Close()
+            word.Application.Quit()
+            # garbage collection
+            del word
+            self.disableVbom()
+    
+            logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+            logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
+        except Exception:
+            logging.exception(" [!] Exception caught!")
+            logging.error(" [!] Hints: Check if MS office is really closed and Antivirus did not catch the files")
+            logging.error(" [!] Attempt to force close MS Word...")
+            objWord = win32com.client.Dispatch("Word.Application")
+            objWord.Application.Quit()
+            del objWord
 
-        logging.info("   [-] Open document...")
-        # open up an instance of Word with the win32com driver
-        word = win32com.client.Dispatch("Word.Application")
-        # do the operation in background without actually opening Excel
-        word.Visible = False
-        document = word.Documents.Add()
-
-        logging.info("   [-] Save document format...")
-        wdFormatDocument = 0
-        wdFormatXMLDocument = 12
-        wdFormatXMLDocumentMacroEnabled = 13
-        
-        if MSTypes.WD97 == self.outputFileType:
-            document.SaveAs(self.outputFilePath, FileFormat=wdFormatDocument)
-        elif MSTypes.WD == self.outputFileType and ".docx" in self.outputFilePath:
-            document.SaveAs(self.outputFilePath, FileFormat=wdFormatXMLDocument)
-        elif MSTypes.WD == self.outputFileType and ".docm" in self.outputFilePath:
-            document.SaveAs(self.outputFilePath, FileFormat=wdFormatXMLDocumentMacroEnabled)
-                    
-        self.resetVBAEntryPoint()
-        logging.info("   [-] Inject VBA...")
-        # Read generated files
-        for vbaFile in self.getVBAFiles():
-            if vbaFile == self.getMainVBAFile():       
-                with open (vbaFile, "r") as f:
-                    # Add the main macro- into ThisDocument part of Word document
-                    wordModule = document.VBProject.VBComponents("ThisDocument")
-                    macro=f.read()
-                    wordModule.CodeModule.AddFromString(macro)
-            else: # inject other vba files as modules
-                with open (vbaFile, "r") as f:
-                    macro=f.read()
-                    wordModule = document.VBProject.VBComponents.Add(1)
-                    wordModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
-                    wordModule.CodeModule.AddFromString(macro)
-                    document.Application.Options.Pagination = False
-                    document.UndoClear()
-                    document.Repaginate()
-                    document.Application.ScreenUpdating = True 
-                    document.Application.ScreenRefresh()
-                    #logging.info("   [-] Saving module %s..." %  wordModule.Name)
-                    document.Save()
-        
-        #word.DisplayAlerts=False
-        # Remove Informations
-        logging.info("   [-] Remove hidden data and personal info...")
-        wdRDIAll=99
-        document.RemoveDocumentInformation(wdRDIAll)
-        
-        # save the document and close
-        document.Save()
-        document.Close()
-        word.Application.Quit()
-        # garbage collection
-        del word
-        self.disableVbom()
-
-        logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
-        logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
         
