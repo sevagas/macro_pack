@@ -178,7 +178,7 @@ def printUsage(banner, currentApp, mpSession):
         Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, xslx, pptm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
         Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
-        Supported shortcuts extensions are: scf, url, glk
+        Supported shortcuts extensions are: lnk, scf, url, glk
     
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
          Use with EMBED_EXE template to auto drop and exec the file or with EMBED_DLL to drop/load the embedded dll.
@@ -204,7 +204,7 @@ def printUsage(banner, currentApp, mpSession):
 
  Notes:   
     Have a look at README.md file for more details and usage!
-    Homes: www.github.com/sevagas && blog.sevagas.com 
+    Home: www.github.com/sevagas && blog.sevagas.com 
     
 """  
     print(details)

