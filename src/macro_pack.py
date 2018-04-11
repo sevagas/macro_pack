@@ -24,6 +24,7 @@ from modules.listen_server import ListenServer
 from modules.scf_gen import SCFGenerator
 from modules.url_gen import UrlShortcutGenerator
 from modules.glk_gen import GlkGenerator
+from modules.lnk_gen import LNKGenerator
 
 from common import utils, mp_session, help
 from common.utils import MSTypes
@@ -378,7 +379,10 @@ def main(argv):
         if mpSession.outputFileType == MSTypes.GLK:
             generator = GlkGenerator(mpSession)
             generator.run()
-        
+            
+        if mpSession.outputFileType == MSTypes.LNK:
+            generator = LNKGenerator(mpSession)
+            generator.run()
         
         # Activate Web server
         if mpSession.listen:

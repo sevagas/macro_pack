@@ -84,6 +84,7 @@ class MpModule():
             f.close()
             os.remove(cmdFile)
             inputValues = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
+            #logging.info(str(inputValues))
             if len(inputValues) == len(paramDict): 
                 i = 0  
                 # Fill entry parameterds
