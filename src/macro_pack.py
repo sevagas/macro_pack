@@ -158,13 +158,7 @@ def handleOfficeFormats(mpSession):
         else:
             logging.warn(" [!] Word and Word97 are only format supported for DDE attacks.")
      
-    if mpSession.runTarget: #run com attack
-        generator = ComGenerator(mpSession)
-        generator.run()
-        
-    if mpSession.dcom: #run dcom attack
-        generator = DcomGenerator(mpSession)
-        generator.run()
+
 
 
 def main(argv):   
@@ -258,8 +252,9 @@ def main(argv):
                 help.printUsage(BANNER, sys.argv[0], mpSession)                          
                 sys.exit(0)
                     
-    
-    os.system('cls' if os.name == 'nt' else 'clear')
+    if logLevel == "INFO":
+        os.system('cls' if os.name == 'nt' else 'clear')
+        
     # Logging
     logging.basicConfig(level=getattr(logging, logLevel),format="%(message)s", handlers=[utils.ColorLogFiler()])
     
@@ -271,7 +266,7 @@ def main(argv):
     # Check output file format
     if mpSession.outputFilePath:
         logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
-    elif mpSession.listen == False:
+    elif mpSession.listen == False and mpSession.runTarget is None and mpSession.dcomTarget is None:
         logging.error("   [!] You need to provide an output file! (-G option)")
         sys.exit(2)
     
@@ -382,6 +377,16 @@ def main(argv):
             
         if mpSession.outputFileType == MSTypes.LNK:
             generator = LNKGenerator(mpSession)
+            generator.run()
+        
+        #run com attack
+        if mpSession.runTarget: 
+            generator = ComGenerator(mpSession)
+            generator.run()
+        
+        #run dcom attack
+        if mpSession.dcom: 
+            generator = DcomGenerator(mpSession)
             generator.run()
         
         # Activate Web server
