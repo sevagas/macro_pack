@@ -59,17 +59,18 @@ class MSTypes():
     LNK="Shell Link"
     GLK = "Groove Shortcut"
     SCF="Explorer Command File"
+    XSL="XSLT Stylesheet"
     URL="URL Shortcut"
     UNKNOWN = "Unknown"
     
     MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, MPP, VSD, VSD97] # Formats supported by macro_pack
-    VB_FORMATS = [VBA, VBS, HTA, SCT, WSF ]
+    VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS.extend(MS_OFFICE_FORMATS)
     Shortcut_FORMATS = [LNK, GLK, SCF, URL]
     
     EXTENSION_DICT = { LNK:".lnk", GLK:".glk", SCF:".scf", URL:".url", XL:".xlsm", XL97:".xls", WD:".docm",
                        WD97:".doc", PPT:".pptm", PPT97:".ppt", MPP:".mpp", PUB:".pub", VSD:".vsdm", VSD97:".vsd", 
-                       VBA:".vba", VBS:".vbs", HTA:".hta", SCT:".wsc", WSF:".wsf" }
+                       VBA:".vba", VBS:".vbs", HTA:".hta", SCT:".wsc", WSF:".wsf", XSL:".xsl" }
     
     @classmethod
     def guessApplicationType(self, documentPath):
@@ -114,6 +115,8 @@ class MSTypes():
             result = self.LNK
         elif ".scf" ==  extension.lower():
             result = self.SCF
+        elif ".xsl" ==  extension.lower():
+            result = self.XSL
         else:
             result = self.UNKNOWN
         return result

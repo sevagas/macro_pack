@@ -177,7 +177,7 @@ def printUsage(banner, currentApp, mpSession):
     -G, --generate=OUTPUT_FILE_PATH. Generates a file. Will guess the format based on extension.
         Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, xslx, pptm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
-        Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
+        Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta, xsl.
         Supported shortcuts extensions are: lnk, scf, url, glk
     
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.

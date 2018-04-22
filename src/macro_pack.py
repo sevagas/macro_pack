@@ -22,6 +22,7 @@ from modules.visio_gen import VisioGenerator
 from modules.com_run import ComGenerator
 from modules.listen_server import ListenServer
 from modules.scf_gen import SCFGenerator
+from modules.xsl_gen import XSLGenerator
 from modules.url_gen import UrlShortcutGenerator
 from modules.glk_gen import GlkGenerator
 from modules.lnk_gen import LNKGenerator
@@ -365,6 +366,10 @@ def main(argv):
             
         if mpSession.outputFileType == MSTypes.SCF:
             generator = SCFGenerator(mpSession)
+            generator.run()
+            
+        if mpSession.outputFileType == MSTypes.XSL:
+            generator = XSLGenerator(mpSession)
             generator.run()
                
         if mpSession.outputFileType == MSTypes.URL:
