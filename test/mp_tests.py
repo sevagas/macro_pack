@@ -2,9 +2,11 @@
 # encoding: utf-8
 import sys, os
 import logging
+import psutil, time
 import __main__ as main # @UnresolvedImport To get the real origin of the script not the location of current file 
 from termcolor import colored
 import colorama
+from collections import OrderedDict
 colorama.init() # for nice colored output on windows
 import tabulate # easy_install tabulate
 
@@ -49,7 +51,7 @@ End Sub
 """ % (fileToGenerate,fileToGenerateContent )
 
 
-testSummary = {}
+testSummary = OrderedDict()
 
 
 def testBuild():
@@ -88,12 +90,104 @@ def testLnkGenerators():
     return result
 
 
+
+def _executeFile(testFile,testFormat):
+    """ Executes an MSType format file based on its format """
+    absPathTestFile = os.path.abspath(testFile)
+    if testFormat in MSTypes.MS_OFFICE_FORMATS:
+        os.system("%s %s  --run=%s -q" % (sys.executable,MP_MAIN, testFile))
+    elif testFormat == MSTypes.VBS or testFormat == MSTypes.WSF:
+        os.system("wscript %s" % (testFile))
+    elif testFormat == MSTypes.HTA:
+        os.system("mshta %s" % (absPathTestFile))
+    elif testFormat == MSTypes.SCT:
+        os.system("regsvr32 /u /n /s /i:%s scrobj.dll" % (testFile))
+    elif testFormat == MSTypes.XSL:
+        os.system("wmic os get /FORMAT:\"%s\"" % (testFile))
+    else:
+        os.system("cmd.exe /c %s" % (testFile))
+
+
+def _clearTextVBGenerationTest(testFile, testFormat):
+    vbaTestFile = "testmacro.vba"
+    logging.info(" [+] Testing generation of %s file..." % testFormat)
+    os.system("%s %s -f %s -G %s -q" % (sys.executable,MP_MAIN,vbaTestFile, testFile))
+    assert(os.path.isfile(testFile))
+    logging.info("   [-] Success!\n")
+    
+    if testFormat not in [MSTypes.VBA]:
+        logging.info(" [+] Testing run of %s file..." % testFormat)
+        _executeFile(testFile,testFormat)
+        # Check result
+        assert(os.path.isfile(fileToGenerate))
+        with open(fileToGenerate, 'rb') as infile:
+            content = infile.read().decode('utf-16')
+        #logging.info("Content:|%s|  - fileToGenerateContent:|%s|" % (content, fileToGenerateContent))
+        assert(content == fileToGenerateContent)
+        testSummary[testFormat+ " in Clear Text"] = "[OK]"
+        logging.info("   [-] Success!\n")
+        os.remove(fileToGenerate)
+
+
+def _obfuscatedVBGenerationTest(testFile, testFormat):
+    vbaTestFile = "testmacro.vba"
+    logging.info(" [+] Testing generation of %s obfuscated file..." % testFormat)
+    os.system("%s %s -f %s -G %s -o -q" % (sys.executable,MP_MAIN,vbaTestFile, testFile))
+    assert(os.path.isfile(testFile))
+    
+    logging.info("   [-] Success!\n")
+
+    if testFormat not in [MSTypes.VBA]:
+        logging.info(" [+] Testing run of %s obfuscated file..." % testFormat)
+        _executeFile(testFile,testFormat)
+        # Check result
+        assert(os.path.isfile(fileToGenerate))
+        with open(fileToGenerate, 'rb') as infile:
+            content = infile.read().decode('utf-16')
+        assert(content == fileToGenerateContent)
+        logging.info("   [-] Success!\n")
+        testSummary[testFormat+ " obfuscated"] = "[OK]"
+        os.remove(fileToGenerate)
+
+
+def _obfuscatedVBCmdTemplateGenerationTest(testFile, testFormat):
+    logging.info(" [+] Testing generation of %s CMD template file..." % testFormat)
+    os.system("echo calc.exe | %s %s -G %s -o -q --template=CMD" % (sys.executable,MP_MAIN, testFile))
+    assert(os.path.isfile(testFile))
+    
+    logging.info("   [-] Success!\n")
+
+    if testFormat not in [MSTypes.VBA]:
+        logging.info(" [+] Testing run of %s CMD template file..." % testFormat)
+        logging.info("   [-] Kill existing calc process")
+        for proc in psutil.process_iter():
+            processObj = psutil.Process(proc.pid)
+            pname = processObj.name()
+            if pname in [ "calc", "Calculator", "calc.exe", "Calculator.exe"]:
+                proc.kill()
+        
+        _executeFile(testFile,testFormat)
+        # Check result (calc.exe should have popped)
+        time.sleep(0.5)
+        calcProcessFound = False
+        for proc in psutil.process_iter():
+            processObj = psutil.Process(proc.pid)
+            pname = processObj.name()
+            if pname in [ "calc", "Calculator", "calc.exe", "Calculator.exe"]:
+                calcProcessFound = True
+                proc.kill()
+        assert(calcProcessFound == True)
+        logging.info("   [-] Success!\n")
+        testSummary[testFormat+ " CMD template"] = "[OK]"
+
+
+
 def testVBGenerators():
     """ 
     will run test of MS Office and VBS based formats 
     The tests consist into creating the documents, then running them triggering a file creation macro. Then checking the file is well created
     The tests are run in both cleartext and obfuscated mode.
-    
+    A third test will check the correct generation of CMD template (pop calc.exe and check it)
     """
     result = True
     vbaTestFile = "testmacro.vba"
@@ -103,27 +197,7 @@ def testVBGenerators():
     for testFormat in MSTypes.VB_FORMATS:
         testFile = utils.randomAlpha(8)+MSTypes.EXTENSION_DICT[testFormat]
         try:
-            logging.info(" [+] Testing generation of %s file..." % testFormat)
-            os.system("%s %s -f %s -G %s -q" % (sys.executable,MP_MAIN,vbaTestFile, testFile))
-            assert(os.path.isfile(testFile))
-            logging.info("   [-] Success!\n")
-            
-            if testFormat not in [MSTypes.VBA, MSTypes.SCT]:
-                logging.info(" [+] Testing run of %s file..." % testFormat)
-                if testFormat in MSTypes.MS_OFFICE_FORMATS:
-                    os.system("%s %s  --run=%s -q" % (sys.executable,MP_MAIN, testFile))
-                else:
-                    os.system("cmd.exe /c %s" % (testFile))
-                # Check result
-                assert(os.path.isfile(fileToGenerate))
-                with open(fileToGenerate, 'rb') as infile:
-                    content = infile.read().decode('utf-16')
-                #logging.info("Content:|%s|  - fileToGenerateContent:|%s|" % (content, fileToGenerateContent))
-                assert(content == fileToGenerateContent)
-                testSummary[testFormat+ " in Clear Text"] = "[OK]"
-                logging.info("   [-] Success!\n")
-                os.remove(fileToGenerate)
-               
+            _clearTextVBGenerationTest(testFile, testFormat)  
         except:
             result = False
             testSummary[testFormat+ " in Clear Text"] = "[KO]"
@@ -134,30 +208,21 @@ def testVBGenerators():
         
         testFile = utils.randomAlpha(8)+MSTypes.EXTENSION_DICT[testFormat]
         try:
-            logging.info(" [+] Testing generation of %s obfuscated file..." % testFormat)
-            os.system("%s %s -f %s -G %s -o -q" % (sys.executable,MP_MAIN,vbaTestFile, testFile))
-            assert(os.path.isfile(testFile))
-            
-            logging.info("   [-] Success!\n")
-
-            if testFormat not in [MSTypes.VBA, MSTypes.SCT]:
-                logging.info(" [+] Testing run of %s obfuscated file..." % testFormat)
-                if testFormat in MSTypes.MS_OFFICE_FORMATS:
-                    os.system("%s %s  --run=%s -q" % (sys.executable,MP_MAIN, testFile))
-                else:
-                    os.system("cmd.exe /c %s" % (testFile))
-                # Check result
-                assert(os.path.isfile(fileToGenerate))
-                with open(fileToGenerate, 'rb') as infile:
-                    content = infile.read().decode('utf-16')
-                assert(content == fileToGenerateContent)
-                logging.info("   [-] Success!\n")
-                testSummary[testFormat+ " obfuscated"] = "[OK]"
-                os.remove(fileToGenerate)
-            
+            _obfuscatedVBGenerationTest(testFile, testFormat)     
         except:
             result = False
             testSummary[testFormat+ " obfuscated"] = "[KO]"
+            logging.exception("   [!] Error!\n")
+            
+        if os.path.isfile(testFile):
+            os.remove(testFile)
+            
+        testFile = utils.randomAlpha(8)+MSTypes.EXTENSION_DICT[testFormat]
+        try:
+            _obfuscatedVBCmdTemplateGenerationTest(testFile, testFormat)     
+        except:
+            result = False
+            testSummary[testFormat+ " CMD template"] = "[KO]"
             logging.exception("   [!] Error!\n")
             
         if os.path.isfile(testFile):

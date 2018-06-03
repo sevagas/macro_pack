@@ -7,6 +7,7 @@ import string
 import logging
 from termcolor import colored
 import os, sys
+from collections import OrderedDict
 
 
 
@@ -68,9 +69,14 @@ class MSTypes():
     VB_FORMATS.extend(MS_OFFICE_FORMATS)
     Shortcut_FORMATS = [LNK, GLK, SCF, URL]
     
-    EXTENSION_DICT = { LNK:".lnk", GLK:".glk", SCF:".scf", URL:".url", XL:".xlsm", XL97:".xls", WD:".docm",
-                       WD97:".doc", PPT:".pptm", PPT97:".ppt", MPP:".mpp", PUB:".pub", VSD:".vsdm", VSD97:".vsd", 
-                       VBA:".vba", VBS:".vbs", HTA:".hta", SCT:".wsc", WSF:".wsf", XSL:".xsl" }
+    # OrderedDict([("target_url",None),("download_path",None)]) 
+    EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"),( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
+                                  (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
+                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".wsc"),( WSF,".wsf"),( XSL,".xsl") ]) 
+    
+    #EXTENSION_DICT = { LNK:".lnk", GLK:".glk", SCF:".scf", URL:".url", XL:".xlsm", XL97:".xls", WD:".docm",
+    #                   WD97:".doc", PPT:".pptm", PPT97:".ppt", MPP:".mpp", PUB:".pub", VSD:".vsdm", VSD97:".vsd", 
+    #                   VBA:".vba", VBS:".vbs", HTA:".hta", SCT:".wsc", WSF:".wsf", XSL:".xsl" }
     
     @classmethod
     def guessApplicationType(self, documentPath):

