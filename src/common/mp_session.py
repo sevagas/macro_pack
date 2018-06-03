@@ -34,6 +34,7 @@ class MpSession:
         self.dcomTarget = None
         self.runTarget = None
         self.printFile = False
+        self.unicodeRtlo = None
         
         self.listen = False
         self.listenPort = 80

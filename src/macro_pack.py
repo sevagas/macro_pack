@@ -169,7 +169,7 @@ def main(argv):
     mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
          
     try:
-        longOptions = ["embed=", "listen=","generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=", "dde", "print"] 
+        longOptions = ["embed=", "listen=","generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=","unicode-rtlo=", "dde", "print"] 
         shortOptions= "e:l:s:f:t:G:hqmop"
         # only for Pro release
         if MP_TYPE == "Pro":
@@ -219,6 +219,8 @@ def main(argv):
         elif opt == "--run":
             if sys.platform == "win32":
                 mpSession.runTarget = os.path.abspath(arg)
+        elif opt == "--unicode-rtlo":
+            mpSession.unicodeRtlo = arg
         elif opt in ("-G", "--generate"): 
             mpSession.outputFilePath = os.path.abspath(arg)
         elif opt=="-h" or opt=="--help": 
@@ -250,6 +252,7 @@ def main(argv):
                     help.printUsage(BANNER, sys.argv[0], mpSession)                         
                     sys.exit(0)
             else:
+                #print("opt:%s, arg:%s",(opt,arg))
                 help.printUsage(BANNER, sys.argv[0], mpSession)                          
                 sys.exit(0)
                     
@@ -270,6 +273,22 @@ def main(argv):
     elif mpSession.listen == False and mpSession.runTarget is None and mpSession.dcomTarget is None:
         logging.error("   [!] You need to provide an output file! (-G option)")
         sys.exit(2)
+        
+        
+    # Edit outputfile name to spoof extension if unicodeRtlo option is enabled
+    if mpSession.unicodeRtlo:
+        logging.info("   [-] Inject %s false extension with unicode RTLO" % mpSession.unicodeRtlo)
+        # Separate document and extension
+        (fileName, fileExtension) = os.path.splitext(mpSession.outputFilePath)
+        # Append unicode RTLO to file name
+        fileName += '\u202e'
+        # Append extension to spoof in reverse order
+        fileName += mpSession.unicodeRtlo[::-1]
+        # Appent file extension
+        fileName +=  fileExtension
+        mpSession.outputFilePath = fileName
+        logging.info("   [-] File name modified to: %s" %  mpSession.outputFilePath)
+        
     
     # check input args
     if mpSession.vbaInput is None:
