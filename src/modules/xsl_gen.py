@@ -6,16 +6,19 @@ from modules.vbs_gen import VBSGenerator
 
 XSL_TEMPLATE = \
 r"""<?xml version='1.0'?>
-<xsl:stylesheet  xmlns:xsl="http://www.w3.org/TR/WD-xsl">
+<stylesheet
+    xmlns="http://www.w3.org/1999/XSL/Transform" xmlns:ms="urn:schemas-microsoft-com:xslt"
+    xmlns:user="placeholder"
+    version="1.0">
+<output method="text"/>
+<ms:script implements-prefix="user" language="VBScript"><![CDATA[ 
 
-<xsl:script language="VBScript"><![CDATA[ 
 <<<VBS>>>
 <<<MAIN>>>
 
-
 ]]>
-</xsl:script>
-</xsl:stylesheet>
+</ms:script>
+</stylesheet>
 """
 
 
