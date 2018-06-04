@@ -123,10 +123,13 @@ python macro_pack.py --help # if python3 is default install
 ```
   
 If you want to produce a standalone exe using pyinstaller:  
+* Install pyinstaller: pip install pyinstaller
 * Install PyCrypto at http://www.voidspace.org.uk/python/pycrypto-2.6.1/  
 * Double-click on the "build.bat" script on a Windows machine.  
 
 The resulted macro\_pack.exe will be inside the **bin** directory.  
+
+**Note:** pycrypto is not available for python after 3.4. If you want pyinstaller encryption, do not use latest python version.
 
 
 ## Some examples
