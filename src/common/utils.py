@@ -62,15 +62,16 @@ class MSTypes():
     SCF="Explorer Command File"
     XSL="XSLT Stylesheet"
     URL="URL Shortcut"
+    SETTINGS_MS="Settings Shortcut"
     UNKNOWN = "Unknown"
     
     MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, MPP, VSD, VSD97] # Formats supported by macro_pack
     VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS.extend(MS_OFFICE_FORMATS)
-    Shortcut_FORMATS = [LNK, GLK, SCF, URL]
+    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS]
     
     # OrderedDict([("target_url",None),("download_path",None)]) 
-    EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"),( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
+    EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
                                   (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
                                   (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".wsc"),( WSF,".wsf"),( XSL,".xsl") ]) 
     
@@ -119,6 +120,8 @@ class MSTypes():
             result = self.GLK    
         elif ".lnk" ==  extension.lower():
             result = self.LNK
+        elif ".settingcontent-ms" == extension.lower():
+            result = self.SETTINGS_MS
         elif ".scf" ==  extension.lower():
             result = self.SCF
         elif ".xsl" ==  extension.lower():

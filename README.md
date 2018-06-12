@@ -67,6 +67,7 @@ Shortcuts supported formats are:
 * Explorer Command File (.scf)
 * URL Shortcut (.url)
 * Groove Shortcuts (.glk)
+* Settings Shortcuts (.settingcontent-ms)
 
 Note that all scripting and shortcuts formats (except LNK) can be generated on Linux version of macro\_pack as well.
 
