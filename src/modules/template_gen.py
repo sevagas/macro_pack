@@ -110,6 +110,7 @@ class TemplateToVba(MpModule):
     def _processEmbedExeTemplate(self):
         # Get parameters      
         paramDict = OrderedDict([("extract_path", None)])  
+        self.fillInputParams(paramDict)
         logging.info("   [-] Output path when file is extracted: %s" % paramDict["extract_path"])
 
         content = vbLib.templates.EMBED_EXE
