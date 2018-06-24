@@ -5,7 +5,7 @@ import logging
 from modules.mp_generator import Generator
 from collections import OrderedDict
 if sys.platform == "win32":
-    from win32com.client import Dispatch
+    from win32com.client import Dispatch  # @UnresolvedImport
 
 
 class LNKGenerator(Generator):
@@ -18,12 +18,12 @@ class LNKGenerator(Generator):
         else:    
             return True
         
-    def buildLnkWithWscript(self, target, targetArgs=None, iconPath=None):
+    def buildLnkWithWscript(self, target, targetArgs=None, iconPath=None, workingDirectory = ""):
         """ Build an lnk shortcut using WScript wrapper """
         shell = Dispatch("WScript.Shell")
         shortcut = shell.CreateShortcut(self.outputFilePath)
         shortcut.Targetpath = target
-        shortcut.WorkingDirectory = r"C:\Windows\System32"
+        shortcut.WorkingDirectory = workingDirectory
         if targetArgs:
             shortcut.Arguments = targetArgs
         if iconPath:
@@ -34,11 +34,12 @@ class LNKGenerator(Generator):
     def generate(self):
         """ Generate LNK file """
         logging.info(" [+] Generating %s file..." % self.outputFileType)
-        paramDict = OrderedDict([("Shortcut_Target",None), ("Shortcut_Icon",None)])      
+        paramDict = OrderedDict([("Shortcut_Target",None), ("Shortcut_Icon",None) ]) # ("Work_Directory",None)      
         self.fillInputParams(paramDict)
         
         # Get needed parameters
         iconPath = paramDict["Shortcut_Icon"]
+        #workingDirectory = paramDict["Work_Directory"]
         # Extract shortcut arguments
         CmdLine = paramDict["Shortcut_Target"].split(' ', 1)
         target = CmdLine[0]
@@ -47,7 +48,7 @@ class LNKGenerator(Generator):
         else:
             targetArgs = None
         # Create lnk file
-        self.buildLnkWithWscript(target, targetArgs, iconPath)
+        self.buildLnkWithWscript(target, targetArgs, iconPath) # ("Work_Directory",None)
         
         logging.info("   [-] Generated %s file: %s" % (self.outputFileType, self.outputFilePath))
         logging.info("   [-] Test with: \nBrowse %s dir to trigger icon resolution. Click on file to trigger shortcut.\n" % self.outputFilePath)
