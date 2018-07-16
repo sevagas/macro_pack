@@ -63,12 +63,13 @@ class MSTypes():
     XSL="XSLT Stylesheet"
     URL="URL Shortcut"
     SETTINGS_MS="Settings Shortcut"
+    LIBRARY_MS="MS Library"
     UNKNOWN = "Unknown"
     
     MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, MPP, VSD, VSD97] # Formats supported by macro_pack
     VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS.extend(MS_OFFICE_FORMATS)
-    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS]
+    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS]
     
     # OrderedDict([("target_url",None),("download_path",None)]) 
     EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
@@ -122,6 +123,8 @@ class MSTypes():
             result = self.LNK
         elif ".settingcontent-ms" == extension.lower():
             result = self.SETTINGS_MS
+        elif ".library-ms" == extension.lower():
+            result = self.LIBRARY_MS
         elif ".scf" ==  extension.lower():
             result = self.SCF
         elif ".xsl" ==  extension.lower():
