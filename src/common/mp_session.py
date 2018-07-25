@@ -9,18 +9,18 @@ class MpSession:
         self.workingPath = workingPath
         self.version = version
         self.mpType = mpType
-        
+
         # Attrs depending on getter/setter
         self._outputFilePath = ""
         self._outputFileType = MSTypes.UNKNOWN
-        
+
         # regular Attrs
         self.vbomEncode = False
         self.background = False
         self.avBypass = False
-        self.obfuscateForm =  False  
-        self.obfuscateNames =  False 
-        self.obfuscateStrings =  False 
+        self.obfuscateForm =  False
+        self.obfuscateNames =  False
+        self.obfuscateStrings =  False
         self.persist = False
         self.keepAlive = False
         self.trojan = False
@@ -35,22 +35,24 @@ class MpSession:
         self.runTarget = None
         self.printFile = False
         self.unicodeRtlo = None
-        
+
         self.listen = False
         self.listenPort = 80
+        self.listenRoot = "."
         self.embeddedFilePath = None
-    
+
+        self.Wlisten = False
+        self.WRoot = "."
+
     @property
     def outputFileType(self):
-        return self._outputFileType 
-    
+        return self._outputFileType
+
     @property
     def outputFilePath(self):
-        return self._outputFilePath 
-    
+        return self._outputFilePath
+
     @outputFilePath.setter
     def outputFilePath(self, outputFilePath):
         self._outputFilePath = outputFilePath
         self._outputFileType = MSTypes.guessApplicationType(self._outputFilePath)
-        
-        

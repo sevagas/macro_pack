@@ -21,6 +21,7 @@ from modules.excel_dde import ExcelDDE
 from modules.visio_gen import VisioGenerator
 from modules.com_run import ComGenerator
 from modules.listen_server import ListenServer
+from modules.Wlisten_server import WListenServer
 from modules.scf_gen import SCFGenerator
 from modules.xsl_gen import XSLGenerator
 from modules.url_gen import UrlShortcutGenerator
@@ -64,14 +65,14 @@ WORKING_DIR = "temp"
 VERSION="1.6-dev"
 BANNER = """\
 
-  _  _   __    ___  ____   __     ____   __    ___  __ _ 
+  _  _   __    ___  ____   __     ____   __    ___  __ _
  ( \/ ) / _\  / __)(  _ \ /  \   (  _ \ / _\  / __)(  / )
- / \/ \/    \( (__  )   /(  O )   ) __//    \( (__  )  ( 
+ / \/ \/    \( (__  )   /(  O )   ) __//    \( (__  )  (
  \_)(_/\_/\_/ \___)(__\_) \__/   (__)  \_/\_/ \___)(__\_)
-    
 
-   Malicious Office, VBS, and other retro formats for pentests and redteam - Version:%s Release:%s 
-                                                                                           
+
+   Malicious Office, VBS, and other retro formats for pentests and redteam - Version:%s Release:%s
+
 """ % (VERSION, MP_TYPE)
 
 
@@ -87,8 +88,8 @@ def handleOfficeFormats(mpSession):
             genericModule.addVBAModule("")
         else:
             logging.warn(" [!] Stealth option is not available for the format %s" % mpSession.outputFileType)
-                    
-                    
+
+
     # Shall we trojan existing file?
     if mpSession.trojan == False:
         if MSTypes.XL in mpSession.outputFileType:
@@ -138,7 +139,7 @@ def handleOfficeFormats(mpSession):
             else:
                 generator = VisioGenerator(mpSession)
                 generator.run()
-                
+
         if MSTypes.MPP in mpSession.outputFileType:
             if os.path.isfile(mpSession.outputFilePath):
                 generator = MsProjectTrojan(mpSession)
@@ -150,7 +151,7 @@ def handleOfficeFormats(mpSession):
     if mpSession.stealth == True:
         obfuscator = Stealth(mpSession)
         obfuscator.run()
-        
+
     if mpSession.ddeMode: # DDE Attack mode
         if MSTypes.WD in mpSession.outputFileType:
             generator = WordDDE(mpSession)
@@ -160,60 +161,66 @@ def handleOfficeFormats(mpSession):
             generator.run()
         else:
             logging.warn(" [!] Word and Word97 are only format supported for DDE attacks.")
-     
 
 
 
-def main(argv):   
-    
+
+def main(argv):
+
     logLevel = "INFO"
     # initialize macro_pack session object
     mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
-         
+
     try:
-        longOptions = ["embed=", "listen=","generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=","unicode-rtlo=", "dde", "print"] 
-        shortOptions= "e:l:s:f:t:G:hqmop"
+        longOptions = ["embed=", "listen-root=", "listen-port=", "Wlisten=", "generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=","unicode-rtlo=", "dde", "print"]
+        shortOptions= "e:l:P:w:s:f:t:G:hqmop"
         # only for Pro release
         if MP_TYPE == "Pro":
             longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom=", "background"])
-            shortOptions += "T:b" 
+            shortOptions += "T:b"
         # Only enabled on windows
         if sys.platform == "win32":
             longOptions.extend([ "run="])
-        
+
         opts, args = getopt.getopt(argv, shortOptions, longOptions) # @UnusedVariable
-    except getopt.GetoptError:          
-        help.printUsage(BANNER, sys.argv[0], mpSession)                     
-        sys.exit(2)                  
-    for opt, arg in opts:                
-        if opt in ("-o", "--obfuscate"):                 
-            mpSession.obfuscateForm =  True  
-            mpSession.obfuscateNames =  True 
-            mpSession.obfuscateStrings =  True 
-        elif opt=="--obfuscate-form":                 
-            mpSession.obfuscateForm =  True  
-        elif opt=="--obfuscate-names":                 
-            mpSession.obfuscateNames =  True    
-        elif opt=="--obfuscate-strings":                 
-            mpSession.obfuscateStrings =  True                
-        elif opt=="-s" or opt=="--start-function":                 
-            mpSession.startFunction =  arg  
-        elif opt=="-l" or opt=="--listen":                 
+    except getopt.GetoptError:
+        help.printUsage(BANNER, sys.argv[0], mpSession)
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-o", "--obfuscate"):
+            mpSession.obfuscateForm =  True
+            mpSession.obfuscateNames =  True
+            mpSession.obfuscateStrings =  True
+        elif opt=="--obfuscate-form":
+            mpSession.obfuscateForm =  True
+        elif opt=="--obfuscate-names":
+            mpSession.obfuscateNames =  True
+        elif opt=="--obfuscate-strings":
+            mpSession.obfuscateStrings =  True
+        elif opt=="-s" or opt=="--start-function":
+            mpSession.startFunction =  arg
+        elif opt=="-l" or opt=="--listen-root":
             mpSession.listen =  True
-            mpSession.listenPort = int(arg)         
-        elif opt == "-f" or opt== "--input-file": 
+            mpSession.listenRoot = arg
+        elif opt=="-P" or opt=="--listen-port":
+            mpSession.listenPort = int(arg)
+            mpSession.WlistenPort = int(arg)
+        elif opt=="-w" or opt=="--Wlisten":
+            mpSession.Wlisten =  True
+            mpSession.WRoot = arg
+        elif opt == "-f" or opt== "--input-file":
             mpSession.vbaInput = arg
-        elif opt == "-e" or opt== "--embed": 
+        elif opt == "-e" or opt== "--embed":
             mpSession.embeddedFilePath = os.path.abspath(arg)
-        elif opt=="-t" or opt=="--template": 
+        elif opt=="-t" or opt=="--template":
             if arg is None or arg.startswith("-") or  arg == "help" or arg == "HELP":
                 help.printTemplatesUsage(BANNER, sys.argv[0])
                 sys.exit(0)
             else:
                 mpSession.template = arg
-        elif opt=="-q" or opt=="--quiet": 
+        elif opt=="-q" or opt=="--quiet":
             logLevel = "ERROR"
-        elif opt=="-p" or opt=="--print": 
+        elif opt=="-p" or opt=="--print":
             mpSession.printFile = True
         elif opt == "--dde":
             if sys.platform == "win32":
@@ -223,19 +230,19 @@ def main(argv):
                 mpSession.runTarget = os.path.abspath(arg)
         elif opt == "--unicode-rtlo":
             mpSession.unicodeRtlo = arg
-        elif opt in ("-G", "--generate"): 
+        elif opt in ("-G", "--generate"):
             mpSession.outputFilePath = os.path.abspath(arg)
-        elif opt=="-h" or opt=="--help": 
-            help.printUsage(BANNER, sys.argv[0], mpSession)                         
+        elif opt=="-h" or opt=="--help":
+            help.printUsage(BANNER, sys.argv[0], mpSession)
             sys.exit(0)
         else:
-            if MP_TYPE == "Pro": 
-                if opt=="--vbom-encode":      
-                    mpSession.vbomEncode = True               
-                elif opt=="--persist": 
-                    mpSession.persist = True       
-                elif opt=="--keep-alive": 
-                    mpSession.keepAlive = True  
+            if MP_TYPE == "Pro":
+                if opt=="--vbom-encode":
+                    mpSession.vbomEncode = True
+                elif opt=="--persist":
+                    mpSession.persist = True
+                elif opt=="--keep-alive":
+                    mpSession.keepAlive = True
                 elif opt=="--av-bypass":
                     mpSession.avBypass = True
                 elif opt == "-T" or opt=="--trojan":
@@ -249,34 +256,34 @@ def main(argv):
                     mpSession.stealth = True
                 elif opt == "--dcom":
                     mpSession.dcom = True
-                    mpSession.dcomTarget = arg 
+                    mpSession.dcomTarget = arg
                 else:
-                    help.printUsage(BANNER, sys.argv[0], mpSession)                         
+                    help.printUsage(BANNER, sys.argv[0], mpSession)
                     sys.exit(0)
             else:
                 #print("opt:%s, arg:%s",(opt,arg))
-                help.printUsage(BANNER, sys.argv[0], mpSession)                          
+                help.printUsage(BANNER, sys.argv[0], mpSession)
                 sys.exit(0)
-                    
+
     if logLevel == "INFO":
         os.system('cls' if os.name == 'nt' else 'clear')
-        
+
     # Logging
     logging.basicConfig(level=getattr(logging, logLevel),format="%(message)s", handlers=[utils.ColorLogFiler()])
-    
+
 
     logging.info(colored(BANNER, 'green'))
 
-    logging.info(" [+] Preparations...") 
-    
+    logging.info(" [+] Preparations...")
+
     # Check output file format
     if mpSession.outputFilePath:
         logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
-    elif mpSession.listen == False and mpSession.runTarget is None and mpSession.dcomTarget is None:
+    elif mpSession.listen == False and mpSession.Wlisten == False and mpSession.runTarget is None and mpSession.dcomTarget is None:
         logging.error("   [!] You need to provide an output file! (-G option)")
         sys.exit(2)
-        
-        
+
+
     # Edit outputfile name to spoof extension if unicodeRtlo option is enabled
     if mpSession.unicodeRtlo:
         logging.info("   [-] Inject %s false extension with unicode RTLO" % mpSession.unicodeRtlo)
@@ -290,13 +297,13 @@ def main(argv):
         fileName +=  fileExtension
         mpSession.outputFilePath = fileName
         logging.info("   [-] File name modified to: %s" %  mpSession.outputFilePath)
-        
-    
+
+
     # check input args
     if mpSession.vbaInput is None:
         # Argument not supplied, try to get file content from stdin
         if os.isatty(0) == False: # check if something is being piped
-            logging.info("   [-] Waiting for piped input feed...")  
+            logging.info("   [-] Waiting for piped input feed...")
             mpSession.stdinContent = sys.stdin.readlines()
             # Close Stdin pipe so we can call input() later without triggering EOF
             #sys.stdin.close()
@@ -307,8 +314,8 @@ def main(argv):
             sys.exit(2)
         else:
             logging.info("   [-] Input file path: %s" % mpSession.vbaInput)
-    
-    
+
+
     if mpSession.trojan==False:
         # verify that output file does not already exist
         if os.path.isfile(mpSession.outputFilePath):
@@ -321,24 +328,24 @@ def main(argv):
             if os.path.isfile(mpSession.outputFilePath):
                 logging.error("   [!] ERROR: Trojan mode not supported for %s format. \nOutput file %s already exist!" % (mpSession.outputFileType,mpSession.outputFilePath))
                 sys.exit(2)
-    
-    
+
+
     #Create temporary folder
     logging.info("   [-] Temporary working dir: %s" % WORKING_DIR)
     if not os.path.exists(WORKING_DIR):
         os.makedirs(WORKING_DIR)
-    
+
     try:
         # Create temporary work file.
         if mpSession.ddeMode or mpSession.template or (mpSession.outputFileType not in MSTypes.VB_FORMATS):
             inputFile = os.path.join(WORKING_DIR,"command.cmd")
         else:
             inputFile = os.path.join(WORKING_DIR,utils.randomAlpha(9))+".vba"
-        if mpSession.stdinContent is not None: 
+        if mpSession.stdinContent is not None:
             logging.info("   [-] Store std input in file..." )
             f = open(inputFile, 'w')
             f.writelines(mpSession.stdinContent)
-            f.close()    
+            f.close()
         else:
             # Create temporary work file
             if mpSession.vbaInput is not None:
@@ -347,8 +354,8 @@ def main(argv):
         if os.path.isfile(inputFile):
             logging.info("   [-] Temporary input file: %s" %  inputFile)
 
-        
-              
+
+
         # Generate template
         if mpSession.template:
             if MP_TYPE == "Pro":
@@ -357,91 +364,93 @@ def main(argv):
             else:
                 generator = TemplateToVba(mpSession)
                 generator.run()
-            
-                                      
+
+
         # MS Office generation/trojan is only enabled on windows
         if sys.platform == "win32" and mpSession.outputFileType in MSTypes.MS_OFFICE_FORMATS:
             handleOfficeFormats(mpSession)
-            
-                
+
+
         if mpSession.outputFileType == MSTypes.VBS:
             generator = VBSGenerator(mpSession)
             generator.run()
-    
+
         if mpSession.outputFileType == MSTypes.HTA:
             generator = HTAGenerator(mpSession)
             generator.run()
-            
+
         if mpSession.outputFileType == MSTypes.SCT:
             generator = SCTGenerator(mpSession)
             generator.run()
-        
+
         if mpSession.outputFileType == MSTypes.WSF:
             generator = WSFGenerator(mpSession)
             generator.run()
-    
+
         if mpSession.outputFileType == MSTypes.VBA:
             generator = VBAGenerator(mpSession)
             generator.run()
-            
-            
+
+
         if mpSession.outputFileType == MSTypes.SCF:
             generator = SCFGenerator(mpSession)
             generator.run()
-            
+
         if mpSession.outputFileType == MSTypes.XSL:
             generator = XSLGenerator(mpSession)
             generator.run()
-               
+
         if mpSession.outputFileType == MSTypes.URL:
             generator = UrlShortcutGenerator(mpSession)
             generator.run()
-        
+
         if mpSession.outputFileType == MSTypes.GLK:
             generator = GlkGenerator(mpSession)
             generator.run()
-            
+
         if mpSession.outputFileType == MSTypes.LNK:
             generator = LNKGenerator(mpSession)
             generator.run()
-            
+
         if mpSession.outputFileType == MSTypes.SETTINGS_MS:
             generator = SettingsShortcutGenerator(mpSession)
             generator.run()
-            
+
         if mpSession.outputFileType == MSTypes.LIBRARY_MS:
             generator = LibraryShortcutGenerator(mpSession)
             generator.run()
-        
+
         #run com attack
-        if mpSession.runTarget: 
+        if mpSession.runTarget:
             generator = ComGenerator(mpSession)
             generator.run()
-        
+
         #run dcom attack
-        if mpSession.dcom: 
+        if mpSession.dcom:
             generator = DcomGenerator(mpSession)
             generator.run()
-        
+
         # Activate Web server
         if mpSession.listen:
             listener = ListenServer(mpSession)
             listener.run()
-                
+
+        if mpSession.Wlisten:
+            Wlistener = WListenServer(mpSession)
+            Wlistener.run()
+
     except Exception:
         logging.exception(" [!] Exception caught!")
-        
-     
+
+
     logging.info(" [+] Cleaning...")
-    shutil.rmtree(WORKING_DIR)   
-    
+    shutil.rmtree(WORKING_DIR)
+
     logging.info(" Done!\n")
-        
-    
+
+
     sys.exit(0)
 
 
 if __name__ == '__main__':
     main(sys.argv[1:])
-    
-    
