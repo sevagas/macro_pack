@@ -38,7 +38,7 @@ def getRunningApp():
     if getattr(sys, 'frozen', False):
         return sys.executable
     else:
-        import __main__ as main # @UnresolvedImport To get the real origin of the script not the location of current file 
+        import __main__ as main # @UnresolvedImport To get the real origin of the script not the location of current file
         return os.path.abspath(main.__file__)
 
 class MSTypes():
@@ -65,21 +65,21 @@ class MSTypes():
     SETTINGS_MS="Settings Shortcut"
     LIBRARY_MS="MS Library"
     UNKNOWN = "Unknown"
-    
+
     MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, MPP, VSD, VSD97] # Formats supported by macro_pack
     VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS.extend(MS_OFFICE_FORMATS)
     Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS]
-    
-    # OrderedDict([("target_url",None),("download_path",None)]) 
+
+    # OrderedDict([("target_url",None),("download_path",None)])
     EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
                                   (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
-                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".wsc"),( WSF,".wsf"),( XSL,".xsl") ]) 
-    
+                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".wsc"),( WSF,".wsf"),( XSL,".xsl") ])
+
     #EXTENSION_DICT = { LNK:".lnk", GLK:".glk", SCF:".scf", URL:".url", XL:".xlsm", XL97:".xls", WD:".docm",
-    #                   WD97:".doc", PPT:".pptm", PPT97:".ppt", MPP:".mpp", PUB:".pub", VSD:".vsdm", VSD97:".vsd", 
+    #                   WD97:".doc", PPT:".pptm", PPT97:".ppt", MPP:".mpp", PUB:".pub", VSD:".vsdm", VSD97:".vsd",
     #                   VBA:".vba", VBS:".vbs", HTA:".hta", SCT:".wsc", WSF:".wsf", XSL:".xsl" }
-    
+
     @classmethod
     def guessApplicationType(self, documentPath):
         """ Guess MS application type based on extension """
@@ -118,7 +118,7 @@ class MSTypes():
         elif ".url" ==  extension.lower():
             result = self.URL
         elif ".glk" ==  extension.lower():
-            result = self.GLK    
+            result = self.GLK
         elif ".lnk" ==  extension.lower():
             result = self.LNK
         elif ".settingcontent-ms" == extension.lower():
@@ -132,12 +132,3 @@ class MSTypes():
         else:
             result = self.UNKNOWN
         return result
-
-
-    
-        
-
-
-
-
-
