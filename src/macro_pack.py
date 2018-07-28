@@ -172,8 +172,8 @@ def main(argv):
     mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
 
     try:
-        longOptions = ["embed=", "listen-root=", "listen-port=", "Wlisten=", "generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=","unicode-rtlo=", "dde", "print"]
-        shortOptions= "e:l:P:w:s:f:t:G:hqmop"
+        longOptions = ["embed=", "listen=", "port=", "webdav-listen=", "generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=","unicode-rtlo=", "dde", "print"]
+        shortOptions= "e:l:w:s:f:t:G:hqmop"
         # only for Pro release
         if MP_TYPE == "Pro":
             longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom=", "background"])
@@ -199,13 +199,13 @@ def main(argv):
             mpSession.obfuscateStrings =  True
         elif opt=="-s" or opt=="--start-function":
             mpSession.startFunction =  arg
-        elif opt=="-l" or opt=="--listen-root":
+        elif opt=="-l" or opt=="--listen":
             mpSession.listen =  True
             mpSession.listenRoot = arg
-        elif opt=="-P" or opt=="--listen-port":
+        elif opt=="--port":
             mpSession.listenPort = int(arg)
             mpSession.WlistenPort = int(arg)
-        elif opt=="-w" or opt=="--Wlisten":
+        elif opt=="-w" or opt=="--webdav-listen":
             mpSession.Wlisten =  True
             mpSession.WRoot = arg
         elif opt == "-f" or opt== "--input-file":

