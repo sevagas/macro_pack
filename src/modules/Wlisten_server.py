@@ -8,6 +8,9 @@ from wsgidav.wsgidav_app import WsgiDAVApp
 # Import Needed modules
 
 import logging
+import sys
+import os
+import shutil
 from modules.mp_module import MpModule
 
 class WListenServer(MpModule):
@@ -48,4 +51,8 @@ class WListenServer(MpModule):
         "wsgi_app": app,
         }
         server = wsgi.Server(**server_args)
-        server.start()
+        try:
+            server.start()
+        except:
+            logging.info("  [!] Ctrl + C detected, closing WebDAV sever")
+            server.stop()
