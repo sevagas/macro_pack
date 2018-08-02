@@ -204,11 +204,12 @@ def printUsage(banner, currentApp, mpSession):
             Ex. To generate an hta file with spoofed jpg extension use options: -G something.hta --unicode-rtlo=jpg
             In this case, windows or linux explorers will show the file named as: somethingath.jpg
 
-    -P, --listen-port=PORT \tSpecify the listening port for both HTTP and WebDAV servers.
 
-    -l, --listen-root=ROOT_PATH\tOpen an HTTP server from ROOT_PATH listening on default port 80.
+    -l, --listen=ROOT_PATH\tOpen an HTTP server from ROOT_PATH listening on default port 80.
 
-    -w, --Wlisten=ROOT_PATH \tOpen a WebDAV server on default port 80, giving access to ROOT_PATH.
+    -w, --webdav-listen=ROOT_PATH \tOpen a WebDAV server on default port 80, giving access to ROOT_PATH.
+    
+    --port=PORT \tSpecify the listening port for HTTP and WebDAV servers.
 
 """ % (currentApp,currentApp, currentApp, currentApp)
 

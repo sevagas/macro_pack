@@ -22,7 +22,7 @@ class WListenServer(MpModule):
         """ Starts listening server"""
 
         logging.info (" [+] Starting Macro_Pack WebDAV server...")
-        logging.info ("   [-] Files in \"" + self.WRoot + "\" folder are accessible under http://localhost:%s" % self.listenPort)
+        logging.info ("   [-] Files in \"" + self.WRoot + r"\" folder are accessible using url http://<hostname>:%s  or \\<hostname>@%s\DavWWWRoot" % (self.listenPort, self.listenPort))
         logging.info ("   [-] Listening on port %s (ctrl-c to exit)...", self.listenPort)
 
         # Prepare WsgiDAV config
