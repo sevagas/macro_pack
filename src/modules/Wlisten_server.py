@@ -8,9 +8,6 @@ from wsgidav.wsgidav_app import WsgiDAVApp
 # Import Needed modules
 
 import logging
-import sys
-import os
-import shutil
 from modules.mp_module import MpModule
 
 class WListenServer(MpModule):
