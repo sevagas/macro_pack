@@ -48,4 +48,8 @@ class WListenServer(MpModule):
         "wsgi_app": app,
         }
         server = wsgi.Server(**server_args)
-        server.start()
+        try:
+            server.start()
+        except:
+            logging.info("  [!] Ctrl + C detected, closing WebDAV sever")
+            server.stop()
