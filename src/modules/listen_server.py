@@ -13,7 +13,7 @@ from flask import send_from_directory
 import logging
 
 from modules.mp_module import MpModule
-from common.utils import getRunningApp
+from common.utils import getRunningApp, getHostIp
 
 
 webapp = Flask(__name__)
@@ -111,7 +111,7 @@ class ListenServer(MpModule):
         logging.info (" [+] Starting Macro_Pack web server...")
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR) # Disable flask log if easier to debug
-        logging.info ("   [-] Files in \"" + self.listenRoot + "\" folder are accessible using http://<hostname>:%s/u/" % self.listenPort)
+        logging.info ("   [-] Files in \"" + self.listenRoot + "\" folder are accessible using http://{ip}:{port}/u/".format(ip=getHostIp(), port=self.listenPort))
         logging.info ("   [-] Listening on port %s (ctrl-c to exit)..." % self.listenPort)
 
         # Run web server in another thread

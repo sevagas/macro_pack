@@ -7,6 +7,7 @@ import string
 import logging
 from termcolor import colored
 import os, sys
+import socket
 from collections import OrderedDict
 
 
@@ -32,6 +33,11 @@ def randomAlpha(length):
     for i in range(length): # @UnusedVariable
         key += choice(string.ascii_lowercase)
     return key
+
+
+def getHostIp():
+    """ returne current facing IP address """
+    return(socket.gethostbyname(socket.gethostname()))
 
 
 def getRunningApp():

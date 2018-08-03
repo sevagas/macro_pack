@@ -5,6 +5,7 @@
 from cheroot import wsgi
 from wsgidav.dir_browser import WsgiDavDirBrowser
 from wsgidav.wsgidav_app import WsgiDAVApp
+from common.utils import getHostIp
 # Import Needed modules
 
 import logging
@@ -22,7 +23,7 @@ class WListenServer(MpModule):
         """ Starts listening server"""
 
         logging.info (" [+] Starting Macro_Pack WebDAV server...")
-        logging.info ("   [-] Files in \"" + self.WRoot + r"\" folder are accessible using url http://<hostname>:%s  or \\<hostname>@%s\DavWWWRoot" % (self.listenPort, self.listenPort))
+        logging.info ("   [-] Files in \"" + self.WRoot + r"\" folder are accessible using url http://{ip}:{port}  or \\{ip}@{port}\DavWWWRoot".format(ip=getHostIp(), port=self.listenPort))
         logging.info ("   [-] Listening on port %s (ctrl-c to exit)...", self.listenPort)
 
         # Prepare WsgiDAV config
