@@ -31,7 +31,7 @@ class WListenServer(MpModule):
             'middleware_stack' : {
                 WsgiDavDirBrowser,  #Enabling dir_browser middleware
             },
-            'host': 'localhost',
+            'host': '0.0.0.0',
             'dir_browser': {'davmount': False,
                 'enable': True, #Enabling directory browsing on dir_browser
                 'ms_mount': False,
