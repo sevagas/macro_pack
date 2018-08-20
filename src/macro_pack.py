@@ -29,6 +29,7 @@ from modules.glk_gen import GlkGenerator
 from modules.lnk_gen import LNKGenerator
 from modules.settingsms_gen import SettingsShortcutGenerator
 from modules.libraryms_gen import LibraryShortcutGenerator
+from modules.inf_gen import InfGenerator
 
 from common import utils, mp_session, help
 from common.utils import MSTypes
@@ -418,6 +419,10 @@ def main(argv):
 
         if mpSession.outputFileType == MSTypes.LIBRARY_MS:
             generator = LibraryShortcutGenerator(mpSession)
+            generator.run()
+            
+        if mpSession.outputFileType == MSTypes.INF:
+            generator = InfGenerator(mpSession)
             generator.run()
 
         #run com attack
