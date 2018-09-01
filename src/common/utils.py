@@ -93,7 +93,7 @@ class MSTypes():
         extension = os.path.splitext(documentPath)[1]
         if ".xls" == extension.lower():
             result = self.XL97
-        elif ".xlsx" == extension.lower() or extension.lower() == ".xlsm":
+        elif extension.lower() in (".xlsx", ".xlsm", ".xltm"):
             result = self.XL
         elif ".doc" ==  extension.lower():
             result = self.WD97
@@ -105,7 +105,7 @@ class MSTypes():
             result = self.MPP
         elif ".ppt" ==  extension.lower():
             result = self.PPT97
-        elif ".pptm" ==  extension.lower() or extension.lower() == ".pptx":
+        elif extension.lower() in (".pptx", ".pptm", ".potm"):
             result = self.PPT
         elif ".vsd" ==  extension.lower():
             result = self.VSD97

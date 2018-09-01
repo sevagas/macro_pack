@@ -125,9 +125,9 @@ class PowerPointGenerator(VBAGenerator):
             presentation.RemoveDocumentInformation(ppRDIAll)
             
             logging.info("   [-] Save presentation...")
-            ppSaveAsOpenXMLPresentationMacroEnabled = 25 
+            pptXMLFileFormatMap = {".pptm": 25, ".potm": 27}
             if MSTypes.PPT == self.outputFileType:
-                presentation.SaveAs(self.outputFilePath, FileFormat=ppSaveAsOpenXMLPresentationMacroEnabled)
+                presentation.SaveAs(self.outputFilePath, FileFormat=pptXMLFileFormatMap[self.outputFilePath[-5:]])
             # save the presentation and close
             ppt.Presentations(1).Close()
             ppt.Quit()
