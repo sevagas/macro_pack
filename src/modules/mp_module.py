@@ -19,16 +19,18 @@ class MpModule():
         if self._startFunction is not None:
             self.reservedFunctions.append(self._startFunction)
         self.reservedFunctions.append("AutoOpen")
+        self.reservedFunctions.append("AutoNew")
         self.reservedFunctions.append("Workbook_Open")
         self.reservedFunctions.append("Document_Open")
-        self.reservedFunctions.append("Auto_Open")    
+        self.reservedFunctions.append("Auto_Open")
         self.reservedFunctions.append("Document_DocumentOpened")
         self.potentialStartFunctions = []
         self.potentialStartFunctions.append("AutoOpen")
+        self.potentialStartFunctions.append("AutoNew")
         self.potentialStartFunctions.append("Workbook_Open")
-        self.potentialStartFunctions.append("Document_Open")  
-        self.potentialStartFunctions.append("Auto_Open") 
-        self.potentialStartFunctions.append("Document_DocumentOpened")    
+        self.potentialStartFunctions.append("Document_Open")
+        self.potentialStartFunctions.append("Auto_Open")
+        self.potentialStartFunctions.append("Document_DocumentOpened")
         
     @property
     def startFunction(self):
@@ -48,7 +50,7 @@ class MpModule():
                                 if self._startFunction not in self.reservedFunctions:
                                     self.reservedFunctions.append(self._startFunction)
                                 result = potentialStartFunction
-                                break                
+                                break
         return result
     
     
@@ -192,7 +194,7 @@ class MpModule():
                         content[n] = self.getAutoOpenVbaSignature() + "\n"
                 f = open(mainFile, 'w')
                 f.writelines(content)
-                f.close()   
+                f.close()
                 # 2 Change  cure module start function
                 self._startFunction = self.getAutoOpenVbaFunction()
         
