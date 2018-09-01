@@ -359,7 +359,7 @@ End Sub
 CMD = \
 r"""
 
-Private Sub AutoOpen()
+Sub AutoOpen()
     WscriptExec "<<<CMD>>>"
 End Sub
 
