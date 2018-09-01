@@ -95,7 +95,6 @@ class WordGenerator(VBAGenerator):
                 document.SaveAs(self.outputFilePath, FileFormat=wdXMLFileFormatMap[self.outputFilePath[-5:]])
                         
             self.resetVBAEntryPoint()
-            print(self.startFunction)
             logging.info("   [-] Inject VBA...")
             # Read generated files
             for vbaFile in self.getVBAFiles():
