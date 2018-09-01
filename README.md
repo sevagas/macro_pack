@@ -46,7 +46,7 @@ Macro Pack pro version also allow to trojan existing Office files with option --
 
 Ms Office Supported formats are:
 * MS Word 97 (.doc)
-* MS Word (.docm, .docx)
+* MS Word (.docm, .docx, .dotm)
 * MS Excel 97 (.xls)
 * MS Excel (.xlsm, .xslx)
 * MS PowerPoint (.pptm)
