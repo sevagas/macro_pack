@@ -97,7 +97,7 @@ class MSTypes():
             result = self.XL
         elif ".doc" ==  extension.lower():
             result = self.WD97
-        elif ".docx" ==  extension.lower() or extension.lower() == ".docm":
+        elif extension.lower() in (".docx", ".docm", ".dotm"):
             result = self.WD
         elif ".hta" ==  extension.lower():
             result = self.HTA

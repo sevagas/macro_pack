@@ -81,15 +81,12 @@ class WordGenerator(VBAGenerator):
     
             logging.info("   [-] Save document format...")
             wdFormatDocument = 0
-            wdFormatXMLDocument = 12
-            wdFormatXMLDocumentMacroEnabled = 13
+            wdXMLFileFormatMap = {".docx": 12, ".docm": 13, ".dotm": 15}
             
             if MSTypes.WD97 == self.outputFileType:
                 document.SaveAs(self.outputFilePath, FileFormat=wdFormatDocument)
-            elif MSTypes.WD == self.outputFileType and ".docx" in self.outputFilePath:
-                document.SaveAs(self.outputFilePath, FileFormat=wdFormatXMLDocument)
-            elif MSTypes.WD == self.outputFileType and ".docm" in self.outputFilePath:
-                document.SaveAs(self.outputFilePath, FileFormat=wdFormatXMLDocumentMacroEnabled)
+            elif MSTypes.WD == self.outputFileType:
+                document.SaveAs(self.outputFilePath, FileFormat=wdXMLFileFormatMap[self.outputFilePath[-5:]])
                         
             self.resetVBAEntryPoint()
             logging.info("   [-] Inject VBA...")
