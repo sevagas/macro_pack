@@ -19,10 +19,16 @@ class WordGenerator(VBAGenerator):
     """ Module used to generate MS Word file from working dir content"""
     
     def getAutoOpenVbaFunction(self):
-        return "AutoOpen"
+        if ".dot" in self.outputFilePath:
+            return "AutoNew"
+        else:
+            return "AutoOpen"
     
     def getAutoOpenVbaSignature(self):
-        return "Sub AutoOpen()"
+        if ".dot" in self.outputFilePath:
+            return "Sub AutoNew()"
+        else:
+            return "Sub AutoOpen()"
     
     def enableVbom(self):
         # Enable writing in macro (VBOM)
@@ -61,11 +67,11 @@ class WordGenerator(VBAGenerator):
             logging.error("   [!] Cannot access Word.Application object. Is software installed on machine? Abort.")
             return False  
         return True
-    
- 
-    
-    
-    
+
+
+
+
+
     def generate(self):
         
         logging.info(" [+] Generating MS Word document...")
