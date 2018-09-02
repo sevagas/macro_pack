@@ -224,10 +224,12 @@ def testVBGenerators():
             result = False
             testSummary[testFormat+ " CMD template"] = "[KO]"
             logging.exception("   [!] Error!\n")
-            
-        if os.path.isfile(testFile):
-            os.remove(testFile)
-            
+        
+        try:  
+            if os.path.isfile(testFile):
+                os.remove(testFile)
+        except:
+            logging.exception("   [!] Error while attempting to remove %s!\n" % testFile)
         
     os.remove(vbaTestFile)
     return result

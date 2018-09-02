@@ -3,6 +3,6 @@ termcolor>=1.1.0
 tabulate>=0.8.1
 psutil>=5.4.3
 clr>=1.0.3
-Flask>=0.12.2
+Flask==0.12.2
 wsgidav>=2.4.1
 cheroot>=6.3.3
