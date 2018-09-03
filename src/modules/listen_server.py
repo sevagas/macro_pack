@@ -90,7 +90,7 @@ def upload():
 @secure_http_response
 def download(filename):
 
-    uploads = os.path.dirname(getRunningApp())
+    uploads = webapp.config['UPLOAD_FOLDER']
     logging.info("   [-] Sending file: %s" % (os.path.join(uploads,filename)))
     return send_from_directory(directory=uploads, filename=filename)
 
