@@ -202,13 +202,13 @@ def main(argv):
             mpSession.startFunction =  arg
         elif opt=="-l" or opt=="--listen":
             mpSession.listen =  True
-            mpSession.listenRoot = arg
+            mpSession.listenRoot = os.path.abspath(arg)
         elif opt=="--port":
             mpSession.listenPort = int(arg)
             mpSession.WlistenPort = int(arg)
         elif opt=="-w" or opt=="--webdav-listen":
             mpSession.Wlisten =  True
-            mpSession.WRoot = arg
+            mpSession.WRoot = os.path.abspath(arg)
         elif opt == "-f" or opt== "--input-file":
             mpSession.vbaInput = arg
         elif opt == "-e" or opt== "--embed":

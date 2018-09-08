@@ -30,7 +30,7 @@ class VBSGenerator(VBAGenerator):
             f.close()
             # Check there are no call to Application object
             for line in content:
-                if line.find("Application.") != -1:
+                if line.find("Application.Run") != -1:
                     logging.info("   [-] You cannot access Application object in VBScript. Abort!")
                     return False  
             
@@ -47,7 +47,7 @@ class VBSGenerator(VBAGenerator):
         logging.info("   [-] Convert VBA to VBScript...")
         translators = [("Val(","CInt("),(" Chr$"," Chr"),(" Mid$"," Mid"),("On Error GoTo","'//On Error GoTo"),("byebye:",""), ("Next ", "Next '//")]
         translators.extend([(" As String"," "),(" As Object"," "),(" As Long"," "),(" As Integer"," "),(" As Variant"," ")])
-        translators.extend([ ("MsgBox ", "WScript.Echo ")])
+        translators.extend([ ("MsgBox ", "WScript.Echo "), ('Application.Wait Now + TimeValue("0:00:01")', 'WScript.Sleep(1000)')])
         content = []
         for vbaFile in self.getVBAFiles():  
             f = open(vbaFile)

@@ -523,6 +523,8 @@ Blog posts about hacking with MS Office, VBS,  and other retro stuff security:
  - https://github.com/Cn33liz/MacroMeter
  - https://github.com/khr0x40sh/MacroShop
  - https://docs.microsoft.com/en-us/dotnet/standard/data/xml/xslt-stylesheet-scripting-using-msxsl-script
+ - https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-exploit-guard/attack-surface-reduction-exploit-guard
+
 
 ## Contact
 
