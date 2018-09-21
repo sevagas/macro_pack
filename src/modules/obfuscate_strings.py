@@ -26,7 +26,7 @@ End Function
         # Find strings and randomly split them in half 
         for n,line in enumerate(macroLines):
             #Check if string is not preprocessor instruction, const or contain escape quotes
-            if len(line) > 3 and "\"\"" not in line  and "PtrSafe Function" not in line and "Declare Function" not in line and "Declare Sub" not in line:
+            if len(line) > 3 and "\"\"" not in line  and "PtrSafe Function" not in line and "Declare Function" not in line and "Declare Sub" not in line and "Environ" not in line:
                 # Find strings in line
                 findList = re.findall( r'"(.+?)"', line, re.I) 
                 if findList:
@@ -47,7 +47,7 @@ End Function
         # Find strings and replace them by hex encoded version
         for n,line in enumerate(macroLines):
             #Check if string is not preprocessor instruction, const or contain escape quoting
-            if line.lstrip() != "" and line.lstrip()[0] != '#' and  "Const" not in line and  "\"\"" not in line and "PtrSafe Function" not in line and "Declare Function" not in line and "Declare Sub" not in line:
+            if line.lstrip() != "" and line.lstrip()[0] != '#' and  "Const" not in line and  "\"\"" not in line and "PtrSafe Function" not in line and "Declare Function" not in line and "Declare Sub" not in line and "Environ" not in line:
                 # Find strings in line
                 findList = re.findall( r'"(.+?)"', line, re.I) 
                 if findList:

