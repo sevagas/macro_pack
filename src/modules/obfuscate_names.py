@@ -126,12 +126,29 @@ class ObfuscateNames(MpModule):
                         self.reservedFunctions.append(keyWord[0])
         # format Set <something> =  ...
         for line in macroLines:
-            findList = re.findall( r'Set\s+([a-zA-Z0-9]+)\s+=', line, re.I) 
+            findList = re.findall( r'Set\s+([a-zA-Z0-9_]+)\s+=', line, re.I) 
             if findList:
                 for keyWord in findList:
                     if keyWord not in self.reservedFunctions:  # prevent erase of previous variables and function names
                         keyWords.append(keyWord)
                         self.reservedFunctions.append(keyWord)
+        # format Const <something> =  ...
+        for line in macroLines:
+            findList = re.findall( r'Const\s+([a-zA-Z0-9_]+)\s+=', line, re.I) 
+            if findList:
+                for keyWord in findList:
+                    if keyWord not in self.reservedFunctions:  # prevent erase of previous variables and function names
+                        keyWords.append(keyWord)
+                        self.reservedFunctions.append(keyWord)
+        # format Type <something>
+        for line in macroLines:
+            findList = re.findall( r'Type\s+([a-zA-Z0-9_]+)$', line, re.I) 
+            if findList:
+                for keyWord in findList:
+                    if keyWord not in self.reservedFunctions:  # prevent erase of previous variables and function names
+                        keyWords.append(keyWord)
+                        self.reservedFunctions.append(keyWord)
+
         #logging.info(str(keyWords))
         
         # Different situation surrounding variables
