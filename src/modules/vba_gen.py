@@ -89,6 +89,10 @@ class VBAGenerator(Generator):
         
         """
         if self.mpSession.mpType == "Pro":
+            if self.mpSession.avBypass:
+                avBypasser = AvBypass(self.mpSession)
+                avBypasser.runPreObfuscation()
+            
             # MAcro to run in background    
             if self.mpSession.background:
                 transformator = Background(self.mpSession)
@@ -138,8 +142,8 @@ class VBAGenerator(Generator):
             
             #macro split
             if self.mpSession.avBypass:
-                obfuscator = AvBypass(self.mpSession)
-                obfuscator.run()
+                avBypasser = AvBypass(self.mpSession)
+                avBypasser.runPostObfuscation()
     
     def check(self):
         return True

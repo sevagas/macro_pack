@@ -83,6 +83,7 @@ class MSTypes():
     UNKNOWN = "Unknown"
 
     MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, MPP, VSD, VSD97] # Formats supported by macro_pack
+    VBSCRIPTS_FORMATS = [VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS.extend(MS_OFFICE_FORMATS)
     Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF]

@@ -225,7 +225,7 @@ class TemplateToVba(MpModule):
         content = vbLib.templates.METERPRETER
         content = content.replace("<<<RHOST>>>", paramDict["rhost"])
         content = content.replace("<<<RPORT>>>", paramDict["rport"])
-        if self.outputFileType in [MSTypes.HTA, MSTypes.VBS, MSTypes.SCT]:
+        if self.outputFileType in MSTypes.VBSCRIPTS_FORMATS:
             content = content + vbLib.Meterpreter.VBS
         else:
             content = content + vbLib.Meterpreter.VBA
