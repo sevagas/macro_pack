@@ -19,18 +19,16 @@ class MpModule():
         if self._startFunction is not None:
             self.reservedFunctions.append(self._startFunction)
         self.reservedFunctions.append("AutoOpen")
-        self.reservedFunctions.append("AutoNew")
         self.reservedFunctions.append("Workbook_Open")
         self.reservedFunctions.append("Document_Open")
-        self.reservedFunctions.append("Auto_Open")
+        self.reservedFunctions.append("Auto_Open")    
         self.reservedFunctions.append("Document_DocumentOpened")
         self.potentialStartFunctions = []
         self.potentialStartFunctions.append("AutoOpen")
-        self.potentialStartFunctions.append("AutoNew")
         self.potentialStartFunctions.append("Workbook_Open")
-        self.potentialStartFunctions.append("Document_Open")
-        self.potentialStartFunctions.append("Auto_Open")
-        self.potentialStartFunctions.append("Document_DocumentOpened")
+        self.potentialStartFunctions.append("Document_Open")  
+        self.potentialStartFunctions.append("Auto_Open") 
+        self.potentialStartFunctions.append("Document_DocumentOpened")    
         
     @property
     def startFunction(self):
@@ -50,7 +48,7 @@ class MpModule():
                                 if self._startFunction not in self.reservedFunctions:
                                     self.reservedFunctions.append(self._startFunction)
                                 result = potentialStartFunction
-                                break
+                                break                
         return result
     
     
@@ -124,6 +122,7 @@ class MpModule():
                             
         return result
     
+    
     def addVBAModule(self, moduleContent):
         """ 
         Add a new VBA module file containing moduleContent and with random name
@@ -133,6 +132,30 @@ class MpModule():
         f = open(newModuleName, 'w')
         f.write(moduleContent)
         f.close()
+        return newModuleName
+    
+    
+    def addVBALib(self, vbaLib):
+        """ 
+        Add a new VBA Library module depending on the current context 
+        """
+        moduleContent = ''
+        if self.outputFileType in MSTypes.MS_OFFICE_FORMATS:
+            if MSTypes.WD in self.outputFileType and hasattr(vbaLib, 'VBA_WD'):
+                moduleContent = vbaLib.VBA_WD
+            elif MSTypes.XL in self.outputFileType and hasattr(vbaLib, 'VBA_XL'): 
+                moduleContent = vbaLib.VBA_XL
+            else:
+                moduleContent = vbaLib.VBA
+        else:
+            if self.outputFileType == MSTypes.HTA and hasattr(vbaLib, 'VBS_HTA'):
+                moduleContent = vbaLib.VBS_HTA
+            else:
+                if hasattr(vbaLib, 'VBS'):
+                    moduleContent = vbaLib.VBS
+                else:
+                    moduleContent = vbaLib.VBA
+        newModuleName = self.addVBAModule(moduleContent)
         return newModuleName
     
     
@@ -156,7 +179,6 @@ class MpModule():
         f.close()
     
     
-    @classmethod
     def getAutoOpenFunction(self):
         """ Return the VBA Function/Sub name which triggers autoopen for the current outputFileType """
         result = ""
@@ -172,6 +194,8 @@ class MpModule():
             result = "Document_DocumentOpened"
         elif MSTypes.PUB in self.outputFileType:
             result = "Document_Open"
+        else:
+            result = "AutoOpen"
         return result
             
     
@@ -194,7 +218,7 @@ class MpModule():
                         content[n] = self.getAutoOpenVbaSignature() + "\n"
                 f = open(mainFile, 'w')
                 f.writelines(content)
-                f.close()
+                f.close()   
                 # 2 Change  cure module start function
                 self._startFunction = self.getAutoOpenVbaFunction()
         

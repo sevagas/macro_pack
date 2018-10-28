@@ -34,6 +34,7 @@ class HTAGenerator(VBSGenerator):
         f.close()
         
         vbsContent = vbsContent.replace("WScript.Echo ", "MsgBox ")
+        vbsContent = vbsContent.replace('WScript.Sleep(1000)','CreateObject("WScript.Shell").Run "cmd /c ping localhost -n 1",0,True')
         
         # Write VBS in template
         htaContent = HTA_TEMPLATE

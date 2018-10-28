@@ -31,14 +31,16 @@ class VBSGenerator(VBAGenerator):
             # Check there are no call to Application object
             for line in content:
                 if line.find("Application.Run") != -1:
-                    logging.info("   [-] You cannot access Application object in VBScript. Abort!")
+                    logging.error("   [-] You cannot access Application object in VBScript. Abort!")
+                    logging.error("   [-] Line: %s" % line)
                     return False  
             
             # Check there are no DLL import
             for line in content:
                 matchObj = re.match( r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"\s*.*', line, re.M|re.I) 
                 if matchObj:
-                    logging.info("   [-] VBScript does not support DLL import. Abort!")
+                    logging.error("   [-] VBScript does not support DLL import. Abort!")
+                    logging.error("   [-] Line: %s" % line)
                     return False 
         return True
     
@@ -46,7 +48,7 @@ class VBSGenerator(VBAGenerator):
     def vbScriptConvert(self):
         logging.info("   [-] Convert VBA to VBScript...")
         translators = [("Val(","CInt("),(" Chr$"," Chr"),(" Mid$"," Mid"),("On Error GoTo","'//On Error GoTo"),("byebye:",""), ("Next ", "Next '//")]
-        translators.extend([(" As String"," "),(" As Object"," "),(" As Long"," "),(" As Integer"," "),(" As Variant"," ")])
+        translators.extend([(" As String"," "),(" As Object"," "),(" As Long"," "),(" As Integer"," "),(" As Variant"," "), (" As Boolean", " "), (" As Byte", " ")])
         translators.extend([ ("MsgBox ", "WScript.Echo "), ('Application.Wait Now + TimeValue("0:00:01")', 'WScript.Sleep(1000)')])
         content = []
         for vbaFile in self.getVBAFiles():  
