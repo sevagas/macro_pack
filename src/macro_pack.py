@@ -177,7 +177,7 @@ def main(argv):
         shortOptions= "e:l:w:s:f:t:G:hqmop"
         # only for Pro release
         if MP_TYPE == "Pro":
-            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom=", "background"])
+            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "uac-bypass", "trojan=", "stealth", "dcom=", "background"])
             shortOptions += "T:b"
         # Only enabled on windows
         if sys.platform == "win32":
@@ -246,6 +246,8 @@ def main(argv):
                     mpSession.keepAlive = True
                 elif opt=="--av-bypass":
                     mpSession.avBypass = True
+                elif opt=="--uac-bypass":
+                    mpSession.uacBypass = True
                 elif opt == "-T" or opt=="--trojan":
                     # Document generation enabled only on windows
                     if sys.platform == "win32":

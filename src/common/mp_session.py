@@ -18,6 +18,7 @@ class MpSession:
         self.vbomEncode = False
         self.background = False
         self.avBypass = False
+        self.uacBypass  = False
         self.obfuscateForm =  False
         self.obfuscateNames =  False
         self.obfuscateStrings =  False
