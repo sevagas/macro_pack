@@ -30,6 +30,7 @@ from modules.lnk_gen import LNKGenerator
 from modules.settingsms_gen import SettingsShortcutGenerator
 from modules.libraryms_gen import LibraryShortcutGenerator
 from modules.inf_gen import InfGenerator
+from modules.iqy_gen import IqyGenerator
 
 from common import utils, mp_session, help
 from common.utils import MSTypes
@@ -425,6 +426,10 @@ def main(argv):
             
         if mpSession.outputFileType == MSTypes.INF:
             generator = InfGenerator(mpSession)
+            generator.run()
+            
+        if mpSession.outputFileType == MSTypes.IQY:
+            generator = IqyGenerator(mpSession)
             generator.run()
 
         #run com attack

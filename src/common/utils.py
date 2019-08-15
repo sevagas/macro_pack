@@ -77,6 +77,7 @@ class MSTypes():
     SCF="Explorer Command File"
     XSL="XSLT Stylesheet"
     URL="URL Shortcut"
+    IQY="Excel Web Query"
     SETTINGS_MS="Settings Shortcut"
     LIBRARY_MS="MS Library"
     INF="Setup Information"
@@ -86,10 +87,10 @@ class MSTypes():
     VBSCRIPTS_FORMATS = [VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS.extend(MS_OFFICE_FORMATS)
-    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF]
+    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF, IQY]
 
     # OrderedDict([("target_url",None),("download_path",None)])
-    EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),(LIBRARY_MS,".library-ms"),(INF,".inf"),
+    EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),(LIBRARY_MS,".library-ms"),(INF,".inf"),(IQY, ".iqy"),
                                   ( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
                                   (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
                                   (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".wsc"),( WSF,".wsf"),( XSL,".xsl") ])
@@ -147,6 +148,8 @@ class MSTypes():
             result = self.SCF
         elif ".xsl" ==  extension.lower():
             result = self.XSL
+        elif ".iqy" == extension.lower():
+            result = self.IQY
         else:
             result = self.UNKNOWN
         return result
