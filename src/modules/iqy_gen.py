@@ -14,11 +14,9 @@ https://inquest.net/blog/2018/08/23/hunting-iqy-files-with-yara
 
 
 IQY_TEMPLATE = \
-r"""
-WEB
+r"""WEB
 1
 <<<URL>>>
-
 """
 
 
