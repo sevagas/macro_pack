@@ -8,13 +8,14 @@ import os
 from modules.obfuscate_names import ObfuscateNames
 from modules.obfuscate_form import ObfuscateForm
 from modules.obfuscate_strings import ObfuscateStrings
+from modules.uac_bypass import UACBypass
 from vbLib import WriteBytes
 try:
     from pro_modules.vbom_encode import VbomEncoder
     from pro_modules.persistance import Persistance
     from pro_modules.background import Background
     from pro_modules.av_bypass import AvBypass
-    from pro_modules.uac_bypass import UACBypass
+    
 except:
     pass
 
@@ -93,15 +94,16 @@ class VBAGenerator(Generator):
             if self.mpSession.avBypass:
                 avBypasser = AvBypass(self.mpSession)
                 avBypasser.runPreObfuscation()
-                
-            if self.mpSession.uacBypass:
-                uacBypasser = UACBypass(self.mpSession)
-                uacBypasser.run()
             
             # MAcro to run in background    
             if self.mpSession.background:
                 transformator = Background(self.mpSession)
                 transformator.run() 
+        
+        # Enable UAC bypass
+        if self.mpSession.uacBypass:
+            uacBypasser = UACBypass(self.mpSession)
+            uacBypasser.run()
         
         # Macro obfuscation
         if self.mpSession.obfuscateNames:

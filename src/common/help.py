@@ -182,6 +182,8 @@ def printUsage(banner, currentApp, mpSession):
            If no auto start function, use --start-function option to indicate which macro to run.
            This option is only compatible with Ms Office formats.
 
+    --uac-bypass Execute payload with high privileges if user is admin. Compatible with next templates: CMD, DROPPER, DROPPER2, DROPPER_PS, EMBED_EXE
+
     --unicode-rtlo=SPOOF_EXTENSION Inject the unicode U+202E char (Right-To-Left Override) to spoof the file extension when view in explorers.
             Ex. To generate an hta file with spoofed jpg extension use options: -G something.hta --unicode-rtlo=jpg
             In this case, windows or linux explorers will show the file named as: somethingath.jpg

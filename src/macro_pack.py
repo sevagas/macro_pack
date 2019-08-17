@@ -38,7 +38,7 @@ from _ast import arg
 from modules import mp_module
 if sys.platform == "win32":
     try:
-        import win32com.client # @UnresolvedImport
+        import win32com.client #@UnresolvedImport
     except:
         print("Error: Could not find win32com. You have to download pywin32 at https://sourceforge.net/projects/pywin32/files/pywin32/")
         sys.exit(1)
@@ -174,11 +174,11 @@ def main(argv):
     mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
 
     try:
-        longOptions = ["embed=", "listen=", "port=", "webdav-listen=", "generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=","unicode-rtlo=", "dde", "print"]
+        longOptions = ["embed=", "listen=", "port=", "webdav-listen=", "generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=","uac-bypass","unicode-rtlo=", "dde", "print"]
         shortOptions= "e:l:w:s:f:t:G:hqmop"
         # only for Pro release
         if MP_TYPE == "Pro":
-            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "uac-bypass", "trojan=", "stealth", "dcom=", "background"])
+            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom=", "background"])
             shortOptions += "T:b"
         # Only enabled on windows
         if sys.platform == "win32":
@@ -230,6 +230,8 @@ def main(argv):
         elif opt == "--run":
             if sys.platform == "win32":
                 mpSession.runTarget = os.path.abspath(arg)
+        elif opt=="--uac-bypass":
+            mpSession.uacBypass = True
         elif opt == "--unicode-rtlo":
             mpSession.unicodeRtlo = arg
         elif opt in ("-G", "--generate"):
@@ -247,8 +249,7 @@ def main(argv):
                     mpSession.keepAlive = True
                 elif opt=="--av-bypass":
                     mpSession.avBypass = True
-                elif opt=="--uac-bypass":
-                    mpSession.uacBypass = True
+                
                 elif opt == "-T" or opt=="--trojan":
                     # Document generation enabled only on windows
                     if sys.platform == "win32":

