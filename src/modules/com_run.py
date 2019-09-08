@@ -39,6 +39,8 @@ class ComGenerator(MpModule):
             comApp = "PowerPoint.Application"
         elif MSTypes.VSD in targetApp:
             comApp = "Visio.InvisibleApp"
+        elif MSTypes.ACC in targetApp:
+            comApp = "Access.Application"
         elif MSTypes.MPP in targetApp:
             comApp = "MSProject.Application"
         else:

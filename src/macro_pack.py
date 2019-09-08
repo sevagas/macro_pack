@@ -19,6 +19,7 @@ from modules.wsf_gen import WSFGenerator
 from modules.word_dde import WordDDE
 from modules.excel_dde import ExcelDDE
 from modules.visio_gen import VisioGenerator
+from modules.access_gen import AccessGenerator
 from modules.com_run import ComGenerator
 from modules.listen_server import ListenServer
 from modules.Wlisten_server import WListenServer
@@ -109,6 +110,9 @@ def handleOfficeFormats(mpSession):
         elif MSTypes.VSD in mpSession.outputFileType:
             generator = VisioGenerator(mpSession)
             generator.run()
+        elif MSTypes.ACC in mpSession.outputFileType:
+            generator = AccessGenerator(mpSession)
+            generator.run()
         elif MSTypes.PUB == mpSession.outputFileType and MP_TYPE == "Pro":
             generator = PublisherGenerator(mpSession)
             generator.run()
@@ -141,6 +145,12 @@ def handleOfficeFormats(mpSession):
             else:
                 generator = VisioGenerator(mpSession)
                 generator.run()
+        if MSTypes.ACC in mpSession.outputFileType:
+            if os.path.isfile(mpSession.outputFilePath):
+                pass
+            else:
+                generator = AccessGenerator(mpSession)
+                generator.run()
 
         if MSTypes.MPP in mpSession.outputFileType:
             if os.path.isfile(mpSession.outputFilePath):
@@ -171,7 +181,8 @@ def main(argv):
 
     logLevel = "INFO"
     # initialize macro_pack session object
-    mpSession = mp_session.MpSession(WORKING_DIR, VERSION, MP_TYPE)
+    working_directory = ''.join([os.getcwd(), WORKING_DIR])
+    mpSession = mp_session.MpSession(working_directory, VERSION, MP_TYPE)
 
     try:
         longOptions = ["embed=", "listen=", "port=", "webdav-listen=", "generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=", "start-function=","uac-bypass","unicode-rtlo=", "dde", "print"]
@@ -336,16 +347,16 @@ def main(argv):
 
 
     #Create temporary folder
-    logging.info("   [-] Temporary working dir: %s" % WORKING_DIR)
-    if not os.path.exists(WORKING_DIR):
-        os.makedirs(WORKING_DIR)
+    logging.info("   [-] Temporary working dir: %s" % working_directory)
+    if not os.path.exists(working_directory):
+        os.makedirs(working_directory)
 
     try:
         # Create temporary work file.
         if mpSession.ddeMode or mpSession.template or (mpSession.outputFileType not in MSTypes.VB_FORMATS):
-            inputFile = os.path.join(WORKING_DIR,"command.cmd")
+            inputFile = os.path.join(working_directory, "command.cmd")
         else:
-            inputFile = os.path.join(WORKING_DIR,utils.randomAlpha(9))+".vba"
+            inputFile = os.path.join(working_directory, utils.randomAlpha(9)) + ".vba"
         if mpSession.stdinContent is not None:
             logging.info("   [-] Store std input in file..." )
             f = open(inputFile, 'w')
@@ -457,7 +468,7 @@ def main(argv):
 
 
     logging.info(" [+] Cleaning...")
-    shutil.rmtree(WORKING_DIR)
+    shutil.rmtree(working_directory)
 
     logging.info(" Done!\n")
 

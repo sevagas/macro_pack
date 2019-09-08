@@ -67,6 +67,7 @@ class MSTypes():
     PUB="Publisher"
     VSD="Visio"
     VSD97="Visio97"
+    ACC="Access"
     VBA="VBA"
     VBS="Visual Basic Script"
     HTA="HTML Application"
@@ -83,7 +84,7 @@ class MSTypes():
     INF="Setup Information"
     UNKNOWN = "Unknown"
 
-    MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, MPP, VSD, VSD97] # Formats supported by macro_pack
+    MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, MPP, VSD, VSD97, ACC] # Formats supported by macro_pack
     VBSCRIPTS_FORMATS = [VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS.extend(MS_OFFICE_FORMATS)
@@ -93,7 +94,7 @@ class MSTypes():
     EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),(LIBRARY_MS,".library-ms"),(INF,".inf"),(IQY, ".iqy"),
                                   ( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
                                   (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
-                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".wsc"),( WSF,".wsf"),( XSL,".xsl") ])
+                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".wsc"),( WSF,".wsf"),( XSL,".xsl"),( ACC,".accdb"), ( ACC,".mdb" ) ])
 
 
 
@@ -122,6 +123,8 @@ class MSTypes():
             result = self.VSD97
         elif ".vsdm" ==  extension.lower() or extension.lower() == ".vsdx":
             result = self.VSD
+        elif extension.lower() in (".accdb", ".accde", ".mdb"):
+            result = self.ACC
         elif ".pub" ==  extension.lower():
             result = self.PUB
         elif ".vba" ==  extension.lower():
