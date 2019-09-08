@@ -192,6 +192,8 @@ class MpModule():
             result = "Auto_Open"
         elif MSTypes.VSD in self.outputFileType:
             result = "Document_DocumentOpened"
+        elif MSTypes.ACC in self.outputFileType:
+            result = "AutoExec"
         elif MSTypes.PUB in self.outputFileType:
             result = "Document_Open"
         else:
