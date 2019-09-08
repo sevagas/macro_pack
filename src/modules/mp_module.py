@@ -19,12 +19,14 @@ class MpModule():
         if self._startFunction is not None:
             self.reservedFunctions.append(self._startFunction)
         self.reservedFunctions.append("AutoOpen")
+        self.reservedFunctions.append("AutoExec")
         self.reservedFunctions.append("Workbook_Open")
         self.reservedFunctions.append("Document_Open")
         self.reservedFunctions.append("Auto_Open")    
         self.reservedFunctions.append("Document_DocumentOpened")
         self.potentialStartFunctions = []
         self.potentialStartFunctions.append("AutoOpen")
+        self.potentialStartFunctions.append("AutoExec")
         self.potentialStartFunctions.append("Workbook_Open")
         self.potentialStartFunctions.append("Document_Open")  
         self.potentialStartFunctions.append("Auto_Open") 

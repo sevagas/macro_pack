@@ -69,6 +69,8 @@ class ComGenerator(MpModule):
                 document = comObj.Documents.Open(self.comTarget)
             elif MSTypes.PPT in targetApp:
                 document = comObj.Presentations.Open(self.comTarget)
+            elif MSTypes.ACC in targetApp:
+                document = comObj.OpenCurrentDatabase(self.comTarget)
             elif MSTypes.MPP in targetApp:
                 document = comObj.FileOpen(self.comTarget, True)
             if self.startFunction and self.startFunction not in self.potentialStartFunctions:

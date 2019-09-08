@@ -6,3 +6,4 @@ clr>=1.0.3
 Flask==0.12.2
 wsgidav>=2.4.1
 cheroot>=6.3.3
+pywin32>=220

