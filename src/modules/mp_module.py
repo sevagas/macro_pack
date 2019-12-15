@@ -165,6 +165,7 @@ class MpModule():
         """
         Insert some code at targetLine (number) at targetFunction in targetModule
         """
+        logging.debug("     [,] Opening "+ targetFunction + " in " + targetModule + " to inject code...")
         f = open(targetModule)
         content = f.readlines()
         f.close()
@@ -172,8 +173,8 @@ class MpModule():
         for n,line in enumerate(content):
             matchObj = re.match( r'.*(Sub|Function)\s+%s\s*\(.*\).*'%targetFunction, line, re.M|re.I) 
             if matchObj:  
-                
-                content[n+targetLine] = content[n+targetLine]+"\n"+vbaCode+"\n"
+                logging.debug("     [,] Found " + targetFunction + " ") 
+                content[n+targetLine] = content[n+targetLine]+ vbaCode+"\n"
                 break
         
         f = open(targetModule, 'w')

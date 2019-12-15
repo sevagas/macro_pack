@@ -13,7 +13,7 @@ if sys.platform == "win32":
     import winreg # @UnresolvedImport
 
 import logging
-from common import utils
+from common import utils    
 from modules.vba_gen import VBAGenerator
 
 

@@ -41,6 +41,7 @@ class MpSession:
         self.listenPort = 80
         self.listenRoot = "."
         self.embeddedFilePath = None
+        self.decoyFilePath = None
 
         self.Wlisten = False
         self.WRoot = "."

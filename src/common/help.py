@@ -137,6 +137,7 @@ def printUsage(banner, currentApp, mpSession):
     --dcom=REMOTE_FILE_PATH Open remote document using DCOM for pivot/remote exec if psexec not possible for example.
         This will trigger AutoOpen/Workbook_Open automatically.
         If no auto start function, use --start-function option to indicate which macro to run.
+    --decoy=DECOY_FILE_PATH Will embed the given file in the body of the generated document. This file will be dropped and started with default application at payload start.
 """
 
     details = \

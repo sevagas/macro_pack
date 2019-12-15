@@ -93,11 +93,12 @@ The pro mode includes features such as:
 * Self decoding VBA
 * MS Office persistance
 * Trojan existing MS Office documents
-* Lateral movement using DCOM objects
+* Embed decoy payload
+* Anti reverse-engineering
 * Anti-debug using http://seclists.org/fulldisclosure/2017/Mar/90
 
-For now I do not plan to release or sell this pro version however if you are really interested I can share code in the next case:
-* You significantly contribute to macro\_pack on GitHub + I need to know your identity
+Pro features are weaponized and I really don't want to hellp ransomware writers so they are not open source.
+If you are in an offensive security audit team and would like more informtion on how to get "pro" version you can contact me (see contact information at end of README).
 
 
 
@@ -128,12 +129,9 @@ python macro_pack.py --help # if python3 is default install
   
 If you want to produce a standalone exe using pyinstaller:  
 * Install pyinstaller: pip install pyinstaller
-* Install PyCrypto at http://www.voidspace.org.uk/python/pycrypto-2.6.1/  
 * Double-click on the "build.bat" script on a Windows machine.  
 
 The resulted macro\_pack.exe will be inside the **bin** directory.  
-
-**Note:** pycrypto is not available for python after 3.4. If you want pyinstaller encryption, do not use latest python version.
 
 
 ## Some examples
@@ -513,6 +511,6 @@ Emails:
 
 [The Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-Copyright 2017,2018 Emeric “Sio” Nasi ([blog.sevagas.com](http://blog.sevagas.com))
+Copyright 2017,2018,2019,2020 Emeric “Sio” Nasi ([blog.sevagas.com](https://blog.sevagas.com))
 
 

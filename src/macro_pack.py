@@ -45,21 +45,26 @@ if sys.platform == "win32":
         sys.exit(1)
 MP_TYPE="Pro"
 try:
-    from pro_modules.excel_trojan import ExcelTrojan
-    from pro_modules.word_trojan import WordTrojan
-    from pro_modules.ppt_trojan import PptTrojan
-    from pro_modules.visio_trojan import VisioTrojan
-    from pro_modules.msproject_trojan import MsProjectTrojan
+    from pro_modules.excel_gen_pro import ExcelGeneratorPro
+    from pro_modules.word_gen_pro import WordGeneratorPro
+    from pro_modules.ppt_gen_pro import PowerPointGeneratorPro
+    from pro_modules.visio_gen_pro import VisioGeneratorPro
+    from pro_modules.msproject_gen_pro import MSProjectGeneratorPro
     from pro_modules.stealth import Stealth
     from pro_modules.dcom_run import DcomGenerator
     from pro_modules.publisher_gen import PublisherGenerator
-    from pro_modules.template_gen import TemplateGeneratorPro
+    from pro_modules.template_gen_pro import TemplateGeneratorPro
+    from pro_modules.hta_gen_pro import HTAGeneratorPro
+    from pro_modules.vbs_gen_pro import VBSGeneratorPro
+    from pro_modules.xsl_gen_pro import XSLGeneratorPro
+    from pro_modules.sct_gen_pro import SCTGeneratorPro
+    from pro_modules.wsf_gen_pro import WSFGeneratorPro
 except:
     MP_TYPE="Community"
 
 from colorama import init
 from termcolor import colored
-
+# {PyArmor Plugins}
 # use Colorama to make Termcolor work on Windows too
 init()
 
@@ -93,8 +98,8 @@ def handleOfficeFormats(mpSession):
             logging.warn(" [!] Stealth option is not available for the format %s" % mpSession.outputFileType)
 
 
-    # Shall we trojan existing file?
-    if mpSession.trojan == False:
+    # Community or pro version
+    if MP_TYPE=="Community":
         if MSTypes.XL in mpSession.outputFileType:
             generator = ExcelGenerator(mpSession)
             generator.run()
@@ -113,52 +118,28 @@ def handleOfficeFormats(mpSession):
         elif MSTypes.ACC in mpSession.outputFileType:
             generator = AccessGenerator(mpSession)
             generator.run()
+    else:
+        if MSTypes.XL in mpSession.outputFileType:
+            generator = ExcelGeneratorPro(mpSession)
+            generator.run()
+        elif MSTypes.WD in mpSession.outputFileType:
+            generator = WordGeneratorPro(mpSession)
+            generator.run()
+        elif MSTypes.PPT in mpSession.outputFileType:
+            generator = PowerPointGeneratorPro(mpSession)
+            generator.run()
+        elif MSTypes.MPP == mpSession.outputFileType:
+            generator = MSProjectGeneratorPro(mpSession)
+            generator.run()
+        elif MSTypes.VSD in mpSession.outputFileType:
+            generator = VisioGeneratorPro(mpSession)
+            generator.run()
+        elif MSTypes.ACC in mpSession.outputFileType:
+            generator = AccessGenerator(mpSession)
+            generator.run()
         elif MSTypes.PUB == mpSession.outputFileType and MP_TYPE == "Pro":
             generator = PublisherGenerator(mpSession)
             generator.run()
-    else:
-        if MSTypes.XL in mpSession.outputFileType:
-            if os.path.isfile(mpSession.outputFilePath):
-                generator = ExcelTrojan(mpSession)
-                generator.run()
-            else:
-                generator = ExcelGenerator(mpSession)
-                generator.run()
-        if MSTypes.WD in mpSession.outputFileType:
-            if os.path.isfile(mpSession.outputFilePath):
-                generator = WordTrojan(mpSession)
-                generator.run()
-            else:
-                generator = WordGenerator(mpSession)
-                generator.run()
-        if MSTypes.PPT in mpSession.outputFileType:
-            if os.path.isfile(mpSession.outputFilePath):
-                generator = PptTrojan(mpSession)
-                generator.run()
-            else:
-                generator = PowerPointGenerator(mpSession)
-                generator.run()
-        if MSTypes.VSD in mpSession.outputFileType:
-            if os.path.isfile(mpSession.outputFilePath):
-                generator = VisioTrojan(mpSession)
-                generator.run()
-            else:
-                generator = VisioGenerator(mpSession)
-                generator.run()
-        if MSTypes.ACC in mpSession.outputFileType:
-            if os.path.isfile(mpSession.outputFilePath):
-                pass
-            else:
-                generator = AccessGenerator(mpSession)
-                generator.run()
-
-        if MSTypes.MPP in mpSession.outputFileType:
-            if os.path.isfile(mpSession.outputFilePath):
-                generator = MsProjectTrojan(mpSession)
-                generator.run()
-            else:
-                generator = MSProjectGenerator(mpSession)
-                generator.run()
 
     if mpSession.stealth == True:
         obfuscator = Stealth(mpSession)
@@ -181,7 +162,7 @@ def main(argv):
 
     logLevel = "INFO"
     # initialize macro_pack session object
-    working_directory = ''.join([os.getcwd(), WORKING_DIR])
+    working_directory = os.path.join(os.getcwd(), WORKING_DIR)
     mpSession = mp_session.MpSession(working_directory, VERSION, MP_TYPE)
 
     try:
@@ -189,7 +170,7 @@ def main(argv):
         shortOptions= "e:l:w:s:f:t:G:hqmop"
         # only for Pro release
         if MP_TYPE == "Pro":
-            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom=", "background"])
+            longOptions.extend(["vbom-encode", "persist","keep-alive", "av-bypass", "trojan=", "stealth", "dcom=", "background","decoy="])
             shortOptions += "T:b"
         # Only enabled on windows
         if sys.platform == "win32":
@@ -273,6 +254,8 @@ def main(argv):
                 elif opt == "--dcom":
                     mpSession.dcom = True
                     mpSession.dcomTarget = arg
+                elif opt== "--decoy":
+                    mpSession.decoyFilePath = os.path.abspath(arg)
                 else:
                     help.printUsage(BANNER, sys.argv[0], mpSession)
                     sys.exit(0)
@@ -386,34 +369,50 @@ def main(argv):
         if sys.platform == "win32" and mpSession.outputFileType in MSTypes.MS_OFFICE_FORMATS:
             handleOfficeFormats(mpSession)
 
+        
+        # Generate Scripts
+        if MP_TYPE == "Pro":
+            if mpSession.outputFileType == MSTypes.VBS:
+                generator = VBSGeneratorPro(mpSession)
+                generator.run()
+            if mpSession.outputFileType == MSTypes.HTA:
+                generator = HTAGeneratorPro(mpSession)
+                generator.run()
+            if mpSession.outputFileType == MSTypes.SCT:
+                generator = SCTGeneratorPro(mpSession)
+                generator.run()
+            if mpSession.outputFileType == MSTypes.WSF:
+                generator = WSFGeneratorPro(mpSession)
+                generator.run()
+            if mpSession.outputFileType == MSTypes.XSL:
+                generator = XSLGeneratorPro(mpSession)
+                generator.run()
 
-        if mpSession.outputFileType == MSTypes.VBS:
-            generator = VBSGenerator(mpSession)
-            generator.run()
+        else:
+            if mpSession.outputFileType == MSTypes.VBS:
+                generator = VBSGenerator(mpSession)
+                generator.run()
+            if mpSession.outputFileType == MSTypes.HTA:
+                generator = HTAGenerator(mpSession)
+                generator.run()
+            if mpSession.outputFileType == MSTypes.SCT:
+                generator = SCTGenerator(mpSession)
+                generator.run()
+            if mpSession.outputFileType == MSTypes.WSF:
+                generator = WSFGenerator(mpSession)
+                generator.run()
+            if mpSession.outputFileType == MSTypes.XSL:
+                generator = XSLGenerator(mpSession)
+                generator.run()
 
-        if mpSession.outputFileType == MSTypes.HTA:
-            generator = HTAGenerator(mpSession)
-            generator.run()
 
-        if mpSession.outputFileType == MSTypes.SCT:
-            generator = SCTGenerator(mpSession)
-            generator.run()
-
-        if mpSession.outputFileType == MSTypes.WSF:
-            generator = WSFGenerator(mpSession)
-            generator.run()
 
         if mpSession.outputFileType == MSTypes.VBA:
             generator = VBAGenerator(mpSession)
             generator.run()
 
-
         if mpSession.outputFileType == MSTypes.SCF:
             generator = SCFGenerator(mpSession)
-            generator.run()
-
-        if mpSession.outputFileType == MSTypes.XSL:
-            generator = XSLGenerator(mpSession)
             generator.run()
 
         if mpSession.outputFileType == MSTypes.URL:
@@ -477,4 +476,5 @@ def main(argv):
 
 
 if __name__ == '__main__':
+    # PyArmor Plugin: checkPlug()
     main(sys.argv[1:])
