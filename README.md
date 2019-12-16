@@ -94,8 +94,8 @@ The pro mode includes features such as:
 * MS Office persistance
 * Trojan existing MS Office documents
 * Embed decoy payload
-* Anti reverse-engineering
-* Anti-debug using http://seclists.org/fulldisclosure/2017/Mar/90
+* Lateral movement using DCOM objects
+* Anti reverse engineering 
 
 Pro features are weaponized and I really don't want to hellp ransomware writers so they are not open source.
 If you are in an offensive security audit team and would like more informtion on how to get "pro" version you can contact me (see contact information at end of README).
