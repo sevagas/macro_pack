@@ -2,7 +2,7 @@
 Get the windows OS version
 """
 
-VBA = \
+
 r"""
 
 #If VBA7 Then 
@@ -35,52 +35,52 @@ End Function
 
 """
 
-VBS = \
+VBA = \
 r'''
 
-Public Function GetOSVersion()
-    ' https://msdn.microsoft.com/fr-fr/library/windows/desktop/ms724832(v=vs.85).aspx
-    ' https://msdn.microsoft.com/en-us/library/aa394239(v=vs.85).aspx
-    ' http://www.nogeekleftbehind.com/2013/09/10/updated-list-of-os-version-queries-for-wmi-filters/
- 
+Public Function GetOSVersion() As String
+    Dim ProductType As String
+    Dim version As String
+    Dim desktopProductType As String
+    desktopProductType = "1"
     For Each objItem in GetObject("winmgmts://./root/cimv2").ExecQuery("Select * from Win32_OperatingSystem",,48)
         version = objItem.Version
-        ProductType = objItem.ProductType
+        ProductType = objItem.ProductType & ""
     Next
  
     Select Case Left(version, Instr(version, ".") + 1)
     Case "10.0"
-        If (ProductType = "1") Then
+        If (ProductType = desktopProductType) Then
             GetOSVersion = "Windows 10"
         Else
             GetOSVersion = "Windows Server 2016"
         End If
     Case "6.3"
-        If (ProductType = "1") Then
+        If (ProductType = desktopProductType) Then
             GetOSVersion = "Windows 8.1"
         Else
             GetOSVersion = "Windows Server 2012 R2"
         End If
     Case "6.2"
-        If (ProductType = "1") Then
+        If (ProductType = desktopProductType) Then
             GetOSVersion = "Windows 8"
         Else
             GetOSVersion = "Windows Server 2012"
         End If
     Case "6.1"
-        If (ProductType = "1") Then
+        If (ProductType = desktopProductType) Then
             GetOSVersion = "Windows 7"
         Else
             GetOSVersion = "Windows Server 2008 R2"
         End If
     Case "6.0"
-        If (ProductType = "1") Then
+        If (ProductType = desktopProductType) Then
             GetOSVersion = "Windows Vista"
         Else
             GetOSVersion = "Windows Server 2008"
         End If
     Case "5.2"
-        If (ProductType = "1") Then
+        If (ProductType = desktopProductType) Then
             GetOSVersion = "Windows XP 64-Bit Edition"
         ElseIf (Left(Version, 5) = "5.2.3") Then
             GetOSVersion = "Windows Server 2003 R2"

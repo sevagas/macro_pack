@@ -25,6 +25,21 @@ Close
 class HTAGenerator(VBSGenerator):
     """ Module used to generate HTA file from working dir content"""
         
+    def vbScriptConvert(self):
+        super().vbScriptConvert()
+        f = open(self.getMainVBAFile()+".vbs")
+        vbsContent = f.read()
+        f.close()
+        
+        vbsContent = vbsContent.replace("WScript.Echo ", "MsgBox ")
+        vbsContent = vbsContent.replace('WScript.Sleep(1000)','CreateObject("WScript.Shell").Run "cmd /c ping localhost -n 1",0,True')
+        vbsContent = vbsContent.replace('Wscript.Quit 0', 'Self.close')
+        
+        # Write in new VBS file
+        f = open(self.getMainVBAFile()+".vbs", 'w')
+        f.writelines(vbsContent)
+        f.close()
+        
         
     def generate(self):
         logging.info(" [+] Generating %s file..." % self.outputFileType)
@@ -32,9 +47,6 @@ class HTAGenerator(VBSGenerator):
         f = open(self.getMainVBAFile()+".vbs")
         vbsContent = f.read()
         f.close()
-        
-        vbsContent = vbsContent.replace("WScript.Echo ", "MsgBox ")
-        vbsContent = vbsContent.replace('WScript.Sleep(1000)','CreateObject("WScript.Shell").Run "cmd /c ping localhost -n 1",0,True')
         
         # Write VBS in template
         htaContent = HTA_TEMPLATE

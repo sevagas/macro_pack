@@ -60,11 +60,7 @@ class MpModule():
         vbaFiles += [os.path.join(self.workingPath,each) for each in os.listdir(self.workingPath) if each.endswith('.vba')]
         return vbaFiles
     
-    def getAutoOpenVbaFunction(self):
-        raise NotImplementedError
-    
-    def getAutoOpenVbaSignature(self):
-        raise NotImplementedError 
+
     
     def getCMDFile(self):
         """ Return command line file (for DDE mode)"""
@@ -83,10 +79,14 @@ class MpModule():
         if cmdFile is not None and cmdFile != "":
             f = open(cmdFile, 'r')
             valuesFileContent = f.read()
+            logging.debug("    -> CMD file content: \n%s" % valuesFileContent)
             f.close()
             os.remove(cmdFile)
-            inputValues = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
-            #logging.info(str(inputValues))
+            if self.mpSession.fileInput is None or len(paramDict) > 1:# if values where passed by input pipe or in a file but there are multiple parame
+            #if len(paramDict) > 1:
+                inputValues = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
+            else: 
+                inputValues = [valuesFileContent] # value where passed using -f option
             if len(inputValues) >= len(paramDict): 
                 i = 0  
                 # Fill entry parameterds
@@ -125,19 +125,42 @@ class MpModule():
         return result
     
     
-    def addVBAModule(self, moduleContent):
+    def getFileContainingString(self, strToFind):
+        """ Returns fist VB file containing the string to find"""
+        result = ""
+        vbaFiles = self.getVBAFiles()
+
+        for vbaFile in vbaFiles:
+            if  os.stat(vbaFile).st_size != 0:  
+                with open(vbaFile, 'rb', 0) as file, mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
+                    if s.find(strToFind.encode()) != -1:
+                        result  = vbaFile
+                        break
+                            
+        return result
+    
+    
+    def addVBAModule(self, moduleContent, moduleName=None):
         """ 
         Add a new VBA module file containing moduleContent and with random name
         Returns name of new VBA file
         """
-        newModuleName = os.path.join(self.workingPath,utils.randomAlpha(9)+".vba")
-        f = open(newModuleName, 'w')
-        f.write(moduleContent)
-        f.close()
-        return newModuleName
+        if moduleName is None:
+            moduleName = utils.randomAlpha(9)
+            modulePath = os.path.join(self.workingPath,moduleName+".vba")
+        else:
+            modulePath = os.path.join(self.workingPath,utils.randomAlpha(9)+".vba")
+        if moduleName in self.mpSession.vbModulesList:
+            logging.debug("    [,] %s module already loaded" % moduleName)
+        else:
+            self.mpSession.vbModulesList.append(moduleName)
+            f = open(modulePath, 'w')
+            f.write(moduleContent)
+            f.close()
+        return modulePath
     
     
-    def addVBALib(self, vbaLib):
+    def addVBLib(self, vbaLib):
         """ 
         Add a new VBA Library module depending on the current context 
         """
@@ -157,7 +180,8 @@ class MpModule():
                     moduleContent = vbaLib.VBS
                 else:
                     moduleContent = vbaLib.VBA
-        newModuleName = self.addVBAModule(moduleContent)
+        #newModuleName = self.addVBAModule(moduleContent)
+        newModuleName = self.addVBAModule(moduleContent, vbaLib.__name__)
         return newModuleName
     
     
@@ -177,6 +201,8 @@ class MpModule():
                 content[n+targetLine] = content[n+targetLine]+ vbaCode+"\n"
                 break
         
+        
+        logging.debug("     [,] New content: \n " + "".join(content) + "\n\n ") 
         f = open(targetModule, 'w')
         f.writelines(content)
         f.close()
@@ -204,28 +230,6 @@ class MpModule():
         return result
             
     
-    
-    def resetVBAEntryPoint(self):
-        """
-        If macro has an autoopen like mechanism, this will replace the entry_point with what is given in newEntrPoin param
-        Ex for Excel it will replace "Sub AutoOpen ()" with "Sub Workbook_Open ()"
-        """
-        mainFile = self.getMainVBAFile()
-        if mainFile != "" and  self.startFunction is not None:
-            if self.startFunction != self.getAutoOpenVbaFunction():
-                logging.info("   [-] Changing auto open function from %s to %s..." % (self.startFunction, self.getAutoOpenVbaFunction()))
-                #1 Replace line in VBA
-                f = open(mainFile)
-                content = f.readlines()
-                f.close
-                for n,line in enumerate(content):
-                    if line.find(self.startFunction) != -1:    
-                        content[n] = self.getAutoOpenVbaSignature() + "\n"
-                f = open(mainFile, 'w')
-                f.writelines(content)
-                f.close()   
-                # 2 Change  cure module start function
-                self._startFunction = self.getAutoOpenVbaFunction()
         
     def run(self):
         """ Run the module """

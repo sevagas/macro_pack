@@ -10,6 +10,7 @@ if sys.platform == "win32":
 
 import logging
 from modules.excel_gen import ExcelGenerator
+from common import utils
 
 
 class ExcelDDE(ExcelGenerator):
@@ -25,12 +26,13 @@ class ExcelDDE(ExcelGenerator):
             paramDict = OrderedDict([("Cmd_Line",None)])      
             self.fillInputParams(paramDict)
             command = paramDict["Cmd_Line"]
-    
+            
+            
             logging.info("   [-] Open document...")
             # open up an instance of Excel with the win32com driver\        \\
             excel = win32com.client.Dispatch("Excel.Application")
             # do the operation in background without actually opening Excel
-            excel.Visible = False
+            #excel.Visible = False
             workbook = excel.Workbooks.Open(self.outputFilePath)
     
             logging.info("   [-] Inject DDE field (Answer 'No' to popup)...")
@@ -47,6 +49,7 @@ class ExcelDDE(ExcelGenerator):
             excel.DisplayAlerts=False
             excel.Workbooks(1).Close(SaveChanges=1)
             excel.Application.Quit()
+            
             # garbage collection
             del excel
             logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
@@ -58,5 +61,8 @@ class ExcelDDE(ExcelGenerator):
             objExcel = win32com.client.Dispatch("Excel.Application")
             objExcel.Application.Quit()
             del objExcel
-
+            # If it Application.Quit() was not enough we force kill the process
+            if utils.checkIfProcessRunning("Excel.exe"):
+                utils.forceProcessKill("Excel.exe")
+            
         

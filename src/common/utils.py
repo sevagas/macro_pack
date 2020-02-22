@@ -9,7 +9,8 @@ from termcolor import colored
 import os, sys
 import socket
 from collections import OrderedDict
-
+import importlib.util
+import psutil
 
 
 class ColorLogFiler(logging.StreamHandler):
@@ -35,6 +36,56 @@ def randomAlpha(length):
     return key
 
 
+def extractWordInString(strToParse, index):
+    """ Exract word (space separated ) at current index"""
+    i = index
+    while i!=0 and strToParse[i-1] not in " \t\n&|":
+        i = i-1
+    leftPart = strToParse[i:index]
+    i = index
+    while i!=len(strToParse) and strToParse[i] not in " \t\n&|":
+        i = i+1
+    rightPart = strToParse[index:i]
+    extractedWord = leftPart+rightPart
+    #logging.debug("     [-] extracted Word: %s" % extractedWord)
+    return extractedWord
+
+
+def extractPreviousWordInString(strToParse, index):
+    """ Exract the word (space separated ) preceding the one at current index"""
+    # Look for beginning or word
+    i = index
+    if strToParse[i] not in " \t\n":
+        while i!=0 and strToParse[i-1] not in " \t\n&|":
+            i = i-1
+    if i > 2:
+        while i!=0 and strToParse[i-1] in " \t\n\",;": # Skip spaces nd special char befor previous word
+            i = i-1
+    if i > 2:
+        previousWord = extractWordInString(strToParse, i)
+    else:
+        previousWord = ""
+    logging.debug("     [-] extracted previous Word: %s" % previousWord)
+    return previousWord
+
+
+def extractNextWordInString(strToParse, index):
+    """ Exract the word (space separated ) following the one at current index"""
+    # Look for beginning or word
+    i = index
+    while i!=len(strToParse) and strToParse[i] not in " \t\n&|":
+        i = i+1
+    if len(strToParse)-i > 2:
+        while i!=0 and strToParse[i] in " \t\n\",;": # Skip spaces nd special char befor previous word
+            i = i+1
+    if len(strToParse)-i > 2:
+        nextWord = extractWordInString(strToParse, i)
+    else:
+        nextWord = ""
+    logging.debug("     [-] Extracted next Word: %s" % nextWord)
+    return nextWord
+
+
 def getHostIp():
     """ returne current facing IP address """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -55,6 +106,55 @@ def getRunningApp():
     else:
         import __main__ as main # @UnresolvedImport To get the real origin of the script not the location of current file
         return os.path.abspath(main.__file__)
+    
+
+def checkIfProcessRunning(processName):
+    '''
+    Check if there is any running process that contains the given name processName.
+    '''
+    #Iterate over the all the running process
+    for proc in psutil.process_iter():
+        try:
+            # Check if process name contains the given name string.
+            if processName.lower() in proc.name().lower():
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return False;
+
+
+def yesOrNo(question):
+    answer = input(question + "(y/n): ").lower().strip()
+    print("")
+    while not(answer == "y" or answer == "yes" or \
+    answer == "n" or answer == "no"):
+        print("Input yes or no")
+        answer = input(question + "(y/n):").lower().strip()
+        print("")
+    if answer[0] == "y":
+        return True
+    else:
+        return False
+
+   
+def forceProcessKill(processName):
+    '''
+    Force kill a process (only work on windows)
+    '''
+    os.system("taskkill /f /im  %s" % processName)
+
+  
+def checkModuleExist(name):
+    r"""Returns if a top-level module with :attr:`name` exists *without**
+    importing it. This is generally safer than try-catch block around a
+    `import X`. It avoids third party libraries breaking assumptions of some of
+    our tests, e.g., setting multiprocessing start method when imported
+    (see librosa/#747, torchvision/#544).
+    """
+    spec = importlib.util.find_spec(name)
+    return spec is not None 
+
+
 
 class MSTypes():
     XL="Excel"
@@ -80,21 +180,27 @@ class MSTypes():
     URL="URL Shortcut"
     IQY="Excel Web Query"
     SETTINGS_MS="Settings Shortcut"
+    SYLK="SYmbolic LinK"
+    CHM="Compressed HTML Help"
     LIBRARY_MS="MS Library"
     INF="Setup Information"
+    CMD="Command line"
     UNKNOWN = "Unknown"
 
     MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, MPP, VSD, VSD97, ACC] # Formats supported by macro_pack
     VBSCRIPTS_FORMATS = [VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS.extend(MS_OFFICE_FORMATS)
-    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF, IQY]
+    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF, IQY, SYLK, CHM, CMD]
+    
+    ProMode_FORMATS =  [SYLK, CHM]
 
     # OrderedDict([("target_url",None),("download_path",None)])
     EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),(LIBRARY_MS,".library-ms"),(INF,".inf"),(IQY, ".iqy"),
+                                  (SYLK,".slk"),(CHM,".chm"),(CMD,".cmd"),
                                   ( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
                                   (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
-                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".wsc"),( WSF,".wsf"),( XSL,".xsl"),( ACC,".accdb"), ( ACC,".mdb" ) ])
+                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".sct"),( WSF,".wsf"),( XSL,".xsl"),( ACC,".accdb"), ( ACC,".mdb" ) ])
 
 
 
@@ -153,6 +259,12 @@ class MSTypes():
             result = self.XSL
         elif ".iqy" == extension.lower():
             result = self.IQY
+        elif ".slk" ==  extension.lower():
+            result = self.SYLK
+        elif ".chm" == extension.lower():
+            result = self.CHM
+        elif ".cmd" == extension.lower() or extension.lower() == ".bat":
+            result = self.CMD
         else:
             result = self.UNKNOWN
         return result

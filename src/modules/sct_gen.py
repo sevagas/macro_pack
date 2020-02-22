@@ -45,8 +45,8 @@ class SCTGenerator(VBSGenerator):
         # Write VBS in template
         sctContent = SCT_TEMPLATE
         sctContent = sctContent.replace("<<<random>>>", randomAlpha(8))
-        sctContent = sctContent.replace("<<<CLS1>>>", ''.join([random.choice('0123456789ABCDEF') for x in range(8)]))
-        sctContent = sctContent.replace("<<<CLS4>>>", ''.join([random.choice('0123456789ABCDEF') for x in range(12)]))
+        sctContent = sctContent.replace("<<<CLS1>>>", ''.join([random.choice('0123456789ABCDEF') for x in range(8)]))  # @UnusedVariable
+        sctContent = sctContent.replace("<<<CLS4>>>", ''.join([random.choice('0123456789ABCDEF') for x in range(12)]))  # @UnusedVariable
         sctContent = sctContent.replace("<<<VBS>>>", vbsContent)
         sctContent = sctContent.replace("<<<MAIN>>>", self.startFunction)
         # Write in new HTA file

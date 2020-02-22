@@ -13,6 +13,7 @@ if sys.platform == "win32":
 
 import logging
 from modules.vba_gen import VBAGenerator
+from common import utils
 
 
 class VisioGenerator(VBAGenerator):
@@ -51,6 +52,12 @@ class VisioGenerator(VBAGenerator):
         
     def check(self):
         logging.info("   [-] Check feasibility...")
+        if utils.checkIfProcessRunning("visio.exe"):
+            logging.error("   [!] Cannot generate Visio payload if Visio is already running.")
+            if utils.yesOrNo(" Do you want macro_pack to kill Visio process? "):
+                utils.forceProcessKill("visio.exe")
+            else:
+                return False
         # Check nb of source file
         try:
             objVisio = win32com.client.Dispatch("Visio.InvisibleApp")
@@ -64,46 +71,58 @@ class VisioGenerator(VBAGenerator):
     def generate(self):
 
         logging.info(" [+] Generating MS Visio document...")
-        
-        self.enableVbom()
-
-        logging.info("   [-] Open document...")
-        # open up an instance of Visio with the win32com driver
-        visio = win32com.client.Dispatch("Visio.InvisibleApp")
-        # do the operation in background without actually opening Visio
-        document = visio.Documents.Add("")
-
-        logging.info("   [-] Save document format...")        
-        document.SaveAs(self.outputFilePath)
+        try:
+            self.enableVbom()
+    
+            logging.info("   [-] Open document...")
+            # open up an instance of Visio with the win32com driver
+            visio = win32com.client.Dispatch("Visio.InvisibleApp")
+            # do the operation in background without actually opening Visio    
+            document = visio.Documents.Add("")
+    
+            logging.info("   [-] Save document format...")        
+            document.SaveAs(self.outputFilePath)
+                
+            self.resetVBAEntryPoint()
+            logging.info("   [-] Inject VBA...")
+            # Read generated files
+            for vbaFile in self.getVBAFiles():
+                if vbaFile == self.getMainVBAFile():       
+                    with open (vbaFile, "r") as f:
+                        macro=f.read()
+                        visioModule = document.VBProject.VBComponents("ThisDocument")
+                        visioModule.CodeModule.AddFromString(macro)
+                else: # inject other vba files as modules
+                    with open (vbaFile, "r") as f:
+                        macro=f.read()
+                        visioModule = document.VBProject.VBComponents.Add(1)
+                        visioModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
+                        visioModule.CodeModule.AddFromString(macro)
             
-        self.resetVBAEntryPoint()
-        logging.info("   [-] Inject VBA...")
-        # Read generated files
-        for vbaFile in self.getVBAFiles():
-            if vbaFile == self.getMainVBAFile():       
-                with open (vbaFile, "r") as f:
-                    macro=f.read()
-                    visioModule = document.VBProject.VBComponents("ThisDocument")
-                    visioModule.CodeModule.AddFromString(macro)
-            else: # inject other vba files as modules
-                with open (vbaFile, "r") as f:
-                    macro=f.read()
-                    visioModule = document.VBProject.VBComponents.Add(1)
-                    visioModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
-                    visioModule.CodeModule.AddFromString(macro)
+            # Remove Informations
+            logging.info("   [-] Remove hidden data and personal info...")
+            document.RemovePersonalInformation = True
+            
+            # save the document and close
+            document.Save()
+            document.Close()
+            visio.Application.Quit()
+            # garbage collection
+            del visio
+            self.disableVbom()
+    
+            logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
+            logging.info("   [-] Test with : \n%s --run %s\n" % (utils.getRunningApp(),self.outputFilePath))
         
-        # Remove Informations
-        logging.info("   [-] Remove hidden data and personal info...")
-        document.RemovePersonalInformation = True
-        
-        # save the document and close
-        document.Save()
-        document.Close()
-        visio.Application.Quit()
-        # garbage collection
-        del visio
-        self.disableVbom()
-
-        logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
-        
+        except Exception:
+            logging.exception(" [!] Exception caught!")
+            logging.error(" [!] Hints: Check if MS office is really closed and Antivirus did not catch the files")
+            logging.error(" [!] Attempt to force close MS Visio applications...")
+            visio = win32com.client.Dispatch("Visio.InvisibleApp")
+            visio.Application.Quit()
+            # If it Application.Quit() was not enough we force kill the process
+            if utils.checkIfProcessRunning("visio.exe"):
+                utils.forceProcessKill("visio.exe")
+            del visio
+            
 

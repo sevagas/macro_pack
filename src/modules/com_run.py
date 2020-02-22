@@ -31,7 +31,7 @@ class ComGenerator(MpModule):
             return
         
         targetApp = MSTypes.guessApplicationType(self.comTarget)
-        if MSTypes.XL in targetApp:
+        if MSTypes.XL in targetApp or MSTypes.SYLK in targetApp:
             comApp = "Excel.Application"
         elif MSTypes.WD in targetApp:
             comApp = "Word.Application"
@@ -63,7 +63,7 @@ class ComGenerator(MpModule):
 
         # do the operation in background without actually opening Excel
         try:
-            if MSTypes.XL in targetApp:
+            if MSTypes.XL in targetApp or MSTypes.SYLK in targetApp:
                 document = comObj.Workbooks.Open(self.comTarget)
             elif MSTypes.WD in targetApp or MSTypes.VSD in targetApp:
                 document = comObj.Documents.Open(self.comTarget)

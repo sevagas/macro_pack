@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import logging
-from modules.mp_generator import Generator
+from modules.payload_builder import PayloadBuilder
 from collections import OrderedDict
 
 """
@@ -22,7 +22,7 @@ r"""
 
 
 
-class GlkGenerator(Generator):
+class GlkGenerator(PayloadBuilder):
     """ Module used to generate malicious Groove workspace shortcut"""
     
     def check(self):

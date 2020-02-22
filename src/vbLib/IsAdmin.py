@@ -21,12 +21,16 @@ End Function
 Function IsMember(groupName)
     Dim objShell,grouplistD,ADSPath,userPath,listGroup
     On Error Resume Next
+    Dim userdomain As String
+    Dim username As String
+    userdomain = "userdomain"
+    username = "username"
     
     set objShell = CreateObject( "WScript.Shell" )
     If IsEmpty(groupListD) then
         Set groupListD = CreateObject("Scripting.Dictionary")
         groupListD.CompareMode = 1
-        ADSPath = EnvString("userdomain") & "/" & EnvString("username")
+        ADSPath = EnvString(userdomain) & "/" & EnvString(username)
         Set userPath = GetObject("WinNT://" & ADSPath & ",user")
         For Each listGroup in userPath.Groups
             groupListD.Add listGroup.Name, "-"

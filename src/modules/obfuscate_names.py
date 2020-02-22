@@ -13,7 +13,11 @@ class ObfuscateNames(MpModule):
     vbaFunctions = []
 
     def _findAllFunctions(self):
+        
         for vbaFile in self.getVBAFiles():
+            if self.mpSession.obfOnlyMain:
+                if vbaFile != self.getMainVBAFile():
+                    continue
             f = open(vbaFile)
             content = f.readlines()
             f.close()
@@ -41,11 +45,11 @@ class ObfuscateNames(MpModule):
 
     def _replaceFunctions(self):
         # Identify function, subs and variables names
-        logging.info("   [-] Rename functions...")
+        
         self._findAllFunctions()
         
         # Different situation surrounding variables
-        varDelimitors=[(" "," "),("\t"," "),("\t","("),(" ","("),("(","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
+        varDelimitors=[(" "," "),("\t"," "),("\t","("),(" ","("),("(","("),(" ","\n"),(" ",","),(""," ="),("."," "),(".","\"")]
         
         # Replace functions and function calls by random string
         for keyWord in self.vbaFunctions:
@@ -54,6 +58,9 @@ class ObfuscateNames(MpModule):
             self.reservedFunctions.append(keyTmp)
         
             for vbaFile in self.getVBAFiles():
+                if self.mpSession.obfOnlyMain:
+                    if vbaFile != self.getMainVBAFile():
+                        continue
                 f = open(vbaFile)
                 content = f.readlines()
                 f.close()
@@ -61,13 +68,18 @@ class ObfuscateNames(MpModule):
                 for varDelimitor in varDelimitors:
                     newKeyWord = varDelimitor[0] + keyTmp +varDelimitor[1]
                     keywordTmp = varDelimitor[0] + keyWord +varDelimitor[1]
+
                     for n,line in enumerate(content):
+                        #if "GetBuffer" in line:
+                        #    logging.info("|%s|->|%s|" %(keywordTmp,newKeyWord))
+                        #    if keywordTmp in line:
+                        #        logging.info("Found %s" % keywordTmp)
+                                
                         matchObj = re.match( r'.*".*%s.*".*' %keyWord, line, re.M|re.I) # check if word is inside a string
                         if matchObj:
                             if "Application.Run" in line or "Application.OnTime" in line: # dynamic function call detected
                                 content[n] = line.replace(keywordTmp, newKeyWord)
                         else:
-                            
                             content[n] = line.replace(keywordTmp, newKeyWord)
                                 
                 # Write in new file 
@@ -77,7 +89,7 @@ class ObfuscateNames(MpModule):
 
 
     def _replaceLibImports(self, macroLines):
-        logging.info("   [-] Rename API imports...")
+        
         # Identify function, subs and variables names
         keyWords = []
         for line in macroLines:
@@ -95,7 +107,7 @@ class ObfuscateNames(MpModule):
             for n,line in enumerate(macroLines):
                 if "Lib " in line and keyWord + " " in line: # take care of declaration
                     if "Alias " in line: # if fct already has an alias we can change the original keyword
-                        macroLines[n] = line.replace(keyWord, keyTmp)
+                        macroLines[n] = line.replace(keyWord, keyTmp, 1)
                     else:
                         # We have to create a new alias
                         matchObj = re.match( r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"(\s*).*', line, re.M|re.I) 
@@ -113,7 +125,7 @@ class ObfuscateNames(MpModule):
 
 
     def _replaceVariables(self,macroLines):
-        logging.info("   [-] Rename variables...")
+        
         #  variables names
         keyWords = []
         # format something As ...
@@ -154,7 +166,7 @@ class ObfuscateNames(MpModule):
         # Different situation surrounding variables
         varDelimitors=[(" "," "),(" ","."),(" ","("),(" ","\n"),(" ",","),(" ",")"),(" "," =")]
         varDelimitors.extend([("\t"," "),("\t","."),("\t","("),("\t","\n"),("\t",","),("\t",")"),("\t"," =")])
-        varDelimitors.extend([("(",")"),("(",","),("("," +"),("("," As"),("(",".")])
+        varDelimitors.extend([("(",")"),("(",","),("("," +"),("("," -"),("("," ="),("("," As"),("(",".")])
         varDelimitors.extend([("="," "),("=",","),("=","\n"),("Set "," =")])
         
         # replace all keywords by random name
@@ -171,7 +183,7 @@ class ObfuscateNames(MpModule):
 
 
     def _replaceConsts(self,macroLines):
-        logging.info("   [-] Rename numeric constants...")
+        
         # Identify and replace constants
         constList = ["0","1", "2"]
         
@@ -201,19 +213,29 @@ class ObfuscateNames(MpModule):
 
     def run(self):
         logging.info(" [+] VBA names obfuscation ...") 
-        
+   
         # Obfuscate function name
+        logging.info("   [-] Rename functions...")
         content = self._replaceFunctions()
         
+        logging.info("   [-] Rename variables...")
+        if self.mpSession.ObfReplaceConstants:
+            logging.info("   [-] Rename some numeric const...")
+        logging.info("   [-] Rename API imports...")
         for vbaFile in self.getVBAFiles():
+            if self.mpSession.obfOnlyMain:
+                if vbaFile != self.getMainVBAFile():
+                    continue
             f = open(vbaFile)
             content = f.readlines()
             f.close()
             
             # Obfuscate variables name
             content = self._replaceVariables(content)
-            # replace numerical consts
-            content = self._replaceConsts (content)
+            if self.mpSession.ObfReplaceConstants:
+                # replace numerical consts
+                if ",0," in content or " 0," in content:
+                    content = self._replaceConsts (content)
             #replace lib imports
             content = self._replaceLibImports (content)
         

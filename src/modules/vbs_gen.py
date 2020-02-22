@@ -45,10 +45,19 @@ class VBSGenerator(VBAGenerator):
         return True
     
     
+    
+    def printFile(self):
+        """ Display generated code on stdout """
+        if os.path.isfile(self.outputFilePath):
+            logging.info(" [+] Generated file content:\n") 
+            with open(self.outputFilePath,'r') as f:
+                print(f.read())
+    
+    
     def vbScriptConvert(self):
         logging.info("   [-] Convert VBA to VBScript...")
         translators = [("Val(","CInt("),(" Chr$"," Chr"),(" Mid$"," Mid"),("On Error GoTo","'//On Error GoTo"),("byebye:",""), ("Next ", "Next '//")]
-        translators.extend([(" As String"," "),(" As Object"," "),(" As Long"," "),(" As Integer"," "),(" As Variant"," "), (" As Boolean", " "), (" As Byte", " ")])
+        translators.extend([(" As String"," "),(" As Object"," "),(" As Long"," "),(" As Integer"," "),(" As Variant"," "), (" As Boolean", " "), (" As Byte", " "), (" As Excel.Application", " ")])
         translators.extend([ ("MsgBox ", "WScript.Echo "), ('Application.Wait Now + TimeValue("0:00:01")', 'WScript.Sleep(1000)')])
         content = []
         for vbaFile in self.getVBAFiles():  
@@ -60,6 +69,9 @@ class VBSGenerator(VBAGenerator):
             # Do easy translations
             for translator in translators:
                 line = line.replace(translator[0],translator[1])
+            
+            if line.strip() == "End":
+                line = "Wscript.Quit 0 \n"
             
             # Check if ENVIRON is used
             if line.find("Environ(")!= -1:

@@ -1,8 +1,9 @@
 import os
 from modules.mp_module import MpModule
 import logging
+from modules.template_gen import TemplateToVba
 
-class Generator(MpModule):
+class PayloadBuilder(MpModule):
     """ Class for modules which are used to generate a file """
     
     def __init__(self,mpSession):
@@ -35,21 +36,32 @@ class Generator(MpModule):
                 print(f.read())
         
     
-    def runObfuscators(self):
+    def vbTransformAndObfuscate(self):
         """ Call this method to apply transformation and obfuscation on the content of temp directory """
         return 
 
+
+    def processDosCommandLine(self,commandLine):
+        """ evaluate command line to  separate target and arguments """
+        return
     
     def run(self):
+        
         logging.info(" [+] Prepare %s file generation..." % self.outputFileType)
         # Check feasability
         if not self.check():
             return
+        
+        # generate template
+        if self.mpSession.template:
+            generator = TemplateToVba(self.mpSession)
+            generator.run()
+        
         # embed a file if asked
         if self.embeddedFilePath:
             self.embedFile()
         # Obfuscate VBA files
-        self.runObfuscators()
+        self.vbTransformAndObfuscate()
         # generate
         self.generate()
         

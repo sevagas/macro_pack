@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import logging
-from modules.mp_generator import Generator
+from modules.payload_builder import PayloadBuilder
 from collections import OrderedDict
 
 """
@@ -21,7 +21,7 @@ r"""WEB
 
 
 
-class IqyGenerator(Generator):
+class IqyGenerator(PayloadBuilder):
     """ Module used to generate malicious IQY Excel web query"""
     
     def check(self):

@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import logging
-from modules.mp_generator import Generator
+from modules.payload_builder import PayloadBuilder
 from collections import OrderedDict
 
 
@@ -30,7 +30,7 @@ r"""<?xml version="1.0" encoding="UTF-8"?>
 
 """
 
-class LibraryShortcutGenerator(Generator):
+class LibraryShortcutGenerator(PayloadBuilder):
     """ Module used to generate malicious MS Library shortcut files"""
     
     def check(self):
@@ -40,13 +40,13 @@ class LibraryShortcutGenerator(Generator):
     def generate(self):
                 
         logging.info(" [+] Generating %s file..." % self.outputFileType)        
-        paramDict = OrderedDict([("Target_Url",None),("Icon_Path",None)])      
+        paramDict = OrderedDict([("Target_Url",None)])      
         self.fillInputParams(paramDict)
         
         # Fill template
         content = LIBRARY_MS_TEMPLATE
         content = content.replace("<<<TARGET>>>", paramDict["Target_Url"])
-        content = content.replace("<<<ICON>>>", paramDict["Icon_Path"])
+        content = content.replace("<<<ICON>>>", self.mpSession.icon)
              
         # Write in new SCF file
         f = open(self.outputFilePath, 'w')

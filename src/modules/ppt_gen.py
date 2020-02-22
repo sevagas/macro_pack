@@ -81,11 +81,18 @@ class PowerPointGenerator(VBAGenerator):
         # 3 Recreate archive
         shutil.make_archive(os.path.join(self.workingPath,"rezipped_archive"), format="zip", root_dir=os.path.join(self.workingPath, "zip")) 
         # 4 replace file
+        os.remove(generatedFile)
         shutil.copy2(os.path.join(self.workingPath,"rezipped_archive.zip"), generatedFile)
     
     
     def check(self):
         logging.info("   [-] Check feasibility...")
+        if utils.checkIfProcessRunning("powerpnt.exe"):
+            logging.error("   [!] Cannot generate PowerPoint payload if PowerPoint is already running.")
+            if utils.yesOrNo(" Do you want macro_pack to kill PowerPoint process? "):
+                utils.forceProcessKill("powerpnt.exe")
+            else:
+                return False
         try:
             ppt = win32com.client.Dispatch("PowerPoint.Application")
             ppt.Quit()
@@ -140,7 +147,7 @@ class PowerPointGenerator(VBAGenerator):
             self._injectCustomUi()
                
             logging.info("   [-] Generated %s file path: %s" % (self.outputFileType, self.outputFilePath))
-            logging.info("   [-] Test with : \nmacro_pack.exe --run %s\n" % self.outputFilePath)
+            logging.info("   [-] Test with : \n%s --run %s\n" % (utils.getRunningApp(),self.outputFilePath))
         
         except Exception:
             logging.exception(" [!] Exception caught!")
@@ -148,6 +155,9 @@ class PowerPointGenerator(VBAGenerator):
             logging.error(" [!] Attempt to force close MS Powerpoint application...")
             ppt = win32com.client.Dispatch("PowerPoint.Application")
             ppt.Quit()
+            # If it Application.Quit() was not enough we force kill the process
+            if utils.checkIfProcessRunning("powerpnt.exe"):
+                utils.forceProcessKill("powerpnt.exe")
             del ppt
      
         

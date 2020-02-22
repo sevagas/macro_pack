@@ -13,7 +13,7 @@ from flask import send_from_directory
 import logging
 
 from modules.mp_module import MpModule
-from common.utils import getRunningApp, getHostIp
+from common.utils import getHostIp
 
 
 webapp = Flask(__name__)
@@ -64,7 +64,7 @@ def hello():
 @secure_http_response
 def answer():
     """ called by client when responding to command """
-    clientId = request.form['id']
+    #clientId = request.form['id']
     cmdOutput = request.form['cmdOutput']
     #logging.info("   [-] From %s received:\n %s " % (clientId,cmdOutput))
     logging.info(" %s \n " % (cmdOutput))

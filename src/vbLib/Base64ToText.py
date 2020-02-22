@@ -1,7 +1,7 @@
 VBA = \
 r"""
 
-Private Function Base64ToText(ByVal vCode)
+Function Base64ToText(ByVal vCode)
     Dim oXML, oNode
 
     Set oXML = CreateObject("Msxml2.DOMDocument.3.0")

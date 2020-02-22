@@ -31,10 +31,10 @@ class UACBypass(MpModule):
             f.writelines(content)
             f.close()
          
-        self.addVBALib(vbLib.UACBypassExecuteCMDAsync)
-        self.addVBALib(vbLib.IsAdmin)
-        self.addVBALib(vbLib.Sleep)
-        self.addVBALib(vbLib.GetOSVersion)
+        self.addVBLib(vbLib.UACBypassExecuteCMDAsync)
+        self.addVBLib(vbLib.IsAdmin)
+        self.addVBLib(vbLib.Sleep)
+        self.addVBLib(vbLib.GetOSVersion)
             
         logging.info("   [-] OK!") 
         

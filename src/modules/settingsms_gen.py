@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import logging
-from modules.mp_generator import Generator
+from modules.payload_builder import PayloadBuilder
 from collections import OrderedDict
 
 """
@@ -35,7 +35,7 @@ r"""<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
-class SettingsShortcutGenerator(Generator):
+class SettingsShortcutGenerator(PayloadBuilder):
     """ Module used to generate malicious MS Settings shortcut"""
     
     def check(self):
@@ -45,13 +45,13 @@ class SettingsShortcutGenerator(Generator):
     def generate(self):
                 
         logging.info(" [+] Generating %s file..." % self.outputFileType)        
-        paramDict = OrderedDict([("Cmd_Line",None),("Icon_Path",None)])      
+        paramDict = OrderedDict([("Cmd_Line",None)])      
         self.fillInputParams(paramDict)
         
         # Fill template
         content = SETTINGS_MS_TEMPLATE
         content = content.replace("<<<CMD>>>", paramDict["Cmd_Line"])
-        content = content.replace("<<<ICON>>>", paramDict["Icon_Path"])
+        content = content.replace("<<<ICON>>>", self.mpSession.icon)
              
         # Write in new SCF file
         f = open(self.outputFilePath, 'w')
