@@ -181,14 +181,6 @@ def main(argv):
         if os.path.isfile(mpSession.outputFilePath):
             logging.error("   [!] ERROR: Output file %s already exist!" % mpSession.outputFilePath)
             sys.exit(2)
-    else:
-        # In trojan mode, files are tojaned if they already exist and created if they dont.
-        # This concerns only non Office documents for now
-        if  mpSession.outputFileType not in MSTypes.MS_OFFICE_FORMATS:
-            if os.path.isfile(mpSession.outputFilePath):
-                logging.error("   [!] ERROR: Trojan mode not supported for %s format. \nOutput file %s already exist!" % (mpSession.outputFileType,mpSession.outputFilePath))
-                sys.exit(2)
-
 
     #Create temporary folder
     logging.info("   [-] Temporary working dir: %s" % working_directory)
