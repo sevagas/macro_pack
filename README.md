@@ -101,6 +101,8 @@ The pro mode includes features such as:
 * Weaponized templates and additional templates (ex EMPIRE)
 * Lot of more advanced stuff
 
+Some short demo videos are available on the [sevagas youtube channel](https://www.youtube.com/channel/UCgWXxtLNEOeNuEFO3ZgbEOw).
+
 Note that MP pro is only available as a commercial offer for professionals.
 If you are in an offensive security audit team and would like more informtion on how to get "pro" version you can contact me (see contact information at end of README).
 
