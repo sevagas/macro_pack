@@ -104,7 +104,7 @@ The pro mode includes features such as:
 Some short demo videos are available on the [sevagas youtube channel](https://www.youtube.com/channel/UCgWXxtLNEOeNuEFO3ZgbEOw).
 
 Note that MP pro is only available as a commercial offer for professionals.
-If you are in an offensive security audit team and would like more informtion on how to get "pro" version you can contact me (see contact information at end of README).
+If you are in an offensive security audit team and would like more informtion on how to get "pro" version you can contact me at emeric.nasi[ at ]sevagas.com.
 
 
 

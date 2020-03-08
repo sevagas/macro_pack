@@ -1,3 +1,3 @@
 
 
-VERSION="1.8_dev"
+VERSION="1.8.1"

@@ -170,6 +170,8 @@ class MpModule():
                 moduleContent = vbaLib.VBA_WD
             elif MSTypes.XL in self.outputFileType and hasattr(vbaLib, 'VBA_XL'): 
                 moduleContent = vbaLib.VBA_XL
+            elif MSTypes.PPT in self.outputFileType and hasattr(vbaLib, 'VBA_PPT'): 
+                moduleContent = vbaLib.VBA_PPT
             else:
                 moduleContent = vbaLib.VBA
         else:
@@ -183,6 +185,7 @@ class MpModule():
         #newModuleName = self.addVBAModule(moduleContent)
         newModuleName = self.addVBAModule(moduleContent, vbaLib.__name__)
         return newModuleName
+    
     
     
     def insertVbaCode(self, targetModule, targetFunction,targetLine, vbaCode):

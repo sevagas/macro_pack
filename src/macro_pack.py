@@ -6,6 +6,7 @@ import sys
 import getopt
 import logging
 import shutil
+import psutil
 from modules.com_run import ComGenerator
 from modules.listen_server import ListenServer
 from modules.Wlisten_server import WListenServer
@@ -172,7 +173,7 @@ def main(argv):
     if mpSession.outputFilePath:
         logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
     elif mpSession.listen == False and mpSession.Wlisten == False and mpSession.runTarget is None and mpSession.dcomTarget is None:
-        logging.error("   [!] You need to provide an output file! (-G option)")
+        logging.error("   [!] You need to provide an output file! (get help using %s -h)" % os.path.basename(utils.getRunningApp()))
         sys.exit(2)
 
 
@@ -269,5 +270,9 @@ def main(argv):
 
 
 if __name__ == '__main__':
+    # check if running from explorer, if yes restart from cmd line
+    running_from = psutil.Process(os.getpid()).parent().parent().name()
+    if running_from == 'explorer.exe':
+        os.system("cmd.exe /k \"%s\"" % utils.getRunningApp())
     # PyArmor Plugin: checkPlug()
     main(sys.argv[1:])

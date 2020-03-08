@@ -59,7 +59,7 @@ Private Sub BypassUAC (targetPath As String)
 End Sub
 
 
-' hijack ms-settings class com object to bypass UAC when fodhelper.exe is called (Windows 10)
+' hijack ms-settings class com object to bypass UAC when sdclt.exe is called (Windows 10)
 Sub BypassUACExec (targetPath As String)
     Dim adminFr As String
     Dim adminEn As String
