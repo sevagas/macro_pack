@@ -164,7 +164,7 @@ class ObfuscateNames(MpModule):
         #logging.info(str(keyWords))
         
         # Different situation surrounding variables
-        varDelimitors=[(" "," "),(" ","."),(" ","("),(" ","\n"),(" ",","),(" ",")"),(" "," =")]
+        varDelimitors=[(" "," "),(" ","."),(" ","("),(" ","\n"),(" ",","),(" ",")"),(" "," ="),("."," =")]
         varDelimitors.extend([("\t"," "),("\t","."),("\t","("),("\t","\n"),("\t",","),("\t",")"),("\t"," =")])
         varDelimitors.extend([("(",")"),("(",","),("("," +"),("("," -"),("("," ="),("("," As"),("(",".")])
         varDelimitors.extend([("="," "),("=",","),("=","\n"),("Set "," =")])

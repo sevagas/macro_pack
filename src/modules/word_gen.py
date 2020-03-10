@@ -64,7 +64,7 @@ class WordGenerator(VBAGenerator):
         if utils.checkIfProcessRunning("winword.exe"):
             logging.error("   [!] Cannot generate Word payload if Word is already running.")
             if utils.yesOrNo(" Do you want macro_pack to kill Word process? "):
-                utils.forceProcessKill("Excel.exe")
+                utils.forceProcessKill("winword.exe")
             else:
                 return False
         try:

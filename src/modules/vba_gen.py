@@ -135,7 +135,10 @@ class VBAGenerator(PayloadBuilder):
                     shutil.copy2(vbaFile, os.path.join(os.path.dirname(self.outputFilePath),os.path.basename(vbaFile)))
                     logging.info("   [-] Generated VBA file: %s" % os.path.join(os.path.dirname(self.outputFilePath),os.path.basename(vbaFile)))   
                     
-                    
+    
+    def getAutoOpenVbaFunction(self):
+        return "AutoOpen"
+            
     def resetVBAEntryPoint(self):
         """
         If macro has an autoopen like mechanism, this will replace the entry_point with what is given in newEntrPoin param
