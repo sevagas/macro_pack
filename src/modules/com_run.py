@@ -4,6 +4,7 @@
 # Only enabled on windows
 import sys
 import os
+import time
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
@@ -79,6 +80,9 @@ class ComGenerator(MpModule):
         except Exception:
             logging.exception("   [!] Problem detected!")
         
+        time.sleep(1.5) # need to have app alive to launch async call with --background option
+
+                
         logging.info("   [-] Cleanup...")
         try:
             document.close()

@@ -225,7 +225,7 @@ def printAvailableFormats(banner):
     print("\n    Supported shortcuts/miscellaneous formats:")
     for fileType in MSTypes.Shortcut_FORMATS:
         print("       - %s: %s" % (fileType, MSTypes.EXTENSION_DICT[fileType]))
-    print("\n    WARNING: These formats only supported in MacroPack Pro:")
+    print("\n    WARNING: These formats are only supported in MacroPack Pro:")
     for fileType in MSTypes.ProMode_FORMATS:
         print("       - %s: %s" % (fileType, MSTypes.EXTENSION_DICT[fileType]))
         

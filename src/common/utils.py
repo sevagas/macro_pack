@@ -187,6 +187,7 @@ class MSTypes():
     CMD="Command line"
     UNKNOWN = "Unknown"
 
+    MS_OFFICE_BASIC_FORMATS = [ XL, XL97, WD, WD97, PPT] # basic office formats
     MS_OFFICE_FORMATS = [ XL, XL97, WD, WD97, PPT, MPP, VSD, VSD97, ACC] # Formats supported by macro_pack
     VBSCRIPTS_FORMATS = [VBS, HTA, SCT, WSF, XSL ]
     VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]

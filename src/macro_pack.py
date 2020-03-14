@@ -171,7 +171,11 @@ def main(argv):
     
         # Check output file format
     if mpSession.outputFilePath:
-        logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
+        if mpSession.outputFileType == MSTypes.UNKNOWN:
+            logging.error("   [!] %s is not a supported extension. Use --listformats to view supported MacroPack formats." % os.path.splitext(mpSession.outputFilePath)[1])
+            sys.exit(2)
+        else:
+            logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
     elif mpSession.listen == False and mpSession.Wlisten == False and mpSession.runTarget is None and mpSession.dcomTarget is None:
         logging.error("   [!] You need to provide an output file! (get help using %s -h)" % os.path.basename(utils.getRunningApp()))
         sys.exit(2)
