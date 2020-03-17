@@ -88,6 +88,7 @@ You may notice that not all part of macro\_pack is available. Only the community
 Features in the pro version are really "weaponizing" the process and I do not want them available to all script kiddies out there.
 The pro mode includes features such as:
 * Advance antimalware bypass
+* Shellcode injection
 * Command line obfuscation (Dosfuscation)
 * ASR and AMSI bypass
 * Self unpacking VBA/VBS payloads
@@ -98,7 +99,7 @@ The pro mode includes features such as:
 * Sandbox detection
 * Support of more formats such as Excel 4.0 SYLK and compiled help files
 * Run advanced VB payload from unusual formats
-* Weaponized templates and additional templates (ex EMPIRE)
+* Weaponized templates and additional templates (ex EMPIRE, AUTOSHELLCODE)
 * Lot of more advanced stuff
 
 Some short demo videos are available on the [sevagas youtube channel](https://www.youtube.com/channel/UCgWXxtLNEOeNuEFO3ZgbEOw).

