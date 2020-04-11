@@ -175,7 +175,7 @@ class MpModule():
             else:
                 moduleContent = vbaLib.VBA
         else:
-            if self.outputFileType == MSTypes.HTA and hasattr(vbaLib, 'VBS_HTA'):
+            if self.outputFileType in [MSTypes.HTA, MSTypes.SCT] and hasattr(vbaLib, 'VBS_HTA'):
                 moduleContent = vbaLib.VBS_HTA
             else:
                 if hasattr(vbaLib, 'VBS'):

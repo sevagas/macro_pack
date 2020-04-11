@@ -8,7 +8,7 @@ from common.utils import MSTypes
 from common.definitions import VERSION
 MP_TYPE="Pro"
 if utils.checkModuleExist("pro_core"):
-    from pro_core.help_pro import getProBanner, getAvBypassFunctionPro, getGenerationFunctionPro, getOtherFunctionPro, getTemplateUsagePro
+    from pro_core.help_pro import getProBanner, getAvBypassFunctionPro, getGenerationFunctionPro, getOtherFunctionPro, getTemplateUsagePro, printAvailableFormatsPro
 else:
     MP_TYPE="Community"
 
@@ -160,16 +160,14 @@ def getGenerationFunction(currentApp):
         MacroPack supports multiple predefined templates useful for social engineering, redteaming, and security bypass    
     --listtemplates View all templates provided by MacroPack
     -e, --embed=EMBEDDED_FILE_PATH Will embed the given file in the body of the generated document.
-        Use with EMBED_EXE template to auto drop and exec the file or with EMBED_DLL to drop/load the embedded dll.   
- """ 
+        Use with EMBED_EXE template to auto drop and exec the file or with EMBED_DLL to drop/load the embedded dll.   """ 
     return details
 
 
 def getAvBypassFunction(currentApp):
     details = """ Security bypass options: 
     -o, --obfuscate Obfuscate code (remove spaces, obfuscate strings, obfuscate functions and variables name)
-    --uac-bypass Execute payload with high privileges if user is admin. Compatible with most MacroPack templates
- """ 
+    --uac-bypass Execute payload with high privileges if user is admin. Compatible with most MacroPack templates """ 
     return details
 
 
@@ -193,8 +191,7 @@ def getOtherFunction(currentApp):
             In this case, windows or linux explorers will show the file named as: somethingath.jpg
     -l, --listen=ROOT_PATH\tOpen an HTTP server from ROOT_PATH listening on default port 80.
     -w, --webdav-listen=ROOT_PATH Open a WebDAV server on default port 80, giving access to ROOT_PATH.
-    --port=PORT Specify the listening port for HTTP and WebDAV servers.
- """ % (currentApp)
+    --port=PORT Specify the listening port for HTTP and WebDAV servers.""" % (currentApp)
     return details
 
 
@@ -230,6 +227,8 @@ def printAvailableFormats(banner):
         print("       - %s: %s" % (fileType, MSTypes.EXTENSION_DICT[fileType]))
         
     print("\n     To create a payload for a certain format just add extension to payload.\n     Ex.  -G payload.hta ")
+    if MP_TYPE=="Pro":
+        printAvailableFormatsPro()
     
 
 def printCommunityUsage(banner, currentApp, mpSession):

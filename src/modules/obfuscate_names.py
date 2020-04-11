@@ -130,7 +130,7 @@ class ObfuscateNames(MpModule):
         keyWords = []
         # format something As ...
         for line in macroLines:
-            findList = re.findall( r'([a-zA-Z0-9_]+)(\(\))?\s+As\s+(String|Integer|Long|Object|Byte|Variant|Boolean|Any|Word.Application|Excel.Application)', line, re.I) 
+            findList = re.findall( r'([a-zA-Z0-9_]+)(\(\))?\s+As\s+(String|Integer|Long|Object|Byte|Variant|Boolean|Single|Any|Word.Application|Excel.Application)', line, re.I) 
             if findList:
                 for keyWord in findList:
                     if keyWord[0] not in self.reservedFunctions: # prevent erase of previous variables and function names
@@ -164,7 +164,8 @@ class ObfuscateNames(MpModule):
         #logging.info(str(keyWords))
         
         # Different situation surrounding variables
-        varDelimitors=[(" "," "),(" ","."),(" ","("),(" ","\n"),(" ",","),(" ",")"),(" "," ="),("."," =")]
+        varDelimitors=[(" "," "),(" ","."),(" ","("),(" ","\n"),(" ",","),(" ",")"),(" "," =")]
+        varDelimitors.extend([("."," ="),("."," A"),("."," O"),(".",")"),(".",",")])
         varDelimitors.extend([("\t"," "),("\t","."),("\t","("),("\t","\n"),("\t",","),("\t",")"),("\t"," =")])
         varDelimitors.extend([("(",")"),("(",","),("("," +"),("("," -"),("("," ="),("("," As"),("(",".")])
         varDelimitors.extend([("="," "),("=",","),("=","\n"),("Set "," =")])

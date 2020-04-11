@@ -184,22 +184,26 @@ class MSTypes():
     CHM="Compressed HTML Help"
     LIBRARY_MS="MS Library"
     INF="Setup Information"
+    CSPROJ="Visual Studio Project"
     CMD="Command line"
     UNKNOWN = "Unknown"
 
     WORD_AND_EXCEL_FORMATS = [ XL, XL97, WD, WD97] 
     MS_OFFICE_BASIC_FORMATS =  WORD_AND_EXCEL_FORMATS + [PPT] 
     MS_OFFICE_FORMATS = MS_OFFICE_BASIC_FORMATS + [ MPP, VSD, VSD97, ACC] # Formats supported by macro_pack
-    VBSCRIPTS_FORMATS = [VBS, HTA, SCT, WSF, XSL ]
-    VB_FORMATS = [VBA, VBS, HTA, SCT, WSF, XSL ]
-    VB_FORMATS.extend(MS_OFFICE_FORMATS)
-    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF, IQY, SYLK, CHM, CMD]
+    VBSCRIPTS_BASIC_FORMATS = [VBS, HTA, SCT, WSF ]
+    VBSCRIPTS_FORMATS = VBSCRIPTS_BASIC_FORMATS + [XSL]
+    VB_FORMATS = VBSCRIPTS_FORMATS + MS_OFFICE_FORMATS
+    
+    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF, IQY, SYLK, CHM, CMD] # , CSPROJ
     
     ProMode_FORMATS =  [SYLK, CHM]
+    HtaMacro_FORMATS = [LNK, CHM, INF, SYLK]
+    Trojan_FORMATS = MS_OFFICE_BASIC_FORMATS + [MPP, VSD, VSD97,CHM]#, CSPROJ
 
     # OrderedDict([("target_url",None),("download_path",None)])
     EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),(LIBRARY_MS,".library-ms"),(INF,".inf"),(IQY, ".iqy"),
-                                  (SYLK,".slk"),(CHM,".chm"),(CMD,".cmd"),
+                                  (SYLK,".slk"),(CHM,".chm"),(CMD,".cmd"), # (CSPROJ,".csproj"),
                                   ( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
                                   (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
                                   (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".sct"),( WSF,".wsf"),( XSL,".xsl"),( ACC,".accdb"), ( ACC,".mdb" ) ])
@@ -265,6 +269,8 @@ class MSTypes():
             result = self.SYLK
         elif ".chm" == extension.lower():
             result = self.CHM
+        elif ".csproj" == extension.lower():
+            result = self.CSPROJ
         elif ".cmd" == extension.lower() or extension.lower() == ".bat":
             result = self.CMD
         else:

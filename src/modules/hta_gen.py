@@ -30,10 +30,11 @@ class HTAGenerator(VBSGenerator):
         f = open(self.getMainVBAFile()+".vbs")
         vbsContent = f.read()
         f.close()
-        
+        logging.info("   [-] Convert VBScript to HTA...")
         vbsContent = vbsContent.replace("WScript.Echo ", "MsgBox ")
         vbsContent = vbsContent.replace('WScript.Sleep(1000)','CreateObject("WScript.Shell").Run "cmd /c ping localhost -n 1",0,True')
-        vbsContent = vbsContent.replace('Wscript.Quit 0', 'Self.close')
+        vbsContent = vbsContent.replace('Wscript.Quit 0', 'Self.Close')
+        vbsContent = vbsContent.replace('Wscript.ScriptFullName', 'self.location.pathname')
         
         # Write in new VBS file
         f = open(self.getMainVBAFile()+".vbs", 'w')

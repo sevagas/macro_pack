@@ -132,9 +132,13 @@ class VBAGenerator(PayloadBuilder):
             else:
                 logging.info("   [!] More then one VBA file generated, files will be copied in same dir as %s" % self.outputFilePath)
                 for vbaFile in self.getVBAFiles():
-                    shutil.copy2(vbaFile, os.path.join(os.path.dirname(self.outputFilePath),os.path.basename(vbaFile)))
-                    logging.info("   [-] Generated VBA file: %s" % os.path.join(os.path.dirname(self.outputFilePath),os.path.basename(vbaFile)))   
-                    
+                    if vbaFile != self.getMainVBAFile():
+                        shutil.copy2(vbaFile, os.path.join(os.path.dirname(self.outputFilePath),os.path.basename(vbaFile)))
+                        logging.info("   [-] Generated VBA file: %s" % os.path.join(os.path.dirname(self.outputFilePath),os.path.basename(vbaFile))) 
+                    else:
+                        shutil.copy2(self.getMainVBAFile(), self.outputFilePath)
+                        logging.info("   [-] Generated VBA file: %s" % self.outputFilePath)
+                        
     
     def getAutoOpenVbaFunction(self):
         return "AutoOpen"

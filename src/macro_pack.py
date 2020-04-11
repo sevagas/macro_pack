@@ -24,6 +24,7 @@ if sys.platform == "win32":
 MP_TYPE="Pro"
 if utils.checkModuleExist("pro_core"):
     from pro_modules.dcom_run import DcomGenerator
+    from pro_modules.containers import ContainerGenerator
     from pro_core.payload_builder_factory_pro import PayloadBuilderFactoryPro
     from pro_core import arg_mgt_pro, mp_session_pro
 else:
@@ -238,6 +239,9 @@ def main(argv):
             # Build payload
             if payloadBuilder is not None:
                 payloadBuilder.run()
+                if MP_TYPE == "Pro":
+                    generator = ContainerGenerator(mpSession)
+                    generator.run()
 
         #run com attack
         if mpSession.runTarget:
