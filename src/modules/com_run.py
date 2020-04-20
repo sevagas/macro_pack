@@ -65,8 +65,12 @@ class ComGenerator(MpModule):
         # do the operation in background without actually opening Excel
         try:
             if MSTypes.XL in targetApp or MSTypes.SYLK in targetApp:
+                if self.mpSession.runVisible:
+                    comObj.Visible = True
                 document = comObj.Workbooks.Open(self.comTarget)
             elif MSTypes.WD in targetApp or MSTypes.VSD in targetApp:
+                if self.mpSession.runVisible:
+                    comObj.Visible = True
                 document = comObj.Documents.Open(self.comTarget)
             elif MSTypes.PPT in targetApp:
                 document = comObj.Presentations.Open(self.comTarget)

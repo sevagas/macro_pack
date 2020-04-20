@@ -155,6 +155,24 @@ def checkModuleExist(name):
     return spec is not None 
 
 
+class MPParam():
+    def __init__(self,name,optional=False):
+        self.name = name
+        self.value = ""
+        self.optional = optional
+
+
+def getParamValue(paramArray, paramName):
+    result = ""
+    i = 0
+    while i < len(paramArray):
+        if paramArray[i].name == paramName:
+            result = paramArray[i].value
+            break
+        i += 1
+    return result
+            
+
 
 class MSTypes():
     XL="Excel"
@@ -195,15 +213,15 @@ class MSTypes():
     VBSCRIPTS_FORMATS = VBSCRIPTS_BASIC_FORMATS + [XSL]
     VB_FORMATS = VBSCRIPTS_FORMATS + MS_OFFICE_FORMATS
     
-    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF, IQY, SYLK, CHM, CMD] # , CSPROJ
+    Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF, IQY, SYLK, CHM, CMD, CSPROJ]
     
     ProMode_FORMATS =  [SYLK, CHM]
-    HtaMacro_FORMATS = [LNK, CHM, INF, SYLK]
-    Trojan_FORMATS = MS_OFFICE_BASIC_FORMATS + [MPP, VSD, VSD97,CHM]#, CSPROJ
+    HtaMacro_FORMATS = [LNK, CHM, INF, SYLK, CSPROJ]
+    Trojan_FORMATS = MS_OFFICE_BASIC_FORMATS + [MPP, VSD, VSD97,CHM, CSPROJ]
 
     # OrderedDict([("target_url",None),("download_path",None)])
     EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),(LIBRARY_MS,".library-ms"),(INF,".inf"),(IQY, ".iqy"),
-                                  (SYLK,".slk"),(CHM,".chm"),(CMD,".cmd"), # (CSPROJ,".csproj"),
+                                  (SYLK,".slk"),(CHM,".chm"),(CMD,".cmd"),(CSPROJ,".csproj"),
                                   ( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
                                   (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
                                   (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".sct"),( WSF,".wsf"),( XSL,".xsl"),( ACC,".accdb"), ( ACC,".mdb" ) ])

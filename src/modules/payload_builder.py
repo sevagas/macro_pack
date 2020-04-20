@@ -2,6 +2,7 @@ import os
 from modules.mp_module import MpModule
 import logging
 from modules.template_gen import TemplateToVba
+from modules.embed_file import Embedder
 
 class PayloadBuilder(MpModule):
     """ Class for modules which are used to generate a file """
@@ -59,7 +60,8 @@ class PayloadBuilder(MpModule):
         
         # embed a file if asked
         if self.embeddedFilePath:
-            self.embedFile()
+            generator = Embedder(self.mpSession)
+            generator.run()
         # Obfuscate VBA files
         self.vbTransformAndObfuscate()
         # generate

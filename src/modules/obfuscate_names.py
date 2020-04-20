@@ -49,7 +49,7 @@ class ObfuscateNames(MpModule):
         self._findAllFunctions()
         
         # Different situation surrounding variables
-        varDelimitors=[(" "," "),("\t"," "),("\t","("),(" ","("),("(","("),(" ","\n"),(" ",","),(""," ="),("."," "),(".","\"")]
+        varDelimitors=[(" "," "),("\t"," "),("\t","("),("\t"," ="),(" ","("),("(","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
         
         # Replace functions and function calls by random string
         for keyWord in self.vbaFunctions:
@@ -103,24 +103,36 @@ class ObfuscateNames(MpModule):
     
         # Replace functions and function calls by random string
         for keyWord in keyWords:
+            
             keyTmp = randomAlpha(randint(8, 20)) # Generate random names with random size
+            #logging.debug("Keyword:%s,keyTmp:%s "%(keyWord,keyTmp))
             for n,line in enumerate(macroLines):
                 if "Lib " in line and keyWord + " " in line: # take care of declaration
                     if "Alias " in line: # if fct already has an alias we can change the original keyword
-                        macroLines[n] = line.replace(keyWord, keyTmp, 1)
+                        #logging.debug(line)
+                        macroLines[n] = line.replace(" %s " % keyWord," %s " %  keyTmp, 1)
+                        #logging.debug(macroLines[n])
                     else:
                         # We have to create a new alias
                         matchObj = re.match( r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"(\s*).*', line, re.M|re.I) 
-                        line =  line.replace(keyWord, keyTmp)
+                        #logging.debug(line)
+                        line =  line.replace(" %s " % keyWord, " %s " % keyTmp)
+                        #logging.debug(line+"\n")
                         macroLines[n] = line.replace(matchObj.groups()[2],matchObj.groups()[2] + "\" Alias \"%s" % keyWord) 
                 else:
                     matchObj = re.match( r'.*".*%s.*".*'%keyWord, line, re.M|re.I) # check if word is inside a string
                     if matchObj:
                         if "Application.Run" in line: # dynamic function call detected
                             macroLines[n] = line.replace(keyWord, keyTmp)
+                            
                         # else word is part of normal string so we do not touch
                     else:
-                        macroLines[n] = line.replace(keyWord, keyTmp)
+                        if keyWord + " " in line or keyWord + "(" in line:
+                            #logging.debug(line)
+                            macroLines[n] = line.replace(keyWord, keyTmp)
+                            #logging.debug(macroLines[n])
+                        #else:
+                        #    macroLines[n] = line.replace(keyWord, keyTmp)
         return macroLines
 
 
@@ -130,7 +142,7 @@ class ObfuscateNames(MpModule):
         keyWords = []
         # format something As ...
         for line in macroLines:
-            findList = re.findall( r'([a-zA-Z0-9_]+)(\(\))?\s+As\s+(String|Integer|Long|Object|Byte|Variant|Boolean|Single|Any|Word.Application|Excel.Application)', line, re.I) 
+            findList = re.findall( r'([a-zA-Z0-9_]+)(\(\))?\s+As\s+(String|Integer|Long|Object|Byte|Variant|Boolean|Single|Any|Collection|Word.Application|Excel.Application)', line, re.I) 
             if findList:
                 for keyWord in findList:
                     if keyWord[0] not in self.reservedFunctions: # prevent erase of previous variables and function names
@@ -165,9 +177,10 @@ class ObfuscateNames(MpModule):
         
         # Different situation surrounding variables
         varDelimitors=[(" "," "),(" ","."),(" ","("),(" ","\n"),(" ",","),(" ",")"),(" "," =")]
-        varDelimitors.extend([("."," ="),("."," A"),("."," O"),(".",")"),(".",",")])
+        varDelimitors.extend([("."," ="),("."," A"),("."," O"),(".",")"),(".",","),("."," ")])
+        varDelimitors.extend([("#"," "),("#",",")])
         varDelimitors.extend([("\t"," "),("\t","."),("\t","("),("\t","\n"),("\t",","),("\t",")"),("\t"," =")])
-        varDelimitors.extend([("(",")"),("(",","),("("," +"),("("," -"),("("," ="),("("," As"),("(",".")])
+        varDelimitors.extend([("(",")"),("(","("),("(",","),("("," +"),("("," *"),("("," -"),("("," ="),("("," As"),("("," And"),("("," To"),("("," Or"),("(",".")])
         varDelimitors.extend([("="," "),("=",","),("=","\n"),("Set "," =")])
         
         # replace all keywords by random name

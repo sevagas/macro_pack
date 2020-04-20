@@ -105,7 +105,58 @@ class MpModule():
                     while newValue is None or newValue == "" or newValue.isspace():
                         newValue = input("    %s:" % key)
                     paramDict[key] = newValue
+    
+    
+    def fillInputParams2(self, paramArray):
+        """ 
+        Fill parameters dictionnary using given input. If input is missing, ask for input to user 
+        """
+        # Fill parameters based on input file
+        allMandatoryParamFilled = False
+        i = 0
+        mandatoryParamLen= 0
+        while i < len(paramArray):
+            if paramArray[i].optional== False:
+                mandatoryParamLen += 1 
+            i += 1
+        if mandatoryParamLen == 0:
+            allMandatoryParamFilled = True
+        
+        cmdFile = self.getCMDFile()
+        if cmdFile is not None and cmdFile != "":
+            f = open(cmdFile, 'r')
+            valuesFileContent = f.read()
+            logging.debug("    -> CMD file content: \n%s" % valuesFileContent)
+            f.close()
+            os.remove(cmdFile)
+            if self.mpSession.fileInput is None or len(paramArray) > 1:# if values where passed by input pipe or in a file but there are multiple parame
+            #if len(paramDict) > 1:
+                inputValues = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
+            else: 
+                inputValues = [valuesFileContent] # value where passed using -f option
+            
+           
+            if len(inputValues) >= mandatoryParamLen: 
+                i = 0  
+                # Fill entry parameterds
+                while i < len(inputValues):
+                    paramArray[i].value = inputValues[i]
+                    i += 1
+                    allMandatoryParamFilled = True
+                        
+        if not allMandatoryParamFilled:
+            # if input was not provided
+            logging.warn("   [!] Could not find some mandatory input parameters. Please provide the next values:")
+            for param in paramArray:
                 
+                if param.value is None or param.value == "" or param.value.isspace():
+                    newValue = None
+                    while newValue is None or newValue == "" or newValue.isspace():
+                        newValue = input("    %s:" % param.name)
+                    param.value = newValue
+     
+
+     
     
     def getMainVBAFile(self):
         """ return main vba file (the one containing macro entry point) """

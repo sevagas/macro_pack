@@ -8,7 +8,7 @@ import logging
 import shutil
 import psutil
 from modules.com_run import ComGenerator
-from modules.listen_server import ListenServer
+from modules.web_server import ListenServer
 from modules.Wlisten_server import WListenServer
 from modules.payload_builder_factory import PayloadBuilderFactory
 from common import utils, mp_session, help
@@ -62,7 +62,7 @@ def main(argv):
             shortOptions += arg_mgt_pro.proArgsShortOptions
         # Only enabled on windows
         if sys.platform == "win32":
-            longOptions.extend([ "run="])
+            longOptions.extend([ "run=", "run-visible"])
 
         opts, args = getopt.getopt(argv, shortOptions, longOptions) # @UnusedVariable
     except getopt.GetoptError:
@@ -102,7 +102,7 @@ def main(argv):
             help.printTemplatesUsage(BANNER, sys.argv[0])
             sys.exit(0)
         elif opt=="-q" or opt=="--quiet":
-            logLevel = "ERROR"
+            logLevel = "WARN"
         elif opt=="-p" or opt=="--print":
             mpSession.printFile = True
         elif opt == "--dde":
@@ -111,6 +111,9 @@ def main(argv):
         elif opt == "--run":
             if sys.platform == "win32":
                 mpSession.runTarget = os.path.abspath(arg)
+        elif opt == "--run-visible":
+            if sys.platform == "win32":
+                mpSession.runVisible = True
         elif opt=="--uac-bypass":
             mpSession.uacBypass = True
         elif opt == "--unicode-rtlo":
@@ -200,6 +203,8 @@ def main(argv):
         else:
             inputFile = os.path.join(working_directory, utils.randomAlpha(9)) + ".vba"
         if mpSession.stdinContent is not None:
+            import time
+            time.sleep(0.4) # Needed to avoid some weird race condition
             logging.info("   [-] Store std input in file..." )
             f = open(inputFile, 'w')
             f.writelines(mpSession.stdinContent)
@@ -266,6 +271,8 @@ def main(argv):
 
     except Exception:
         logging.exception(" [!] Exception caught!")
+    except KeyboardInterrupt:
+        logging.error(" [!] Keyboard interrupt caught!")
 
 
     logging.info(" [+] Cleaning...")

@@ -19,6 +19,7 @@ from modules.lnk_gen import LNKGenerator
 from modules.settingsms_gen import SettingsShortcutGenerator
 from modules.libraryms_gen import LibraryShortcutGenerator
 from modules.inf_gen import InfGenerator
+from modules.csproj_gen import CsProjGenerator
 from modules.iqy_gen import IqyGenerator
 from common.utils import MSTypes
 
@@ -88,6 +89,8 @@ class PayloadBuilderFactory():
             
         if mpSession.outputFileType == MSTypes.INF:
             payloadBuilder = InfGenerator(mpSession)
+        if mpSession.outputFileType == MSTypes.CSPROJ:
+            payloadBuilder = CsProjGenerator(mpSession)
             
         if mpSession.outputFileType == MSTypes.IQY:
             payloadBuilder = IqyGenerator(mpSession)

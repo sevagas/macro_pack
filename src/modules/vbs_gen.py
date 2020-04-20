@@ -4,8 +4,7 @@
 import logging
 from modules.vba_gen import VBAGenerator
 import re, os
-from vbLib import Base64ToBin, CreateBinFile
-import base64
+
 
 VBS_TEMPLATE = \
 r"""
@@ -89,45 +88,6 @@ class VBSGenerator(VBAGenerator):
         f.writelines(content)
         f.close()
         
-    
-    
-    def embedFile(self):
-        """
-        Embed the content of  self.embeddedFilePath inside the generated target file
-        """
-        logging.info("   [-] Embedding file %s..." % self.embeddedFilePath)
-        if not os.path.isfile(self.embeddedFilePath):
-            logging.warning("   [!] Could not find %s! " % self.embeddedFilePath)
-            return
-        
-        f = open(self.embeddedFilePath, 'rb')
-        content = f.read()
-        f.close()
-        encodedBytes = base64.b64encode(content)
-        base64Str= encodedBytes.decode("utf-8")  
-       
-        # Shorten size if needed
-        VBAMAXLINELEN = 100 # VBA will fail if line is too long
-        cpt = 0
-        newPackedMacro = ""
-        nbIter = int(len(base64Str) / VBAMAXLINELEN)
-        # Create a VBA string builder containing all encoded macro
-        while cpt < nbIter:
-            newPackedMacro += base64Str[cpt * VBAMAXLINELEN:(cpt+1) * VBAMAXLINELEN] + "\" \n str = str & \"" 
-            cpt += 1
-        newPackedMacro += base64Str[cpt * VBAMAXLINELEN:] 
-        packedMacro= "\"" + newPackedMacro + "\"" 
-    
-        newContent = Base64ToBin.VBA + "\n"
-        newContent += CreateBinFile.VBA + "\n"
-        newContent += "Sub DumpFile(strFilename)"
-        newContent += "\n Dim str \n str = %s \n readEmbed = Base64ToBin(str) \n CreateBinFile strFilename, readEmbed \n" % (packedMacro) 
-        newContent += "End Sub \n \n"       
-        
-        
-        self.addVBAModule(newContent)
-        return  
-    
     
     def generate(self):
                 

@@ -8,7 +8,7 @@ Sub CreateTxtFile(FilePath As String, FileContent As String)
     Set fso = CreateObject("Scripting.FileSystemObject")
 
     Dim Fileout As Object
-    Set Fileout = fso.CreateTextFile(FilePath, True, True)
+    Set Fileout = fso.CreateTextFile(FilePath, True)
     Fileout.Write FileContent
     Fileout.Close
 

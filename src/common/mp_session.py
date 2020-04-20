@@ -33,6 +33,7 @@ class MpSession:
 
        
         self.runTarget = None
+        self.runVisible = False
         self.printFile = False
         self.unicodeRtlo = None
 

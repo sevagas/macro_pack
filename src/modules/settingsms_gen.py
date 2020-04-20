@@ -59,7 +59,8 @@ class SettingsShortcutGenerator(PayloadBuilder):
         f.close()
         
         logging.info("   [-] Generated Settings Shortcut file: %s" % self.outputFilePath)
-        logging.info("   [-] Test with : \n Click on %s file to test.\n" % self.outputFilePath)
+        logging.info("   [-] Test with: Double click on %s file." % self.outputFilePath)
+        logging.info("   [!] The attack via SettingContent-ms has been patched as CVE-2018-8414. \n       This payload is kept in MacroPack but its useless in offensive security scenario.\n")
         
 
         

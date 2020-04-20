@@ -69,9 +69,11 @@ Shortcuts/Shell supported formats are:
 * MS Library (.library-ms)
 * Setup Information (.inf)
 * Excel Web Query (.iqy)
+* Visual Studio Project (.csproj)
+* Command line (.cmd)
 * SYmbolic LinK (.slk) Pro version only
 * Compressed HTML Help (.chm) Pro version only
-* Command line (.cmd)
+
 
 Note that all scripting and shortcuts formats (except LNK) can be generated on Linux version of macro\_pack as well.
 
@@ -92,7 +94,7 @@ The pro mode includes features such as:
 * Command line obfuscation (Dosfuscation)
 * ASR and AMSI bypass
 * Self unpacking VBA/VBS payloads
-* Trojan existing MS Office documents
+* Trojan existing MS Office documents, Help files and Visual Studio projects.
 * Embed decoy payload
 * Lateral movement using DCOM objects
 * Anti reverse engineering 
