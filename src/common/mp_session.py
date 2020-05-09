@@ -42,7 +42,7 @@ class MpSession:
         self.listenRoot = "."
         self.embeddedFilePath = None
         
-        self.trojan = False
+        self.isTrojanMode = False
         self.htaMacro = False
 
         self.Wlisten = False

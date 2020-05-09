@@ -11,6 +11,7 @@ import socket
 from collections import OrderedDict
 import importlib.util
 import psutil
+from datetime import datetime
 
 
 class ColorLogFiler(logging.StreamHandler):
@@ -153,6 +154,15 @@ def checkModuleExist(name):
     """
     spec = importlib.util.find_spec(name)
     return spec is not None 
+
+
+def validateDate(date_text):
+    try:
+        if date_text != datetime.strptime(date_text, "%Y-%m-%d").strftime('%Y-%m-%d'):
+            raise ValueError
+        return True
+    except ValueError:
+        return False
 
 
 class MPParam():

@@ -180,12 +180,12 @@ def main(argv):
             sys.exit(2)
         else:
             logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
-    elif mpSession.listen == False and mpSession.Wlisten == False and mpSession.runTarget is None and mpSession.dcomTarget is None:
+    elif mpSession.listen == False and mpSession.Wlisten == False and mpSession.runTarget is None and (MP_TYPE != "Pro" or mpSession.dcomTarget is None):
         logging.error("   [!] You need to provide an output file! (get help using %s -h)" % os.path.basename(utils.getRunningApp()))
         sys.exit(2)
 
 
-    if mpSession.trojan==False:
+    if mpSession.isTrojanMode==False:
         # verify that output file does not already exist
         if os.path.isfile(mpSession.outputFilePath):
             logging.error("   [!] ERROR: Output file %s already exist!" % mpSession.outputFilePath)
@@ -226,11 +226,11 @@ def main(argv):
             
             logging.info("   [-] Extension %s " % fileExtension)
             # Append unicode RTLO to file name
-            fileName += '\u202e'
+            fileName += '\u202e' 
             # Append extension to spoof in reverse order
-            fileName += mpSession.unicodeRtlo[::-1]
+            fileName += '\u200b' + mpSession.unicodeRtlo[::-1] # PRepend invisible space so filename does not end with malicious extension
             # Appent file extension
-            fileName +=  fileExtension
+            fileName +=  fileExtension   # add space after extension
             mpSession.outputFilePath = fileName
             logging.info("   [-] File name modified to: %s" %  mpSession.outputFilePath)
                 
@@ -276,7 +276,8 @@ def main(argv):
 
 
     logging.info(" [+] Cleaning...")
-    shutil.rmtree(working_directory)
+    if os.path.isdir(working_directory):
+        shutil.rmtree(working_directory)
 
     logging.info(" Done!\n")
 
