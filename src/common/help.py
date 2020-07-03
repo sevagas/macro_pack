@@ -276,7 +276,7 @@ def printTemplatesUsage(banner, currentApp):
     print(colored(banner, 'green'))
     templatesInfo = getTemplateUsage(currentApp)
     if MP_TYPE=="Pro":
-        templatesInfo += getTemplateUsagePro(currentApp)
+        templatesInfo = getTemplateUsagePro()
     print(templatesInfo)
 
     

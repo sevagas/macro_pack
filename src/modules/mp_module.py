@@ -204,6 +204,7 @@ class MpModule():
         if moduleName in self.mpSession.vbModulesList:
             logging.debug("    [,] %s module already loaded" % moduleName)
         else:
+            logging.debug("    [,] Adding module: %s" % moduleName)
             self.mpSession.vbModulesList.append(moduleName)
             f = open(modulePath, 'w')
             f.write(moduleContent)

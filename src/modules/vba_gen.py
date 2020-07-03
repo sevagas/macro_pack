@@ -15,7 +15,7 @@ class VBAGenerator(PayloadBuilder):
     """ Module used to generate VBA file from working dir content"""
         
         
-    def vbTransformAndObfuscate(self):
+    def transformAndObfuscate(self):
         """ 
         Call this method to apply transformation and obfuscation on the content of temp directory 
         This method does obfuscation for all VBA and VBA like types

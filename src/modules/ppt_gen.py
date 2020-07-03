@@ -89,7 +89,7 @@ class PowerPointGenerator(VBAGenerator):
         logging.info("   [-] Check feasibility...")
         if utils.checkIfProcessRunning("powerpnt.exe"):
             logging.error("   [!] Cannot generate PowerPoint payload if PowerPoint is already running.")
-            if utils.yesOrNo(" Do you want macro_pack to kill PowerPoint process? "):
+            if self.mpSession.forceYes or utils.yesOrNo(" Do you want macro_pack to kill PowerPoint process? "):
                 utils.forceProcessKill("powerpnt.exe")
             else:
                 return False

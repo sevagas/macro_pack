@@ -54,7 +54,7 @@ class VisioGenerator(VBAGenerator):
         logging.info("   [-] Check feasibility...")
         if utils.checkIfProcessRunning("visio.exe"):
             logging.error("   [!] Cannot generate Visio payload if Visio is already running.")
-            if utils.yesOrNo(" Do you want macro_pack to kill Visio process? "):
+            if self.mpSession.forceYes or utils.yesOrNo(" Do you want macro_pack to kill Visio process? "):
                 utils.forceProcessKill("visio.exe")
             else:
                 return False

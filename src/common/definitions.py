@@ -1,3 +1,4 @@
 
 
-VERSION="1.9.1"
+VERSION="1.9.4"
+LOGLEVEL = "INFO"

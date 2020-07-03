@@ -14,7 +14,7 @@ from modules.payload_builder_factory import PayloadBuilderFactory
 from common import utils, mp_session, help
 from common.utils import MSTypes
 from _ast import arg
-from common.definitions import VERSION
+from common.definitions import VERSION, LOGLEVEL
 if sys.platform == "win32":
     try:
         import win32com.client #@UnresolvedImport @UnusedImport
@@ -45,7 +45,7 @@ BANNER = help.getToolPres()
 
 def main(argv):
     global MP_TYPE
-    logLevel = "INFO"
+    logLevel = LOGLEVEL
     # initialize macro_pack session object
     working_directory = os.path.join(os.getcwd(), WORKING_DIR)
     if MP_TYPE == "Pro":
@@ -54,7 +54,7 @@ def main(argv):
         mpSession = mp_session.MpSession(working_directory, VERSION, MP_TYPE)
 
     try:
-        longOptions = ["embed=", "listen=", "port=", "webdav-listen=", "generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=","listtemplates","listformats","icon=", "start-function=","uac-bypass","unicode-rtlo=", "dde", "print"]
+        longOptions = ["embed=", "listen=", "port=", "webdav-listen=", "generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=","listtemplates","listformats","icon=", "start-function=","uac-bypass","unicode-rtlo=", "dde", "print", "force-yes"]
         shortOptions= "e:l:w:s:f:t:G:hqmop"
         # only for Pro release
         if MP_TYPE == "Pro":
@@ -114,6 +114,8 @@ def main(argv):
         elif opt == "--run-visible":
             if sys.platform == "win32":
                 mpSession.runVisible = True
+        elif opt == "--force-yes":
+            mpSession.forceYes = True
         elif opt=="--uac-bypass":
             mpSession.uacBypass = True
         elif opt == "--unicode-rtlo":
@@ -175,6 +177,10 @@ def main(argv):
     
         # Check output file format
     if mpSession.outputFilePath:
+        if not os.path.isdir(os.path.dirname(mpSession.outputFilePath)):
+            logging.error("   [!] Could not find output folder %s." % os.path.dirname(mpSession.outputFilePath))
+            sys.exit(2)
+        
         if mpSession.outputFileType == MSTypes.UNKNOWN:
             logging.error("   [!] %s is not a supported extension. Use --listformats to view supported MacroPack formats." % os.path.splitext(mpSession.outputFilePath)[1])
             sys.exit(2)
@@ -220,17 +226,18 @@ def main(argv):
             
         # Edit outputfile name to spoof extension if unicodeRtlo option is enabled
         if mpSession.unicodeRtlo:
+            # Reminer; mpSession.unicodeRtlo contains the extension we want to spoof, such as "jpg"
             logging.info(" [+] Inject %s false extension with unicode RTLO" % mpSession.unicodeRtlo)
-            # Separate document and extension
+            # Separate document path and extension
             (fileName, fileExtension) = os.path.splitext(mpSession.outputFilePath)
             
             logging.info("   [-] Extension %s " % fileExtension)
             # Append unicode RTLO to file name
             fileName += '\u202e' 
             # Append extension to spoof in reverse order
-            fileName += '\u200b' + mpSession.unicodeRtlo[::-1] # PRepend invisible space so filename does not end with malicious extension
-            # Appent file extension
-            fileName +=  fileExtension   # add space after extension
+            fileName += '\u200b' + mpSession.unicodeRtlo[::-1] # Prepend invisible space so filename does not end with flagged extension
+            # Append file extension
+            fileName +=  fileExtension   
             mpSession.outputFilePath = fileName
             logging.info("   [-] File name modified to: %s" %  mpSession.outputFilePath)
                 

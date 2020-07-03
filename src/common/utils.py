@@ -214,6 +214,9 @@ class MSTypes():
     INF="Setup Information"
     CSPROJ="Visual Studio Project"
     CMD="Command line"
+    EXE="Portable Executable"
+    DLL="Portable Executable (DLL)"
+    MSI="Installer"
     UNKNOWN = "Unknown"
 
     WORD_AND_EXCEL_FORMATS = [ XL, XL97, WD, WD97] 
@@ -228,13 +231,15 @@ class MSTypes():
     ProMode_FORMATS =  [SYLK, CHM]
     HtaMacro_FORMATS = [LNK, CHM, INF, SYLK, CSPROJ]
     Trojan_FORMATS = MS_OFFICE_BASIC_FORMATS + [MPP, VSD, VSD97,CHM, CSPROJ]
+    PE_FORMATS = [EXE, DLL]
 
     # OrderedDict([("target_url",None),("download_path",None)])
     EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),(LIBRARY_MS,".library-ms"),(INF,".inf"),(IQY, ".iqy"),
                                   (SYLK,".slk"),(CHM,".chm"),(CMD,".cmd"),(CSPROJ,".csproj"),
                                   ( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
                                   (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
-                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".sct"),( WSF,".wsf"),( XSL,".xsl"),( ACC,".accdb"), ( ACC,".mdb" ) ])
+                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".sct"),( WSF,".wsf"),( XSL,".xsl"),( ACC,".accdb"), ( ACC,".mdb" ),
+                                   (EXE,".exe"),( DLL,".dll"),(MSI,".msi")])
 
 
 
@@ -301,6 +306,14 @@ class MSTypes():
             result = self.CSPROJ
         elif ".cmd" == extension.lower() or extension.lower() == ".bat":
             result = self.CMD
+        elif extension.lower() in (".dll", ".ocx"):
+            result = self.DLL
+        elif extension.lower() in (".exe"):
+            result = self.EXE
+        elif extension.lower() in (".msi"):
+            result = self.MSI
         else:
             result = self.UNKNOWN
         return result
+    
+

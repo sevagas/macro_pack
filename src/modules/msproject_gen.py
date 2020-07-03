@@ -55,7 +55,7 @@ class MSProjectGenerator(VBAGenerator):
         
         if utils.checkIfProcessRunning("winproj.exe"):
             logging.error("   [!] Cannot generate MS Project payload if Project is already running.")
-            if utils.yesOrNo(" Do you want macro_pack to kill Ms Project process? "):
+            if self.mpSession.forceYes or utils.yesOrNo(" Do you want macro_pack to kill Ms Project process? "):
                 utils.forceProcessKill("winproj.exe")
             else:
                 return False

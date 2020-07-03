@@ -71,7 +71,7 @@ Sub BypassUACExec (targetPath As String)
     If IsAdmin  () Then
         ExecuteCmdAsync targetPath
     Else
-        If IsMember(adminEn) or IsMember(adminFr) Then
+        If IsCurrentUserMemberOfAdminGroup() Then
                BypassUAC targetPath
             Else
                ExecuteCmdAsync targetPath

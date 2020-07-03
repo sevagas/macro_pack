@@ -1,7 +1,7 @@
 import os
 from modules.mp_module import MpModule
 import logging
-from modules.template_gen import TemplateToVba
+from modules.templates.template_factory import TemplateFactory
 from modules.embed_file import Embedder
 
 class PayloadBuilder(MpModule):
@@ -37,7 +37,7 @@ class PayloadBuilder(MpModule):
                 print(f.read())
         
     
-    def vbTransformAndObfuscate(self):
+    def transformAndObfuscate(self):
         """ Call this method to apply transformation and obfuscation on the content of temp directory """
         return 
 
@@ -55,7 +55,7 @@ class PayloadBuilder(MpModule):
         
         # generate template
         if self.mpSession.template:
-            generator = TemplateToVba(self.mpSession)
+            generator = TemplateFactory(self.mpSession)
             generator.run()
         
         # embed a file if asked
@@ -63,7 +63,7 @@ class PayloadBuilder(MpModule):
             generator = Embedder(self.mpSession)
             generator.run()
         # Obfuscate VBA files
-        self.vbTransformAndObfuscate()
+        self.transformAndObfuscate()
         # generate
         self.generate()
         

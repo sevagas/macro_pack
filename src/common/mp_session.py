@@ -34,6 +34,7 @@ class MpSession:
        
         self.runTarget = None
         self.runVisible = False
+        self.forceYes = False
         self.printFile = False
         self.unicodeRtlo = None
 

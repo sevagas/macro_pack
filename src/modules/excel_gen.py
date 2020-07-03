@@ -57,7 +57,7 @@ class ExcelGenerator(VBAGenerator):
         logging.info("   [-] Check feasibility...")
         if utils.checkIfProcessRunning("Excel.exe"):
             logging.error("   [!] Cannot generate Excel payload if Excel is already running.")
-            if utils.yesOrNo(" Do you want macro_pack to kill Excel process? "):
+            if self.mpSession.forceYes or utils.yesOrNo(" Do you want macro_pack to kill Excel process? "):
                 utils.forceProcessKill("Excel.exe")
             else:
                 return False

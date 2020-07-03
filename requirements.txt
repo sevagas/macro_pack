@@ -1,8 +1,10 @@
-colorama>=0.3.9
+colorama>=0.4.0
 termcolor>=1.1.0
-tabulate>=0.8.1
-psutil>=5.4.3
+tabulate>=0.8.5
+psutil>=5.6.7
 clr>=1.0.3
-wsgidav>=2.4.1
+wsgidav>=3.0.0
 cheroot>=6.3.3
-pywin32>=220
+pywin32>=225
+pycdlib>=1.9.0
+PyInstaller>=4.0

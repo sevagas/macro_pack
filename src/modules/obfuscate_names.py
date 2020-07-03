@@ -180,7 +180,7 @@ class ObfuscateNames(MpModule):
         varDelimitors.extend([("."," ="),("."," A"),("."," O"),(".",")"),(".",","),("."," ")])
         varDelimitors.extend([("#"," "),("#",",")])
         varDelimitors.extend([("\t"," "),("\t","."),("\t","("),("\t","\n"),("\t",","),("\t",")"),("\t"," =")])
-        varDelimitors.extend([("(",")"),("(","("),("(",","),("("," +"),("("," *"),("("," -"),("("," ="),("("," As"),("("," And"),("("," To"),("("," Or"),("(",".")])
+        varDelimitors.extend([("(",")"),("(","("),("(",","),("("," +"),("("," *"),("("," &"),("("," -"),("("," ="),("("," As"),("("," And"),("("," To"),("("," Or"),("(",".")])
         varDelimitors.extend([("="," "),("=",","),("=","\n"),("Set "," =")])
         
         # replace all keywords by random name
