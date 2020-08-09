@@ -124,6 +124,8 @@ def checkIfProcessRunning(processName):
     return False;
 
 
+
+
 def yesOrNo(question):
     answer = input(question + "(y/n): ").lower().strip()
     print("")
@@ -182,6 +184,9 @@ def getParamValue(paramArray, paramName):
         i += 1
     return result
             
+
+textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f}) # https://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
+isBinaryString = lambda bytes: bool(bytes.translate(None, textchars))
 
 
 class MSTypes():

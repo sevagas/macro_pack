@@ -144,10 +144,12 @@ class WordGenerator(VBAGenerator):
                         # Add the main macro- into ThisDocument part of Word document
                         wordModule = document.VBProject.VBComponents("ThisDocument")
                         macro=f.read()
+                        #logging.info(macro)
                         wordModule.CodeModule.AddFromString(macro)
                 else: # inject other vba files as modules
                     with open (vbaFile, "r") as f:
                         macro=f.read()
+                        #logging.info(macro)
                         wordModule = document.VBProject.VBComponents.Add(1)
                         wordModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                         wordModule.CodeModule.AddFromString(macro)

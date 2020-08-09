@@ -343,7 +343,7 @@ class TemplateFactory(MpModule):
                 f.close()
             else:
                 logging.info("   [!] Template %s is not recognized as file or default template. Payload will not work." % self.template)
-                return True
+                return False
          
 
         self._fillGenericTemplate(content) 

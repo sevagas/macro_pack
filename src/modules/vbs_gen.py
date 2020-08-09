@@ -56,6 +56,7 @@ class VBSGenerator(VBAGenerator):
     def vbScriptConvert(self):
         logging.info("   [-] Convert VBA to VBScript...")
         translators = [("Val(","CInt("),(" Chr$"," Chr"),(" Mid$"," Mid"),("On Error GoTo","'//On Error GoTo"),("byebye:",""), ("Next ", "Next '//")]
+        translators.extend([("() As String"," "),("CVar","")])
         translators.extend([(" As String"," "),(" As Object"," "),(" As Long"," "),(" As Integer"," "),(" As Variant"," "), (" As Boolean", " "), (" As Byte", " "), (" As Excel.Application", " "), (" As Word.Application", " ")])
         translators.extend([ ("MsgBox ", "WScript.Echo "), ('Application.Wait Now + TimeValue("0:00:01")', 'WScript.Sleep(1000)')])
         translators.extend([ ('ChDir ', 'createobject("WScript.Shell").currentdirectory =  ')])
