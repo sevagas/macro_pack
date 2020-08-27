@@ -144,7 +144,7 @@ def forceProcessKill(processName):
     '''
     Force kill a process (only work on windows)
     '''
-    os.system("taskkill /f /im  %s" % processName)
+    os.system("taskkill /f /im  %s >nul 2>&1" % processName)
 
   
 def checkModuleExist(name):

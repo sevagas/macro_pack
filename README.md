@@ -456,6 +456,8 @@ Emails:
 * emeric.nasi[ at ]sevagas.com  
 * ena.sevagas[ at ]protonmail.com  
 
+**Important:** If you wish to contact me about MacroPack pro, use my sevagas.com email address. Also please note that I will not answer to anonymous inquiries for the Pro version. Only to professional emails.
+
 
 ## License and credits
 
