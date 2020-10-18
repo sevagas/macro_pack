@@ -3,7 +3,7 @@
 
 import re
 from modules.mp_module import MpModule
-from common.utils import randomAlpha
+from common.utils import randomAlpha, extractStringsFromText
 import logging
 from random import randint
 
@@ -41,11 +41,11 @@ class ObfuscateNames(MpModule):
             f = open(vbaFile, 'w')
             f.writelines(content)
             f.close()
-            
+    
+
 
     def _replaceFunctions(self):
         # Identify function, subs and variables names
-        
         self._findAllFunctions()
         
         # Different situation surrounding variables
@@ -54,7 +54,6 @@ class ObfuscateNames(MpModule):
         # Replace functions and function calls by random string
         for keyWord in self.vbaFunctions:
             keyTmp = randomAlpha(randint(8, 20)) # Generate random names with random size
-            #logging.info("|%s|->|%s|" %(keyWord,keyTmp))
             self.reservedFunctions.append(keyTmp)
         
             for vbaFile in self.getVBAFiles():
@@ -71,12 +70,20 @@ class ObfuscateNames(MpModule):
 
                     for n,line in enumerate(content):
                         #if "GetBuffer" in line:
-                        #    logging.info("|%s|->|%s|" %(keywordTmp,newKeyWord))
-                        #    if keywordTmp in line:
-                        #        logging.info("Found %s" % keywordTmp)
-                                
+                        #if keyWord == "StrEncoder":
+                            #logging.info("|%s|->|%s|" %(keywordTmp,newKeyWord))
+                            #if keywordTmp in line:
+                            #    logging.info("line: %s" % (line))
+                            #    logging.info("Found %s, new keyword will be %s" % (keywordTmp,newKeyWord))
+                        
+                        
+                        extractedStrings=extractStringsFromText(line)  
+                        #if extractedStrings != "":
+                        #    logging.info(extractedStrings)    
+                        """
                         matchObj = re.match( r'.*".*%s.*".*' %keyWord, line, re.M|re.I) # check if word is inside a string
-                        if matchObj:
+                        if matchObj:"""
+                        if keyWord in extractedStrings:
                             if "Application.Run" in line or "Application.OnTime" in line: # dynamic function call detected
                                 content[n] = line.replace(keywordTmp, newKeyWord)
                         else:

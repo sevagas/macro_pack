@@ -29,12 +29,23 @@ class ColorLogFiler(logging.StreamHandler):
         except Exception:
             self.handleError(record)
 
+
 def randomAlpha(length):
     """ Returns a random alphabetic string of length 'length' """
     key = ''
     for i in range(length): # @UnusedVariable
         key += choice(string.ascii_lowercase)
     return key
+
+
+def extractStringsFromText(text):      
+    import re
+    result = ""
+    if '"' in text:
+        matches=re.findall(r'\"(.+?)\"',text)
+        # matches is now ['String 1', 'String 2', 'String3']
+        result = ",".join(matches)  
+    return result
 
 
 def extractWordInString(strToParse, index):
@@ -235,7 +246,7 @@ class MSTypes():
     
     ProMode_FORMATS =  [SYLK, CHM]
     HtaMacro_FORMATS = [LNK, CHM, INF, SYLK, CSPROJ]
-    Trojan_FORMATS = MS_OFFICE_BASIC_FORMATS + [MPP, VSD, VSD97,CHM, CSPROJ]
+    Trojan_FORMATS = MS_OFFICE_BASIC_FORMATS + [MPP, VSD, VSD97,CHM, CSPROJ, LNK]
     PE_FORMATS = [EXE, DLL]
 
     # OrderedDict([("target_url",None),("download_path",None)])

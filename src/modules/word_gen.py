@@ -184,11 +184,11 @@ class WordGenerator(VBAGenerator):
             logging.exception(" [!] Exception caught!")
             logging.error(" [!] Hints: Check if MS office is really closed and Antivirus did not catch the files")
             logging.error(" [!] Attempt to force close MS Word...")
-            objWord = win32com.client.Dispatch("Word.Application")
-            objWord.Application.Quit()
+            #objWord = win32com.client.Dispatch("Word.Application")
+            #objWord.Application.Quit()
             # If it Application.Quit() was not enough we force kill the process
             if utils.checkIfProcessRunning("winword.exe"):
                 utils.forceProcessKill("winword.exe")
-            del objWord
+            #del objWord
 
         

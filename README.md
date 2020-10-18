@@ -102,6 +102,7 @@ The pro mode includes features such as:
 * Support of more formats such as Excel 4.0 SYLK and compiled help files
 * Run advanced VB payload from unusual formats
 * Weaponized templates and additional templates (ex EMPIRE, AUTOSHELLCODE)
+* Excel 4.0 macros (XLM)
 * Lot of more advanced stuff
 
 Some short demo videos are available on the [sevagas youtube channel](https://www.youtube.com/channel/UCgWXxtLNEOeNuEFO3ZgbEOw).

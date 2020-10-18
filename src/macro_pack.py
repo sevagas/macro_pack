@@ -160,6 +160,7 @@ def main(argv):
             else:
                 sys.stdin = sys.__stdin__
             
+            
     else:
         if not os.path.isfile(mpSession.fileInput):
             logging.error("   [!] ERROR: Could not find %s!" % mpSession.fileInput)
@@ -218,9 +219,17 @@ def main(argv):
         else:
             # Create temporary work file
             if mpSession.fileInput is not None:
+                # Check there are not binary chars in input fil 
+                if utils.isBinaryString(open(mpSession.fileInput, 'rb').read(1024)):
+                    logging.error("   [!] ERROR: Invalid format for %s. Input should be text format containing your VBA script." % mpSession.fileInput)
+                    logging.info(" [+] Cleaning...")
+                    if os.path.isdir(working_directory):
+                        shutil.rmtree(working_directory)
+                    sys.exit(2)
                 logging.info("   [-] Store input file..." )
                 shutil.copy2(mpSession.fileInput, inputFile)
-        if os.path.isfile(inputFile):
+        
+        if os.path.isfile(inputFile): 
             logging.info("   [-] Temporary input file: %s" %  inputFile)
             
             
