@@ -205,7 +205,7 @@ def main(argv):
 
     try:
         # Create temporary work file.
-        if mpSession.ddeMode or mpSession.template or (mpSession.outputFileType not in MSTypes.VB_FORMATS and mpSession.htaMacro==False):
+        if mpSession.ddeMode or mpSession.template or (mpSession.outputFileType not in MSTypes.VB_FORMATS+[MSTypes.VBA] and mpSession.htaMacro==False):
             inputFile = os.path.join(working_directory, "command.cmd")
         else:
             inputFile = os.path.join(working_directory, utils.randomAlpha(9)) + ".vba"

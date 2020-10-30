@@ -37,12 +37,17 @@ class LNKGenerator(PayloadBuilder):
     def buildLnkWithWscript(self, target, targetArgs=None, iconPath=None, workingDirectory = ""):
         """ Build an lnk shortcut using WScript wrapper """
         shell = Dispatch("WScript.Shell")
+        
         shortcut = shell.CreateShortcut(self.outputFilePath)
+        logging.debug("    ['] Shortcut target: %s" % target)
         shortcut.Targetpath = target
+        logging.debug("    ['] Shortcut WorkingDirectory: %s" % workingDirectory)
         shortcut.WorkingDirectory = workingDirectory
         if targetArgs:
+            logging.debug("    ['] Shortcut args: %s" % targetArgs)
             shortcut.Arguments = targetArgs
         if iconPath:
+            logging.debug("    ['] Shortcut icon: %s" % iconPath)
             shortcut.IconLocation = iconPath
         shortcut.save()
         
