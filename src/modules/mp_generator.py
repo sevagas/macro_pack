@@ -9,24 +9,16 @@ class PayloadBuilder(MpModule):
     
     def __init__(self,mpSession):
         self.embeddedFilePath = mpSession.embeddedFilePath
-        super().__init__(mpSession)    
-    
-    
-        
-    def embedFile(self):
-        """
-        Embed the content of  self.embeddedFilePath inside the generated target file
-        """
-        raise NotImplementedError
+        super().__init__(mpSession)
     
     
     def generate(self):
         """ Generate the targeted file """
         raise NotImplementedError
-    
+
+
     def check(self):
-        """ Verify generation feasability return true if ok, false if not"""
-        
+        """ Verify generation feasibility return true if ok, false if not"""
         raise NotImplementedError
     
     
@@ -49,7 +41,7 @@ class PayloadBuilder(MpModule):
     def run(self):
         
         logging.info(" [+] Prepare %s file generation..." % self.outputFileType)
-        # Check feasability
+        # Check feasibility
         if not self.check():
             return
         

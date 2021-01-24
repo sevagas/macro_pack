@@ -38,6 +38,14 @@ def randomAlpha(length):
     return key
 
 
+def randomStringBasedOnCharset(length, charset):
+    """ Returns a random alphabetic string of length 'length' """
+    key = ''
+    for i in range(length): # @UnusedVariable
+        key += choice(charset)
+    return key
+
+
 def extractStringsFromText(text):      
     import re
     result = ""
@@ -49,7 +57,7 @@ def extractStringsFromText(text):
 
 
 def extractWordInString(strToParse, index):
-    """ Exract word (space separated ) at current index"""
+    """ Extract word (space separated ) at current index"""
     i = index
     while i!=0 and strToParse[i-1] not in " \t\n&|":
         i = i-1
@@ -64,7 +72,7 @@ def extractWordInString(strToParse, index):
 
 
 def extractPreviousWordInString(strToParse, index):
-    """ Exract the word (space separated ) preceding the one at current index"""
+    """ Extract the word (space separated ) preceding the one at current index"""
     # Look for beginning or word
     i = index
     if strToParse[i] not in " \t\n":
@@ -82,7 +90,7 @@ def extractPreviousWordInString(strToParse, index):
 
 
 def extractNextWordInString(strToParse, index):
-    """ Exract the word (space separated ) following the one at current index"""
+    """ Extract the word (space separated) following the one at current index"""
     # Look for beginning or word
     i = index
     while i!=len(strToParse) and strToParse[i] not in " \t\n&|":
@@ -99,7 +107,7 @@ def extractNextWordInString(strToParse, index):
 
 
 def getHostIp():
-    """ returne current facing IP address """
+    """ return current facing IP address """
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         # doesn't have to be reachable
@@ -121,9 +129,9 @@ def getRunningApp():
     
 
 def checkIfProcessRunning(processName):
-    '''
+    """
     Check if there is any running process that contains the given name processName.
-    '''
+    """
     #Iterate over the all the running process
     for proc in psutil.process_iter():
         try:
@@ -132,7 +140,7 @@ def checkIfProcessRunning(processName):
                 return True
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
-    return False;
+    return False
 
 
 
@@ -152,9 +160,9 @@ def yesOrNo(question):
 
    
 def forceProcessKill(processName):
-    '''
+    """
     Force kill a process (only work on windows)
-    '''
+    """
     os.system("taskkill /f /im  %s >nul 2>&1" % processName)
 
   
@@ -200,7 +208,7 @@ textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f}) # 
 isBinaryString = lambda bytes: bool(bytes.translate(None, textchars))
 
 
-class MSTypes():
+class MSTypes:
     XL="Excel"
     XL97="Excel97"
     WD="Word"
@@ -235,12 +243,13 @@ class MSTypes():
     MSI="Installer"
     UNKNOWN = "Unknown"
 
-    WORD_AND_EXCEL_FORMATS = [ XL, XL97, WD, WD97] 
+    WORD_AND_EXCEL_FORMATS = [XL, XL97, WD, WD97]
     MS_OFFICE_BASIC_FORMATS =  WORD_AND_EXCEL_FORMATS + [PPT] 
-    MS_OFFICE_FORMATS = MS_OFFICE_BASIC_FORMATS + [ MPP, VSD, VSD97, ACC] # Formats supported by macro_pack
-    VBSCRIPTS_BASIC_FORMATS = [VBS, HTA, SCT, WSF ]
+    MS_OFFICE_FORMATS = MS_OFFICE_BASIC_FORMATS + [MPP, VSD, VSD97, ACC] # Formats supported by macro_pack
+    VBSCRIPTS_BASIC_FORMATS = [VBS, HTA, SCT, WSF]
     VBSCRIPTS_FORMATS = VBSCRIPTS_BASIC_FORMATS + [XSL]
     VB_FORMATS = VBSCRIPTS_FORMATS + MS_OFFICE_FORMATS
+    VB_FORMATS_EXT = VB_FORMATS + [VBA] # VBA format is non executable
     
     Shortcut_FORMATS = [LNK, GLK, SCF, URL, SETTINGS_MS, LIBRARY_MS, INF, IQY, SYLK, CHM, CMD, CSPROJ]
     
@@ -250,12 +259,12 @@ class MSTypes():
     PE_FORMATS = [EXE, DLL]
 
     # OrderedDict([("target_url",None),("download_path",None)])
-    EXTENSION_DICT = OrderedDict([ (LNK,".lnk"),( GLK,".glk"),( SCF,".scf"),( URL,".url"), (SETTINGS_MS,".SettingContent-ms"),(LIBRARY_MS,".library-ms"),(INF,".inf"),(IQY, ".iqy"),
+    EXTENSION_DICT = OrderedDict([(LNK,".lnk"),(GLK,".glk"),(SCF,".scf"),(URL,".url"), (SETTINGS_MS,".SettingContent-ms"),(LIBRARY_MS,".library-ms"),(INF,".inf"),(IQY, ".iqy"),
                                   (SYLK,".slk"),(CHM,".chm"),(CMD,".cmd"),(CSPROJ,".csproj"),
-                                  ( XL,".xlsm"),( XL97,".xls"),( WD,".docm"),
-                                  (WD97,".doc"),( PPT,".pptm"),( PPT97,".ppt"),( MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),( VSD97,".vsd"),
-                                  (VBA,".vba"),( VBS,".vbs"),( HTA,".hta"),( SCT,".sct"),( WSF,".wsf"),( XSL,".xsl"),( ACC,".accdb"), ( ACC,".mdb" ),
-                                   (EXE,".exe"),( DLL,".dll"),(MSI,".msi")])
+                                  (XL,".xlsm"),(XL97,".xls"),(WD,".docm"),
+                                  (WD97,".doc"),(PPT,".pptm"),(PPT97,".ppt"),(MPP,".mpp"),( PUB,".pub"),( VSD,".vsdm"),(VSD97,".vsd"),
+                                  (VBA,".vba"),(VBS,".vbs"),(HTA,".hta"),(SCT,".sct"),(WSF,".wsf"),(XSL,".xsl"),(ACC,".accdb"), (ACC,".mdb"),
+                                   (EXE,".exe"),(DLL,".dll"),(MSI,".msi")])
 
 
 

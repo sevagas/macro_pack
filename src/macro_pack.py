@@ -13,7 +13,6 @@ from modules.Wlisten_server import WListenServer
 from modules.payload_builder_factory import PayloadBuilderFactory
 from common import utils, mp_session, help
 from common.utils import MSTypes
-from _ast import arg
 from common.definitions import VERSION, LOGLEVEL
 if sys.platform == "win32":
     try:
@@ -23,8 +22,8 @@ if sys.platform == "win32":
         sys.exit(1)
 MP_TYPE="Pro"
 if utils.checkModuleExist("pro_core"):
-    from pro_modules.dcom_run import DcomGenerator
-    from pro_modules.containers import ContainerGenerator
+    from pro_modules.utilities.dcom_run import DcomGenerator
+    from pro_modules.payload_builders.containers import ContainerGenerator
     from pro_core.payload_builder_factory_pro import PayloadBuilderFactoryPro
     from pro_core import arg_mgt_pro, mp_session_pro
 else:
@@ -54,7 +53,11 @@ def main(argv):
         mpSession = mp_session.MpSession(working_directory, VERSION, MP_TYPE)
 
     try:
-        longOptions = ["embed=", "listen=", "port=", "webdav-listen=", "generate=", "quiet", "input-file=", "encode","obfuscate","obfuscate-form", "obfuscate-names", "obfuscate-strings", "file=","template=","listtemplates","listformats","icon=", "start-function=","uac-bypass","unicode-rtlo=", "dde", "print", "force-yes"]
+        longOptions = ["embed=", "listen=", "port=", "webdav-listen=", "generate=", "quiet", "input-file=", "encode",
+                       "obfuscate", "obfuscate-form", "obfuscate-names", "obfuscate-strings",
+                       "obfuscate-names-charset=", "obfuscate-names-minlen=", "obfuscate-names-maxlen=",
+                       "file=","template=","listtemplates","listformats","icon=", "start-function=","uac-bypass",
+                       "unicode-rtlo=", "dde", "print", "force-yes", "help"]
         shortOptions= "e:l:w:s:f:t:G:hqmop"
         # only for Pro release
         if MP_TYPE == "Pro":
@@ -62,11 +65,11 @@ def main(argv):
             shortOptions += arg_mgt_pro.proArgsShortOptions
         # Only enabled on windows
         if sys.platform == "win32":
-            longOptions.extend([ "run=", "run-visible"])
+            longOptions.extend(["run=", "run-visible"])
 
         opts, args = getopt.getopt(argv, shortOptions, longOptions) # @UnusedVariable
     except getopt.GetoptError:
-        help.printUsage(BANNER, sys.argv[0], mpSession)
+        help.printUsage(BANNER, sys.argv[0])
         sys.exit(2)
     for opt, arg in opts:
         if opt in ("-o", "--obfuscate"):
@@ -77,12 +80,36 @@ def main(argv):
             mpSession.obfuscateForm =  True
         elif opt=="--obfuscate-names":
             mpSession.obfuscateNames =  True
+        elif opt=="--obfuscate-names-charset":
+            try:
+                mpSession.obfuscatedNamesCharset = arg
+            except ValueError:
+                help.printUsage(BANNER, sys.argv[0])
+                sys.exit(0)
+        elif opt=="--obfuscate-names-minlen":
+            try:
+                mpSession.obfuscatedNamesMinLen = int(arg)
+            except ValueError:
+                help.printUsage(BANNER, sys.argv[0])
+                sys.exit(0)
+            if mpSession.obfuscatedNamesMinLen < 4 or mpSession.obfuscatedNamesMinLen > 255:
+                help.printUsage(BANNER, sys.argv[0])
+                sys.exit(0)
+        elif opt=="--obfuscate-names-maxlen":
+            try:
+                mpSession.obfuscatedNamesMaxLen = int(arg)
+            except ValueError:
+                help.printUsage(BANNER, sys.argv[0])
+                sys.exit(0)
+            if mpSession.obfuscatedNamesMaxLen < 4 or mpSession.obfuscatedNamesMaxLen > 255:
+                help.printUsage(BANNER, sys.argv[0])
+                sys.exit(0)
         elif opt=="--obfuscate-strings":
             mpSession.obfuscateStrings =  True
         elif opt=="-s" or opt=="--start-function":
             mpSession.startFunction =  arg
         elif opt=="-l" or opt=="--listen":
-            mpSession.listen =  True
+            mpSession.listen = True
             mpSession.listenRoot = os.path.abspath(arg)
         elif opt=="--port":
             mpSession.listenPort = int(arg)
@@ -126,14 +153,13 @@ def main(argv):
             help.printAvailableFormats(BANNER)
             sys.exit(0)
         elif opt=="-h" or opt=="--help":
-            help.printUsage(BANNER, sys.argv[0], mpSession)
+            help.printUsage(BANNER, sys.argv[0])
             sys.exit(0)
         else:
             if MP_TYPE == "Pro":
                 arg_mgt_pro.processProArg(opt, arg, mpSession, BANNER)
             else:
-                #print("opt:%s, arg:%s",(opt,arg))
-                help.printUsage(BANNER, sys.argv[0], mpSession)
+                help.printUsage(BANNER, sys.argv[0])
                 sys.exit(0)
 
     if logLevel == "INFO":
@@ -150,10 +176,10 @@ def main(argv):
     # check input args
     if mpSession.fileInput is None:
         # Argument not supplied, try to get file content from stdin
-        if os.isatty(0) == False: # check if something is being piped
+        if not os.isatty(0): # check if something is being piped
             logging.info("   [-] Waiting for piped input feed...")
             mpSession.stdinContent = sys.stdin.readlines()
-            # Close Stdin pipe so we can call input() later without triggering EOF
+            # Close Stdin pipe, so we can call input() later without triggering EOF
             #sys.stdin.close()
             if sys.platform == "win32":
                 sys.stdin = open("conIN$")
@@ -169,7 +195,7 @@ def main(argv):
             logging.info("   [-] Input file path: %s" % mpSession.fileInput)
 
     if MP_TYPE == "Pro":
-        if mpSession.communityMode == True:
+        if mpSession.communityMode:
             logging.warning("   [!] Running in community mode (pro features not applied)")
             MP_TYPE="Community"
         else:
@@ -187,12 +213,12 @@ def main(argv):
             sys.exit(2)
         else:
             logging.info("   [-] Target output format: %s" %  mpSession.outputFileType)
-    elif mpSession.listen == False and mpSession.Wlisten == False and mpSession.runTarget is None and (MP_TYPE != "Pro" or mpSession.dcomTarget is None):
+    elif not mpSession.listen and not mpSession.Wlisten and mpSession.runTarget is None and (MP_TYPE != "Pro" or mpSession.dcomTarget is None):
         logging.error("   [!] You need to provide an output file! (get help using %s -h)" % os.path.basename(utils.getRunningApp()))
         sys.exit(2)
 
 
-    if mpSession.isTrojanMode==False:
+    if not mpSession.isTrojanMode:
         # verify that output file does not already exist
         if os.path.isfile(mpSession.outputFilePath):
             logging.error("   [!] ERROR: Output file %s already exist!" % mpSession.outputFilePath)
@@ -205,14 +231,14 @@ def main(argv):
 
     try:
         # Create temporary work file.
-        if mpSession.ddeMode or mpSession.template or (mpSession.outputFileType not in MSTypes.VB_FORMATS+[MSTypes.VBA] and mpSession.htaMacro==False):
+        if mpSession.ddeMode or mpSession.template or (mpSession.outputFileType not in MSTypes.VB_FORMATS+[MSTypes.VBA] and not mpSession.htaMacro):
             inputFile = os.path.join(working_directory, "command.cmd")
         else:
             inputFile = os.path.join(working_directory, utils.randomAlpha(9)) + ".vba"
         if mpSession.stdinContent is not None:
             import time
             time.sleep(0.4) # Needed to avoid some weird race condition
-            logging.info("   [-] Store std input in file..." )
+            logging.info("   [-] Store std input in file...")
             f = open(inputFile, 'w')
             f.writelines(mpSession.stdinContent)
             f.close()
@@ -226,7 +252,7 @@ def main(argv):
                     if os.path.isdir(working_directory):
                         shutil.rmtree(working_directory)
                     sys.exit(2)
-                logging.info("   [-] Store input file..." )
+                logging.info("   [-] Store input file...")
                 shutil.copy2(mpSession.fileInput, inputFile)
         
         if os.path.isfile(inputFile): 
@@ -235,7 +261,7 @@ def main(argv):
             
         # Edit outputfile name to spoof extension if unicodeRtlo option is enabled
         if mpSession.unicodeRtlo:
-            # Reminer; mpSession.unicodeRtlo contains the extension we want to spoof, such as "jpg"
+            # Reminder; mpSession.unicodeRtlo contains the extension we want to spoof, such as "jpg"
             logging.info(" [+] Inject %s false extension with unicode RTLO" % mpSession.unicodeRtlo)
             # Separate document path and extension
             (fileName, fileExtension) = os.path.splitext(mpSession.outputFilePath)
@@ -253,7 +279,7 @@ def main(argv):
 
         # Retrieve the right payload builder
         if mpSession.outputFileType != MSTypes.UNKNOWN:
-            if MP_TYPE == "Pro" and mpSession.communityMode == False:
+            if MP_TYPE == "Pro" and not mpSession.communityMode:
                 payloadBuilder = PayloadBuilderFactoryPro().getPayloadBuilder(mpSession)
             else:
                 payloadBuilder = PayloadBuilderFactory().getPayloadBuilder(mpSession)

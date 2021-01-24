@@ -3,10 +3,11 @@
 
 import re
 from modules.mp_module import MpModule
-from common.utils import randomAlpha, extractStringsFromText
+from common.utils import extractStringsFromText, randomStringBasedOnCharset
 import logging
 from random import randint
-
+from random import choice
+import string
 
 class ObfuscateNames(MpModule):
 
@@ -23,14 +24,14 @@ class ObfuscateNames(MpModule):
             f.close()
             
             for line in content:
-                matchObj = re.match( r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*\(.*\).*', line, re.M|re.I) 
+                matchObj = re.match(r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*\(.*\).*', line, re.M|re.I)
                 if matchObj:
                     keyword = matchObj.groups()[1]
                     if keyword not in self.reservedFunctions:
                         self.vbaFunctions.append(keyword)
                         self.reservedFunctions.append(keyword)
                 else:
-                    matchObj = re.match( r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*As\s*.*', line, re.M|re.I) 
+                    matchObj = re.match(r'.*(Sub|Function)\s+([a-zA-Z0-9_]+)\s*As\s*.*', line, re.M|re.I)
                     if matchObj:
                         keyword = matchObj.groups()[1]
                         if keyword not in self.reservedFunctions:
@@ -49,11 +50,11 @@ class ObfuscateNames(MpModule):
         self._findAllFunctions()
         
         # Different situation surrounding variables
-        varDelimitors=[(" "," "),("\t"," "),("\t","("),("\t"," ="),(" ","("),("(","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
+        varDelimitors=[(" "," "),("\t"," "),("\t","("),("\t"," ="),(" ","("),(", ",")"),("AddressOf ",")"),("(","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
         
         # Replace functions and function calls by random string
         for keyWord in self.vbaFunctions:
-            keyTmp = randomAlpha(randint(8, 20)) # Generate random names with random size
+            keyTmp = self._generateRandomVbaName() # Generate random names with random size
             self.reservedFunctions.append(keyTmp)
         
             for vbaFile in self.getVBAFiles():
@@ -69,20 +70,7 @@ class ObfuscateNames(MpModule):
                     keywordTmp = varDelimitor[0] + keyWord +varDelimitor[1]
 
                     for n,line in enumerate(content):
-                        #if "GetBuffer" in line:
-                        #if keyWord == "StrEncoder":
-                            #logging.info("|%s|->|%s|" %(keywordTmp,newKeyWord))
-                            #if keywordTmp in line:
-                            #    logging.info("line: %s" % (line))
-                            #    logging.info("Found %s, new keyword will be %s" % (keywordTmp,newKeyWord))
-                        
-                        
-                        extractedStrings=extractStringsFromText(line)  
-                        #if extractedStrings != "":
-                        #    logging.info(extractedStrings)    
-                        """
-                        matchObj = re.match( r'.*".*%s.*".*' %keyWord, line, re.M|re.I) # check if word is inside a string
-                        if matchObj:"""
+                        extractedStrings=extractStringsFromText(line)
                         if keyWord in extractedStrings:
                             if "Application.Run" in line or "Application.OnTime" in line: # dynamic function call detected
                                 content[n] = line.replace(keywordTmp, newKeyWord)
@@ -95,12 +83,21 @@ class ObfuscateNames(MpModule):
                 f.close()
 
 
+    def _generateRandomVbaName(self):
+        """
+        Generate random names with random size
+        :return:
+        """
+        vbaName = choice(string.ascii_lowercase) # Name has to start with a letter
+        return vbaName + randomStringBasedOnCharset(randint(self.mpSession.obfuscatedNamesMinLen - 1, self.mpSession.obfuscatedNamesMaxLen - 1), self.mpSession.obfuscatedNamesCharset)
+
+
     def _replaceLibImports(self, macroLines):
         
         # Identify function, subs and variables names
         keyWords = []
         for line in macroLines:
-            matchObj = re.match( r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"\s*.*', line, re.M|re.I) 
+            matchObj = re.match(r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"\s*.*', line, re.M|re.I)
             if matchObj:
                 keyword = matchObj.groups()[1]
                 keyWords.append(keyword)
@@ -111,7 +108,7 @@ class ObfuscateNames(MpModule):
         # Replace functions and function calls by random string
         for keyWord in keyWords:
             
-            keyTmp = randomAlpha(randint(8, 20)) # Generate random names with random size
+            keyTmp = self._generateRandomVbaName()
             #logging.debug("Keyword:%s,keyTmp:%s "%(keyWord,keyTmp))
             for n,line in enumerate(macroLines):
                 if "Lib " in line and keyWord + " " in line: # take care of declaration
@@ -121,35 +118,31 @@ class ObfuscateNames(MpModule):
                         #logging.debug(macroLines[n])
                     else:
                         # We have to create a new alias
-                        matchObj = re.match( r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"(\s*).*', line, re.M|re.I) 
+                        matchObj = re.match(r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"(\s*).*', line, re.M|re.I)
                         #logging.debug(line)
                         line =  line.replace(" %s " % keyWord, " %s " % keyTmp)
                         #logging.debug(line+"\n")
                         macroLines[n] = line.replace(matchObj.groups()[2],matchObj.groups()[2] + "\" Alias \"%s" % keyWord) 
                 else:
-                    matchObj = re.match( r'.*".*%s.*".*'%keyWord, line, re.M|re.I) # check if word is inside a string
+                    matchObj = re.match(r'.*".*%s.*".*' % keyWord, line, re.M|re.I) # check if word is inside a string
                     if matchObj:
                         if "Application.Run" in line: # dynamic function call detected
                             macroLines[n] = line.replace(keyWord, keyTmp)
                             
-                        # else word is part of normal string so we do not touch
+                        # else word is part of normal string, so we do not touch
                     else:
                         if keyWord + " " in line or keyWord + "(" in line:
-                            #logging.debug(line)
                             macroLines[n] = line.replace(keyWord, keyTmp)
-                            #logging.debug(macroLines[n])
-                        #else:
-                        #    macroLines[n] = line.replace(keyWord, keyTmp)
         return macroLines
 
 
     def _replaceVariables(self,macroLines):
         
-        #  variables names
+        #  will contain variables names
         keyWords = []
         # format something As ...
         for line in macroLines:
-            findList = re.findall( r'([a-zA-Z0-9_]+)(\(\))?\s+As\s+(String|Integer|Long|Object|Byte|Variant|Boolean|Single|Any|Collection|Word.Application|Excel.Application)', line, re.I) 
+            findList = re.findall(r'([a-zA-Z0-9_]+)(\(\))?\s+As\s+(String|Integer|Long|Object|Byte|Variant|Boolean|Single|Any|Collection|Word.Application|Excel.Application|VbVarType)', line, re.I)
             if findList:
                 for keyWord in findList:
                     if keyWord[0] not in self.reservedFunctions: # prevent erase of previous variables and function names
@@ -157,7 +150,7 @@ class ObfuscateNames(MpModule):
                         self.reservedFunctions.append(keyWord[0])
         # format Set <something> =  ...
         for line in macroLines:
-            findList = re.findall( r'Set\s+([a-zA-Z0-9_]+)\s+=', line, re.I) 
+            findList = re.findall(r'Set\s+([a-zA-Z0-9_]+)\s+=', line, re.I)
             if findList:
                 for keyWord in findList:
                     if keyWord not in self.reservedFunctions:  # prevent erase of previous variables and function names
@@ -165,7 +158,7 @@ class ObfuscateNames(MpModule):
                         self.reservedFunctions.append(keyWord)
         # format Const <something> =  ...
         for line in macroLines:
-            findList = re.findall( r'Const\s+([a-zA-Z0-9_]+)\s+=', line, re.I) 
+            findList = re.findall(r'Const\s+([a-zA-Z0-9_]+)\s+=', line, re.I)
             if findList:
                 for keyWord in findList:
                     if keyWord not in self.reservedFunctions:  # prevent erase of previous variables and function names
@@ -173,7 +166,7 @@ class ObfuscateNames(MpModule):
                         self.reservedFunctions.append(keyWord)
         # format Type <something>
         for line in macroLines:
-            findList = re.findall( r'Type\s+([a-zA-Z0-9_]+)$', line, re.I) 
+            findList = re.findall(r'Type\s+([a-zA-Z0-9_]+)$', line, re.I)
             if findList:
                 for keyWord in findList:
                     if keyWord not in self.reservedFunctions:  # prevent erase of previous variables and function names
@@ -192,25 +185,25 @@ class ObfuscateNames(MpModule):
         
         # replace all keywords by random name
         for keyWord in keyWords:
-            keyTmp = randomAlpha(randint(8, 20)) # Generate random names with random size
+            keyTmp = self._generateRandomVbaName()
             #logging.info("|%s|->|%s|" %(keyWord,keyTmp))
             for varDelimitor in varDelimitors:
-                newKeyWord = varDelimitor[0] + keyTmp +varDelimitor[1]
-                keywordTmp = varDelimitor[0] + keyWord +varDelimitor[1]
+                newKeyWord = varDelimitor[0] + keyTmp + varDelimitor[1]
+                keywordTmp = varDelimitor[0] + keyWord + varDelimitor[1]
                 for n,line in enumerate(macroLines):
                     macroLines[n] = line.replace(keywordTmp, newKeyWord)
                 
         return macroLines
 
 
-    def _replaceConsts(self,macroLines):
-        
+    def _replaceConsts(self, macroLines):
+
         # Identify and replace constants
         constList = ["0","1", "2"]
         
         for constant in constList:
             # Create random string to replace constant 
-            keyTmp = randomAlpha(10)
+            keyTmp = self._generateRandomVbaName()
             constDeclaration = "Const " + keyTmp +" = " + constant + "\n"
             macroLines.insert(0, constDeclaration)
             newKeyWord = " " + keyTmp + ", "
@@ -237,7 +230,7 @@ class ObfuscateNames(MpModule):
    
         # Obfuscate function name
         logging.info("   [-] Rename functions...")
-        content = self._replaceFunctions()
+        self._replaceFunctions()
         
         logging.info("   [-] Rename variables...")
         if self.mpSession.ObfReplaceConstants:
@@ -256,9 +249,9 @@ class ObfuscateNames(MpModule):
             if self.mpSession.ObfReplaceConstants:
                 # replace numerical consts
                 if ",0," in content or " 0," in content:
-                    content = self._replaceConsts (content)
+                    content = self._replaceConsts(content)
             #replace lib imports
-            content = self._replaceLibImports (content)
+            content = self._replaceLibImports(content)
         
             # Write in new file 
             f = open(vbaFile, 'w')

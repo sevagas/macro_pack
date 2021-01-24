@@ -93,7 +93,7 @@ class VBAGenerator(PayloadBuilder):
                 #1 Replace line in VBA
                 f = open(mainFile)
                 content = f.readlines()
-                f.close
+                f.close()
                 for n,line in enumerate(content):
                     if line.find(" " + self.startFunction) != -1:  
                         #logging.info("     -> %s becomes %s" %(content[n], self.getAutoOpenVbaSignature()))  

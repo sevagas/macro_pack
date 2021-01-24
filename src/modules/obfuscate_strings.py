@@ -69,6 +69,12 @@ End Function
         logging.info("   [-] Split strings...")
         logging.info("   [-] Encode strings...")
         for vbaFile in self.getVBAFiles():
+            # Check if there are strings in file
+            with open(vbaFile) as fileToCheck:
+                data = fileToCheck.read()
+            if '"' not in data:
+                continue
+            
             # Compute new random function and variable names for HexToStr
             newFunctionName = randomAlpha(12)
             newVarName1 = randomAlpha(12)

