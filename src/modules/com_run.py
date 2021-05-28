@@ -84,7 +84,7 @@ class ComGenerator(MpModule):
         except Exception:
             logging.exception("   [!] Problem detected!")
         
-        time.sleep(1.5) # need to have app alive to launch async call with --background option
+        time.sleep(3.5) # need to have app alive to launch async call with --background option
 
                 
         logging.info("   [-] Cleanup...")

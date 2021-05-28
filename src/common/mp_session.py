@@ -20,6 +20,8 @@ class MpSession:
         self.obfuscateForm =  False
         self.obfuscateNames =  False
         self.obfuscateStrings =  False
+        self.obfuscateDeclares = False
+
         self.obfOnlyMain = False
         self.doNotObfConst = False
         self.ObfReplaceConstants = True

@@ -12,6 +12,7 @@ import string
 class ObfuscateNames(MpModule):
 
     vbaFunctions = []
+    win32Functions = []
 
     def _findAllFunctions(self):
         
@@ -92,48 +93,74 @@ class ObfuscateNames(MpModule):
         return vbaName + randomStringBasedOnCharset(randint(self.mpSession.obfuscatedNamesMinLen - 1, self.mpSession.obfuscatedNamesMaxLen - 1), self.mpSession.obfuscatedNamesCharset)
 
 
-    def _replaceLibImports(self, macroLines):
-        
-        # Identify function, subs and variables names
-        keyWords = []
-        for line in macroLines:
-            matchObj = re.match(r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"\s*.*', line, re.M|re.I)
-            if matchObj:
-                keyword = matchObj.groups()[1]
-                keyWords.append(keyword)
-        
-        # Remove duplicates
-        keyWords = list(set(keyWords))
-    
+    def _findAllWin32Api(self):
+
+        for vbaFile in self.getVBAFiles():
+            if self.mpSession.obfOnlyMain:
+                if vbaFile != self.getMainVBAFile():
+                    continue
+            f = open(vbaFile)
+            content = f.readlines()
+            f.close()
+
+            for line in content:
+                matchObj = re.match(r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"\s*.*', line, re.M | re.I)
+                if matchObj:
+                    keyword = matchObj.groups()[1]
+                    if keyword not in self.reservedFunctions:
+                        self.win32Functions.append(keyword)
+                        self.reservedFunctions.append(keyword)
+
+
+
+    def _replaceLibImports(self):
+
+        self._findAllWin32Api()
+
         # Replace functions and function calls by random string
-        for keyWord in keyWords:
+        for keyWord in self.win32Functions:
             
             keyTmp = self._generateRandomVbaName()
-            #logging.debug("Keyword:%s,keyTmp:%s "%(keyWord,keyTmp))
-            for n,line in enumerate(macroLines):
-                if "Lib " in line and keyWord + " " in line: # take care of declaration
-                    if "Alias " in line: # if fct already has an alias we can change the original keyword
-                        #logging.debug(line)
-                        macroLines[n] = line.replace(" %s " % keyWord," %s " %  keyTmp, 1)
-                        #logging.debug(macroLines[n])
+            self.reservedFunctions.append(keyTmp)
+            for vbaFile in self.getVBAFiles():
+                if self.mpSession.obfOnlyMain:
+                    if vbaFile != self.getMainVBAFile():
+                        continue
+                f = open(vbaFile)
+                macroLines = f.readlines()
+                f.close()
+
+                #logging.info("Keyword:%s,keyTmp:%s "%(keyWord,keyTmp))
+                for n,line in enumerate(macroLines):
+                    if "Lib " in line and keyWord + " " in line: # take care of declaration
+                        if "Alias " in line: # if fct already has an alias we can change the original keyword
+                            #logging.debug(line)
+                            macroLines[n] = line.replace(" %s " % keyWord," %s " %  keyTmp, 1)
+                            #logging.debug(macroLines[n])
+                        else:
+                            # We have to create a new alias
+                            matchObj = re.match(r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"(\s*).*', line, re.M|re.I)
+                            #logging.debug(line)
+                            line =  line.replace(" %s " % keyWord, " %s " % keyTmp)
+                            #logging.debug(line+"\n")
+                            macroLines[n] = line.replace(matchObj.groups()[2],matchObj.groups()[2] + "\" Alias \"%s" % keyWord)
                     else:
-                        # We have to create a new alias
-                        matchObj = re.match(r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"(\s*).*', line, re.M|re.I)
-                        #logging.debug(line)
-                        line =  line.replace(" %s " % keyWord, " %s " % keyTmp)
-                        #logging.debug(line+"\n")
-                        macroLines[n] = line.replace(matchObj.groups()[2],matchObj.groups()[2] + "\" Alias \"%s" % keyWord) 
-                else:
-                    matchObj = re.match(r'.*".*%s.*".*' % keyWord, line, re.M|re.I) # check if word is inside a string
-                    if matchObj:
-                        if "Application.Run" in line: # dynamic function call detected
-                            macroLines[n] = line.replace(keyWord, keyTmp)
-                            
-                        # else word is part of normal string, so we do not touch
-                    else:
-                        if keyWord + " " in line or keyWord + "(" in line:
-                            macroLines[n] = line.replace(keyWord, keyTmp)
-        return macroLines
+                        matchObj = re.match(r'.*".*%s.*".*' % keyWord, line, re.M|re.I) # check if word is inside a string
+                        if matchObj:
+                            if "Application.Run" in line: # dynamic function call detected
+                                macroLines[n] = line.replace(keyWord, keyTmp)
+
+                            # else word is part of normal string, so we do not touch
+                        else:
+                            if keyWord + " " in line or keyWord + "(" in line:
+                                #logging.info(line)
+                                macroLines[n] = line.replace(keyWord, keyTmp)
+
+                # Write in new file
+                f = open(vbaFile, 'w')
+                f.writelines(macroLines)
+                f.close()
+
 
 
     def _replaceVariables(self,macroLines):
@@ -235,7 +262,8 @@ class ObfuscateNames(MpModule):
         logging.info("   [-] Rename variables...")
         if self.mpSession.ObfReplaceConstants:
             logging.info("   [-] Rename some numeric const...")
-        logging.info("   [-] Rename API imports...")
+
+        # go through each file
         for vbaFile in self.getVBAFiles():
             if self.mpSession.obfOnlyMain:
                 if vbaFile != self.getMainVBAFile():
@@ -243,19 +271,21 @@ class ObfuscateNames(MpModule):
             f = open(vbaFile)
             content = f.readlines()
             f.close()
-            
             # Obfuscate variables name
             content = self._replaceVariables(content)
             if self.mpSession.ObfReplaceConstants:
                 # replace numerical consts
-                if ",0," in content or " 0," in content:
+                if ",0," in content or " 0," in "".join(content):
                     content = self._replaceConsts(content)
-            #replace lib imports
-            content = self._replaceLibImports(content)
-        
-            # Write in new file 
+
+            # Write in new file
             f = open(vbaFile, 'w')
             f.writelines(content)
             f.close()
+
+        # replace lib imports
+        if self.mpSession.obfuscateDeclares:
+            logging.info("   [-] Rename API imports...")
+            self._replaceLibImports()
         logging.info("   [-] OK!") 
         

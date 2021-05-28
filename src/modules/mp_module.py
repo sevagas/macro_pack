@@ -170,7 +170,8 @@ class MpModule:
                             if s.find(self.startFunction.encode()) != -1:
                                 result = vbaFile
                                 break
-                            
+        logging.debug("    [*] Start function:%s" % self.startFunction)
+        logging.debug("    [*] Main VBA file:%s" % result)
         return result
     
     
@@ -214,7 +215,6 @@ class MpModule:
         """ 
         Add a new VBA Library module depending on the current context 
         """
-        moduleContent = ''
         if self.outputFileType in MSTypes.MS_OFFICE_FORMATS:
             if MSTypes.WD in self.outputFileType and hasattr(vbaLib, 'VBA_WD'):
                 moduleContent = vbaLib.VBA_WD

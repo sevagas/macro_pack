@@ -31,6 +31,8 @@ else:
 
 from colorama import init
 from termcolor import colored
+
+# {PyArmor Protection Code}
 # {PyArmor Plugins}
 # use Colorama to make Termcolor work on Windows too
 init()
@@ -54,7 +56,7 @@ def main(argv):
 
     try:
         longOptions = ["embed=", "listen=", "port=", "webdav-listen=", "generate=", "quiet", "input-file=", "encode",
-                       "obfuscate", "obfuscate-form", "obfuscate-names", "obfuscate-strings",
+                       "obfuscate", "obfuscate-form", "obfuscate-names", "obfuscate-declares", "obfuscate-strings",
                        "obfuscate-names-charset=", "obfuscate-names-minlen=", "obfuscate-names-maxlen=",
                        "file=","template=","listtemplates","listformats","icon=", "start-function=","uac-bypass",
                        "unicode-rtlo=", "dde", "print", "force-yes", "help"]
@@ -76,8 +78,11 @@ def main(argv):
             mpSession.obfuscateForm =  True
             mpSession.obfuscateNames =  True
             mpSession.obfuscateStrings =  True
+            mpSession.obfuscateDeclares = True
         elif opt=="--obfuscate-form":
             mpSession.obfuscateForm =  True
+        elif opt=="--obfuscate-declares":
+            mpSession.obfuscateDeclares =  True
         elif opt=="--obfuscate-names":
             mpSession.obfuscateNames =  True
         elif opt=="--obfuscate-names-charset":

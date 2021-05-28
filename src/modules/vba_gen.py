@@ -80,6 +80,9 @@ class VBAGenerator(PayloadBuilder):
     
     def getAutoOpenVbaFunction(self):
         return "AutoOpen"
+
+    def getAutoOpenVbaSignature(self):
+        return "Sub AutoOpen()"
             
     def resetVBAEntryPoint(self):
         """
@@ -87,8 +90,8 @@ class VBAGenerator(PayloadBuilder):
         Ex for Excel it will replace "Sub AutoOpen ()" with "Sub Workbook_Open ()"
         """
         mainFile = self.getMainVBAFile()
-        if mainFile != "" and  self.startFunction is not None:
-            if self.startFunction != self.getAutoOpenVbaFunction():
+        if mainFile != "" and self.startFunction is not None:
+            if self.startFunction != self.getAutoOpenVbaFunction() and self.startFunction in self.potentialStartFunctions: # we do not replace if non autopopen start function is used
                 logging.info("   [-] Changing auto open function from %s to %s..." % (self.startFunction, self.getAutoOpenVbaFunction()))
                 #1 Replace line in VBA
                 f = open(mainFile)
@@ -101,7 +104,7 @@ class VBAGenerator(PayloadBuilder):
                 f = open(mainFile, 'w')
                 f.writelines(content)
                 f.close()   
-                # 2 Change  cure module start function
+                # 2 Change  current module start function
                 self._startFunction = self.getAutoOpenVbaFunction()
                             
     

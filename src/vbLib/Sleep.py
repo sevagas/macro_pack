@@ -1,5 +1,16 @@
 
+TOTEST = \
+r'''
 
+Sub Sleep(ByVal time As Integer)
+    Dim current As Long
+    current = Timer * 1000
+    Do While current + time > CLng(Timer * 1000)
+    DoEvents
+    Loop
+End Sub
+
+'''
 
 
 VBA = \

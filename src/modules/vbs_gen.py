@@ -36,7 +36,7 @@ class VBSGenerator(VBAGenerator):
             
             # Check there are no DLL import
             for line in content:
-                matchObj = re.match( r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"\s*.*', line, re.M|re.I) 
+                matchObj = re.match(r'.*(Sub|Function)\s*([a-zA-Z0-9_]+)\s*Lib\s*"(.+)"\s*.*', line, re.M|re.I)
                 if matchObj:
                     logging.error("   [-] VBScript does not support DLL import. Abort!")
                     logging.error("   [-] Line: %s" % line)
@@ -58,8 +58,8 @@ class VBSGenerator(VBAGenerator):
         translators = [("Val(","CInt("),(" Chr$"," Chr"),(" Mid$"," Mid"),("On Error GoTo","'//On Error GoTo"),("byebye:",""), ("Next ", "Next '//")]
         translators.extend([("() As String"," "),("CVar","")])
         translators.extend([(" As String"," "),(" As Object"," "),(" As Long"," "),(" As Integer"," "),(" As Variant"," "), (" As Boolean", " "), (" As Byte", " "), (" As Excel.Application", " "), (" As Word.Application", " ")])
-        translators.extend([ ("MsgBox ", "WScript.Echo "), ('Application.Wait Now + TimeValue("0:00:01")', 'WScript.Sleep(1000)')])
-        translators.extend([ ('ChDir ', 'createobject("WScript.Shell").currentdirectory =  ')])
+        translators.extend([("MsgBox ", "WScript.Echo "), ('Application.Wait Now + TimeValue("0:00:01")', 'WScript.Sleep(1000)')])
+        translators.extend([('ChDir ', 'createobject("WScript.Shell").currentdirectory =  ')])
         content = []
         for vbaFile in self.getVBAFiles():  
             f = open(vbaFile)
@@ -77,7 +77,7 @@ class VBSGenerator(VBAGenerator):
             # Check if ENVIRON is used
             if line.find("Environ(")!= -1:
                 isUsingEnviron = True
-                line = re.sub('Environ\("([A-Z_]+)"\)',r'wshShell.ExpandEnvironmentStrings( "%\1%" )' , line, flags=re.I)
+                line = re.sub('Environ\("([A-Z_]+)"\)',r'wshShell.ExpandEnvironmentStrings( "%\1%" )', line, flags=re.I)
             content[n] = line
             # ENVIRON("COMPUTERNAME") ->   
             #Set wshShell = CreateObject( "WScript.Shell" )
