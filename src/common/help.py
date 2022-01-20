@@ -167,10 +167,15 @@ def getGenerationFunction():
 def getAvBypassFunction():
     details = """ Security bypass options: 
     -o, --obfuscate Obfuscate code (remove spaces, obfuscate strings, obfuscate functions and variables name)
+    If also possible to only apply parts of obfuscation using:
+        --obfuscate-form to remove comments and space
+        --obfuscate-names to rename functions and variables
+        --obfuscate-declares to rename Win32 import declarations
+        --obfuscate-strings to split and encode strings
     --obfuscate-names-charset=<CHARSET> Set a charset for obfuscated variables and functions
-        Choose between: alpha, alphanum, complete or provide the list of char you want
-    --obfuscate-names-minlen=<len> Set min length of obfuscated variables and functions (default 8)
-    --obfuscate-names-maxlen=<len> Set max length of obfuscated variables and functions (default 20)
+        Choose between: alpha, alphanum, complete or provide the list of char you want (default is alpha)
+    --obfuscate-names-minlen=<len> Set min length of obfuscated variables and functions (default is 7)
+    --obfuscate-names-maxlen=<len> Set max length of obfuscated variables and functions (default is 15)
     --uac-bypass Execute payload with high privileges if user is admin. Compatible with most MacroPack templates """ 
     return details
 
@@ -273,6 +278,7 @@ def printProUsage(banner, currentApp):
 
 """ % (getGenerationFunction(), getGenerationFunctionPro(), getAvBypassFunction(), getAvBypassFunctionPro(), getOtherFunction(currentApp), getOtherFunctionPro())
     details +="    -h, --help   Displays help and exit \n"
+    details += "\n Please send your support requests to emeric.nasi@sevagas.com \n"
 
     print(details)
     

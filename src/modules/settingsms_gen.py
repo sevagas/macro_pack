@@ -2,8 +2,10 @@
 # encoding: utf-8
 
 import logging
+
+from common.utils import getParamValue, MPParam
 from modules.payload_builder import PayloadBuilder
-from collections import OrderedDict
+
 
 """
 
@@ -44,13 +46,13 @@ class SettingsShortcutGenerator(PayloadBuilder):
     
     def generate(self):
                 
-        logging.info(" [+] Generating %s file..." % self.outputFileType)        
-        paramDict = OrderedDict([("Cmd_Line",None)])      
-        self.fillInputParams(paramDict)
+        logging.info(" [+] Generating %s file..." % self.outputFileType)
+        paramArray = [MPParam("Command line")]
+        self.fillInputParams(paramArray)
         
         # Fill template
         content = SETTINGS_MS_TEMPLATE
-        content = content.replace("<<<CMD>>>", paramDict["Cmd_Line"])
+        content = content.replace("<<<CMD>>>", getParamValue(paramArray, "Command line"))
         content = content.replace("<<<ICON>>>", self.mpSession.icon)
              
         # Write in new SCF file

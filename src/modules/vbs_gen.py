@@ -65,6 +65,8 @@ class VBSGenerator(VBAGenerator):
             f = open(vbaFile)
             content.extend(f.readlines())
             f.close()
+            if not content[len(content)-1].endswith("\n"): # Add \n to avoid overlap
+                content[len(content) - 1] += "\n"
         isUsingEnviron = False
         for n,line in enumerate(content):
             # Do easy translations

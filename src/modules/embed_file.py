@@ -5,7 +5,7 @@
 import base64, os
 from modules.mp_module import MpModule
 import logging
-from common.utils import MSTypes
+from common.utils import MSTypes, VBAMAXLINELEN
 from vbLib import WriteBytes
 from vbLib import Base64ToBin, CreateBinFile
 
@@ -20,7 +20,6 @@ class Embedder(MpModule):
         if not os.path.isfile(self.mpSession.embeddedFilePath):
             logging.error("   [!] Could not find %s " % self.mpSession.embeddedFilePath)
             raise Exception("Invalid file path")
-            return
         
         infile = open(self.mpSession.embeddedFilePath, 'rb')
         packedFile = ""
@@ -88,7 +87,6 @@ class Embedder(MpModule):
         base64Str= encodedBytes.decode("utf-8")  
        
         # Shorten size if needed
-        VBAMAXLINELEN = 100 # VBA will fail if line is too long
         cpt = 0
         newPackedMacro = ""
         nbIter = int(len(base64Str) / VBAMAXLINELEN)
@@ -102,7 +100,7 @@ class Embedder(MpModule):
         newContent = Base64ToBin.VBA + "\n"
         newContent += CreateBinFile.VBA + "\n"
         newContent += "Sub DumpFile(strFilename)"
-        newContent += "\n Dim str \n str = %s \n readEmbed = Base64ToBin(str) \n CreateBinFile strFilename, readEmbed \n" % (packedMacro) 
+        newContent += "\n Dim str \n str = %s \n readEmbed = Base64ToBin(str) \n CreateBinFile strFilename, readEmbed \n" % packedMacro
         newContent += "End Sub \n \n"       
         
         

@@ -1,6 +1,6 @@
 
 import logging
-
+import os
 from modules.mp_module import MpModule
 from http.server import HTTPServer, SimpleHTTPRequestHandler, HTTPStatus
 from common.utils import getHostIp
@@ -37,10 +37,12 @@ class ListenServer(MpModule):
     def run(self):
         """ Starts listening server"""
 
-        logging.info (" [+] Starting Macro_Pack web server...")
-        logging.info ("   [-] Files in \"" + self.listenRoot + "\" folder are accessible via http://{ip}:{port}/".format(ip=getHostIp(), port=self.listenPort))
-        logging.info ("   [-] Listening on port %s (ctrl-c to exit)..." % self.listenPort)
-        handler_class = partial(WebServer, directory=self.listenRoot)
-        httpdServer = HTTPServer(("0.0.0.0", self.listenPort), handler_class)
-        httpdServer.serve_forever()
-
+        logging.info(" [+] Starting Macro_Pack web server...")
+        if os.path.isdir(self.listenRoot):
+            logging.info("   [-] Files in \"" + self.listenRoot + "\" folder are accessible via http://{ip}:{port}/".format(ip=getHostIp(), port=self.listenPort))
+            logging.info("   [-] Listening on port %s (ctrl-c to exit)..." % self.listenPort)
+            handler_class = partial(WebServer, directory=self.listenRoot)
+            httpdServer = HTTPServer(("0.0.0.0", self.listenPort), handler_class)
+            httpdServer.serve_forever()
+        else:
+            logging.info("   [!] Error: Could not find local folder %s" % self.listenRoot)

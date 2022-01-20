@@ -20,28 +20,28 @@ End Function
 'Stream_BinaryToString Function
 '2003 Antonin Foller, http://www.motobit.com
 'Binary - VT_UI1 | VT_ARRAY data To convert To a string
-Private Function Stream_BinaryToString(Binary)
-    Const adTypeText = 2
-    Const adTypeBinary = 1
+Private Function Stream_BinaryToString(some_value)
+    'Const adTypeText = 2
+    'Const adTypeBinary = 1
     
     'Create Stream object
     Dim BinaryStream 'As New Stream
     Dim tmpString As String
-    tmpString = "ADO"
-    tmpString = tmpString & "DB.St"
+    tmpString = "AD"
+    tmpString = tmpString & "ODB.St"
     tmpString = tmpString & "ream"
     Set BinaryStream = CreateObject(tmpString)
     
     'Specify stream type - we want To save binary data.
-    BinaryStream.Type = adTypeBinary
+    BinaryStream.Type = 1'adTypeBinary
     
     'Open the stream And write binary data To the object
     BinaryStream.Open
-    BinaryStream.Write Binary
+    BinaryStream.Write some_value
     
     'Change stream type To text/string
-    BinaryStream.Position = 0
-    BinaryStream.Type = adTypeText
+    BinaryStream.Position = BinaryStream.Type - 1'0
+    BinaryStream.Type = BinaryStream.Type + 1 'adTypeText
     
     'Specify charset For the output text (unicode) data.
     BinaryStream.Charset = "us-ascii"

@@ -56,7 +56,7 @@ class PowerPointGenerator(VBAGenerator):
     def _injectCustomUi(self):
         customUIfile = utils.randomAlpha(8)+".xml" # Generally something like customUI.xml
         customUiContent = \
-"""<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="AutoOpen" ></customUI>"""       
+"""<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="%s" ></customUI>""" % self.startFunction
         relationShipContent =  \
 """<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail" Target="docProps/thumbnail.jpeg"/><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="ppt/presentation.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/><Relationship Id="%s" Type="http://schemas.microsoft.com/office/2007/relationships/ui/extensibility" Target="/customUI/%s" /></Relationships>""" \
  % ("rId5", customUIfile)

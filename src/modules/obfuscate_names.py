@@ -3,11 +3,9 @@
 
 import re
 from modules.mp_module import MpModule
-from common.utils import extractStringsFromText, randomStringBasedOnCharset
+from common.utils import extractStringsFromText, progressBar
 import logging
 from random import randint
-from random import choice
-import string
 
 class ObfuscateNames(MpModule):
 
@@ -49,39 +47,56 @@ class ObfuscateNames(MpModule):
     def _replaceFunctions(self):
         # Identify function, subs and variables names
         self._findAllFunctions()
-        
-        # Different situation surrounding variables
-        varDelimitors=[(" "," "),("\t"," "),("\t","("),("\t"," ="),(" ","("),(", ",")"),("AddressOf ",")"),("(","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
-        
-        # Replace functions and function calls by random string
-        for keyWord in self.vbaFunctions:
-            keyTmp = self._generateRandomVbaName() # Generate random names with random size
-            self.reservedFunctions.append(keyTmp)
-        
-            for vbaFile in self.getVBAFiles():
-                if self.mpSession.obfOnlyMain:
-                    if vbaFile != self.getMainVBAFile():
-                        continue
-                f = open(vbaFile)
-                content = f.readlines()
-                f.close()
-    
-                for varDelimitor in varDelimitors:
-                    newKeyWord = varDelimitor[0] + keyTmp +varDelimitor[1]
-                    keywordTmp = varDelimitor[0] + keyWord +varDelimitor[1]
 
-                    for n,line in enumerate(content):
-                        extractedStrings=extractStringsFromText(line)
-                        if keyWord in extractedStrings:
-                            if "Application.Run" in line or "Application.OnTime" in line: # dynamic function call detected
+        if len(self.vbaFunctions) > 0:
+        
+            # Different situation surrounding variables
+            varDelimitors=[(" "," "),("\t"," "),("\t","("),("\t"," ="),(" ","("), (",","("),(", ",")"),("AddressOf ",")"),("(","("),(" ","\n"),(" ",","),(" "," ="),("."," "),(".","\"")]
+
+            #for keyWord in self.vbaFunctions:
+            disableProgressBar = False
+            if self.mpSession.logLevel == "WARN":
+                disableProgressBar = True
+
+            for keyWord in progressBar(self.vbaFunctions, prefix='Progress:', suffix='Complete', length=50, disableProgressBar=disableProgressBar):
+
+                keyTmp = self._generateRandomVbaName() # Generate random names with random size
+                self.reservedFunctions.append(keyTmp)
+
+                for vbaFile in self.getVBAFiles():
+                    if self.mpSession.obfOnlyMain:
+                        if vbaFile != self.getMainVBAFile():
+                            continue
+                    f = open(vbaFile)
+                    if keyWord not in f.read(): # optimisation, do not obfuscate if function is not in file
+                        f.close()
+                        continue
+
+                    f.close()
+
+                    f = open(vbaFile)
+                    content = f.readlines()
+                    f.close()
+
+                    for varDelimitor in varDelimitors:
+                        newKeyWord = varDelimitor[0] + keyTmp + varDelimitor[1]
+                        keywordTmp = varDelimitor[0] + keyWord + varDelimitor[1]
+
+                        for n,line in enumerate(content):
+                            if "\"" in line:
+                                extractedStrings=extractStringsFromText(line)
+                                if keyWord in extractedStrings:
+                                    if "Application.Run" in line or "Application.OnTime" in line: # dynamic function call detected
+                                        content[n] = line.replace(keywordTmp, newKeyWord)
+                                else:
+                                    content[n] = line.replace(keywordTmp, newKeyWord)
+                            else:
                                 content[n] = line.replace(keywordTmp, newKeyWord)
-                        else:
-                            content[n] = line.replace(keywordTmp, newKeyWord)
-                                
-                # Write in new file 
-                f = open(vbaFile, 'w')
-                f.writelines(content)
-                f.close()
+
+                    # Write in new file
+                    f = open(vbaFile, 'w')
+                    f.writelines(content)
+                    f.close()
 
 
     def _generateRandomVbaName(self):
@@ -89,8 +104,11 @@ class ObfuscateNames(MpModule):
         Generate random names with random size
         :return:
         """
-        vbaName = choice(string.ascii_lowercase) # Name has to start with a letter
-        return vbaName + randomStringBasedOnCharset(randint(self.mpSession.obfuscatedNamesMinLen - 1, self.mpSession.obfuscatedNamesMaxLen - 1), self.mpSession.obfuscatedNamesCharset)
+        vbaName = self.mpSession.nameObfuscationCallback(
+            randint(self.mpSession.obfuscatedNamesMinLen, self.mpSession.obfuscatedNamesMaxLen),
+            self.mpSession.obfuscatedNamesCharset)
+        #logging.info(vbaName)
+        return vbaName
 
 
     def _findAllWin32Api(self):
@@ -169,7 +187,7 @@ class ObfuscateNames(MpModule):
         keyWords = []
         # format something As ...
         for line in macroLines:
-            findList = re.findall(r'([a-zA-Z0-9_]+)(\(\))?\s+As\s+(String|Integer|Long|Object|Byte|Variant|Boolean|Single|Any|Collection|Word.Application|Excel.Application|VbVarType)', line, re.I)
+            findList = re.findall(r'([a-zA-Z0-9_]+)(\(\))?\s+As\s+(String|Integer|Long|Object|Byte|Variant|Range|Boolean|Single|Any|Collection|Word.Application|Excel.Application|VbVarType)', line, re.I)
             if findList:
                 for keyWord in findList:
                     if keyWord[0] not in self.reservedFunctions: # prevent erase of previous variables and function names
@@ -204,8 +222,8 @@ class ObfuscateNames(MpModule):
         
         # Different situation surrounding variables
         varDelimitors=[(" "," "),(" ","."),(" ","("),(" ","\n"),(" ",","),(" ",")"),(" "," =")]
-        varDelimitors.extend([("."," ="),("."," A"),("."," O"),(".",")"),(".",","),("."," ")])
-        varDelimitors.extend([("#"," "),("#",",")])
+        varDelimitors.extend([("."," ="),("."," A"),("."," O"),(".",")"),(".",","),("."," "),(".","\n")])
+        varDelimitors.extend([("#"," "), ("#",","), ("#","\n")])
         varDelimitors.extend([("\t"," "),("\t","."),("\t","("),("\t","\n"),("\t",","),("\t",")"),("\t"," =")])
         varDelimitors.extend([("(",")"),("(","("),("(",","),("("," +"),("("," *"),("("," &"),("("," -"),("("," ="),("("," As"),("("," And"),("("," To"),("("," Or"),("(",".")])
         varDelimitors.extend([("="," "),("=",","),("=","\n"),("Set "," =")])
@@ -217,7 +235,11 @@ class ObfuscateNames(MpModule):
             for varDelimitor in varDelimitors:
                 newKeyWord = varDelimitor[0] + keyTmp + varDelimitor[1]
                 keywordTmp = varDelimitor[0] + keyWord + varDelimitor[1]
+                firstWordNewKeyWord = keyTmp + varDelimitor[1]
+                firstWordKeywordTmp = keyWord + varDelimitor[1]
                 for n,line in enumerate(macroLines):
+                    if line.startswith(firstWordKeywordTmp):
+                        line = line.replace(firstWordKeywordTmp, firstWordNewKeyWord)
                     macroLines[n] = line.replace(keywordTmp, newKeyWord)
                 
         return macroLines
@@ -253,39 +275,49 @@ class ObfuscateNames(MpModule):
 
 
     def run(self):
-        logging.info(" [+] VBA names obfuscation ...") 
-   
-        # Obfuscate function name
-        logging.info("   [-] Rename functions...")
-        self._replaceFunctions()
-        
-        logging.info("   [-] Rename variables...")
-        if self.mpSession.ObfReplaceConstants:
-            logging.info("   [-] Rename some numeric const...")
+        if not self.mpSession.noNamesObfuscation:
+            logging.info(" [+] VBA names obfuscation ...")
 
-        # go through each file
-        for vbaFile in self.getVBAFiles():
-            if self.mpSession.obfOnlyMain:
-                if vbaFile != self.getMainVBAFile():
-                    continue
-            f = open(vbaFile)
-            content = f.readlines()
-            f.close()
-            # Obfuscate variables name
-            content = self._replaceVariables(content)
+            # Obfuscate function name
+            logging.info("   [-] Rename functions...")
+            self._replaceFunctions()
+
+
+            logging.info("   [-] Rename variables...")
+
+            # go through each file
+            vbaFiles = self.getVBAFiles()
+            disableProgressBar = False
+            if self.mpSession.logLevel == "WARN":
+                disableProgressBar = True
+            # for vbaFile in self.getVBAFiles():
+            for vbaFile in progressBar(vbaFiles, prefix='Progress:', suffix='Complete', length=50,
+                                       disableProgressBar=disableProgressBar):
+
+                if self.mpSession.obfOnlyMain:
+                    if vbaFile != self.getMainVBAFile():
+                        continue
+                f = open(vbaFile)
+                content = f.readlines()
+                f.close()
+                # Obfuscate variables name
+                content = self._replaceVariables(content)
+                if self.mpSession.ObfReplaceConstants:
+                    # replace numerical consts
+                    if ",0," in content or " 0," in "".join(content):
+                        content = self._replaceConsts(content)
+
+                # Write in new file
+                f = open(vbaFile, 'w')
+                f.writelines(content)
+                f.close()
+
             if self.mpSession.ObfReplaceConstants:
-                # replace numerical consts
-                if ",0," in content or " 0," in "".join(content):
-                    content = self._replaceConsts(content)
+                logging.info("   [-] Rename some numeric const...")
 
-            # Write in new file
-            f = open(vbaFile, 'w')
-            f.writelines(content)
-            f.close()
-
-        # replace lib imports
-        if self.mpSession.obfuscateDeclares:
-            logging.info("   [-] Rename API imports...")
-            self._replaceLibImports()
-        logging.info("   [-] OK!") 
+            # replace lib imports
+            if self.mpSession.obfuscateDeclares:
+                logging.info("   [-] Rename API imports...")
+                self._replaceLibImports()
+            logging.info("   [-] OK!")
         

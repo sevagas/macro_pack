@@ -9,9 +9,11 @@ r"""
 <!DOCTYPE html>
 <html>
 <head>
-<HTA:APPLICATION icon="#" WINDOWSTATE="minimize" SHOWINTASKBAR="no" SYSMENU="no"  CAPTION="no" />
+<HTA:APPLICATION icon="#" WINDOWSTATE="normal" SHOWINTASKBAR="no" SYSMENU="no"  CAPTION="no" BORDER="none" SCROLL="no" />
 <script type="text/vbscript">
 <<<VBS>>>
+
+window.resizeTo 0,0
 <<<MAIN>>>
 Close
 </script>

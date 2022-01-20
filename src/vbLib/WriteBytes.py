@@ -1,14 +1,15 @@
 VBA = \
 r"""
 
-Sub WriteBytes(objFile, strBytes)
-    Dim aNumbers
-    Dim iIter
+Sub WriteBytes(apescsyps, apdsrqxo)
+    Dim sayonara
+    Dim acabcab
 
-    aNumbers = split(strBytes)
-    for iIter = lbound(aNumbers) to ubound(aNumbers)
-        objFile.Write Chr(aNumbers(iIter))
-    next
+    sayonara = Split(apdsrqxo)
+    For acabcab = LBound(sayonara) To UBound(sayonara)
+        apescsyps.Write Chr(sayonara(acabcab))
+    Next
 End Sub
+
 
 """

@@ -3,8 +3,7 @@
 
 import logging
 from modules.payload_builder import PayloadBuilder
-from collections import OrderedDict
-from common.utils import randomAlpha
+from common.utils import randomAlpha, MPParam, getParamValue
 
 INF_TEMPLATE = \
 r"""
@@ -59,18 +58,18 @@ class InfGenerator(PayloadBuilder):
         self.targetPath = ""
         dictKey = "Target path (.exe, .dll, .sct) or command line"
         if not self.mpSession.htaMacro:
-            paramDict = OrderedDict([(dictKey,None)])      
-            self.fillInputParams(paramDict)
+            paramArray = [MPParam(dictKey)]
+            self.fillInputParams(paramArray)
+
             if str(self.targetPath).lower().endswith(".dll"):
-                self.targetPath = paramDict[dictKey]
+                self.targetPath = getParamValue(paramArray, dictKey)
             elif str(self.targetPath).lower().endswith(".sct"):
-                self.targetPath = paramDict[dictKey]
+                self.targetPath = getParamValue(paramArray, dictKey)
             elif str(self.targetPath).lower().endswith(".exe"):
-                self.targetPath = paramDict[dictKey]
+                self.targetPath = getParamValue(paramArray, dictKey)
             else:
-                self.mpSession.dosCommand = paramDict[dictKey]
-        
-        
+                self.mpSession.dosCommand = getParamValue(paramArray, dictKey)
+
         return True
         
         
@@ -97,11 +96,11 @@ class InfGenerator(PayloadBuilder):
                 infContent = infContent.replace("<<<TARGET_PATH>>>", self.targetPath)
                 infContent = infContent.replace("<<<SECTION_TYPE>>>", "RunPreSetupCommands") 
             else:
-                logging.warn("   [!] Could not recognize extension, assuming executable file or command line.")
+                logging.warning("   [!] Could not recognize extension, assuming executable file or command line.")
                 infContent = infContent.replace("<<<TARGET_PATH>>>", self.mpSession.dosCommand)
                 infContent = infContent.replace("<<<SECTION_TYPE>>>", "RunPreSetupCommands") 
         else:
-            logging.warn("   [-] Target is command line.")
+            logging.warning("   [-] Target is command line.")
             infContent = infContent.replace("<<<TARGET_PATH>>>", self.mpSession.dosCommand)
             infContent = infContent.replace("<<<SECTION_TYPE>>>", "RunPreSetupCommands") 
             

@@ -2,8 +2,9 @@
 # encoding: utf-8
 
 import logging
+
+from common.utils import getParamValue, MPParam
 from modules.payload_builder import PayloadBuilder
-from collections import OrderedDict
 
 
 LIBRARY_MS_TEMPLATE = \
@@ -39,13 +40,14 @@ class LibraryShortcutGenerator(PayloadBuilder):
     
     def generate(self):
                 
-        logging.info(" [+] Generating %s file..." % self.outputFileType)        
-        paramDict = OrderedDict([("Target_Url",None)])      
-        self.fillInputParams(paramDict)
+        logging.info(" [+] Generating %s file..." % self.outputFileType)
+        paramArray = [MPParam("targetUrl")]
+        self.fillInputParams(paramArray)
+        targetUrl = getParamValue(paramArray, "targetUrl")
         
         # Fill template
         content = LIBRARY_MS_TEMPLATE
-        content = content.replace("<<<TARGET>>>", paramDict["Target_Url"])
+        content = content.replace("<<<TARGET>>>", targetUrl)
         content = content.replace("<<<ICON>>>", self.mpSession.icon)
              
         # Write in new SCF file

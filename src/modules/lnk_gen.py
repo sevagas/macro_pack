@@ -2,8 +2,9 @@
 # encoding: utf-8
 import sys
 import logging
+
+from common.utils import MPParam, getParamValue
 from modules.payload_builder import PayloadBuilder
-from collections import OrderedDict
 if sys.platform == "win32":
     from win32com.client import Dispatch  # @UnresolvedImport
 
@@ -18,12 +19,11 @@ class LNKGenerator(PayloadBuilder):
         
         if not self.mpSession.htaMacro:
             # Get needed parameters
-            paramDict = OrderedDict([("Command line",None) ]) # ("Work_Directory",None)      
-            self.fillInputParams(paramDict)
+            paramArray = [MPParam("Command line")]
+            self.fillInputParams(paramArray)
+            self.mpSession.dosCommand = getParamValue(paramArray, "Command line")
             
             #workingDirectory = paramDict["Work_Directory"]
-            # Extract shortcut arguments
-            self.mpSession.dosCommand = paramDict["Command line"]
 
         return True
     

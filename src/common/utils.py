@@ -14,6 +14,9 @@ import psutil
 from datetime import datetime
 
 
+VBAMAXLINELEN = 400 # max char for a vba line
+VBAMAXNBLINE = 100 # Max nm line in a vba method
+
 class ColorLogFiler(logging.StreamHandler):
     """ Override logging class to enable terminal colors """
     def emit(self, record):
@@ -40,7 +43,7 @@ def randomAlpha(length):
 
 def randomStringBasedOnCharset(length, charset):
     """ Returns a random alphabetic string of length 'length' """
-    key = ''
+    key = choice('aaaabbcddeeeeeffgghhiiiijkllmmnnnoooppqrrrrsstttuvwy')  # Name has to start with a letter
     for i in range(length): # @UnusedVariable
         key += choice(charset)
     return key
@@ -79,7 +82,7 @@ def extractPreviousWordInString(strToParse, index):
         while i!=0 and strToParse[i-1] not in " \t\n&|":
             i = i-1
     if i > 2:
-        while i!=0 and strToParse[i-1] in " \t\n\",;": # Skip spaces nd special char befor previous word
+        while i!=0 and strToParse[i-1] in " \t\n\",;": # Skip spaces nd special char before previous word
             i = i-1
     if i > 2:
         previousWord = extractWordInString(strToParse, i)
@@ -126,7 +129,18 @@ def getRunningApp():
     else:
         import __main__ as main # @UnresolvedImport To get the real origin of the script not the location of current file
         return os.path.abspath(main.__file__)
-    
+
+def randomAlphaWithSeed(length, seed):
+    """ Returns a random alphabetic string of length 'length' """
+    key = ''
+    cpt = 0
+    for i in range(length): # @UnusedVariable
+        if i == 0 or i == 2 or i == 4:
+            key += seed[cpt]
+            cpt +=1
+        else:
+            key += choice(string.ascii_lowercase)
+    return key
 
 def checkIfProcessRunning(processName):
     """
@@ -148,8 +162,7 @@ def checkIfProcessRunning(processName):
 def yesOrNo(question):
     answer = input(question + "(y/n): ").lower().strip()
     print("")
-    while not(answer == "y" or answer == "yes" or \
-    answer == "n" or answer == "no"):
+    while not(answer == "y" or answer == "yes" or answer == "n" or answer == "no"):
         print("Input yes or no")
         answer = input(question + "(y/n):").lower().strip()
         print("")
@@ -202,6 +215,41 @@ def getParamValue(paramArray, paramName):
             break
         i += 1
     return result
+
+
+def progressBar(iterable, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd="\r", disableProgressBar=False):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    if not disableProgressBar:
+        total = len(iterable)
+
+        # Progress Bar Printing Function
+        def printProgressBar(iteration):
+            percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+            filledLength = int(length * iteration // total)
+            bar = fill * filledLength + '-' * (length - filledLength)
+            print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
+        # Initial Call
+        printProgressBar(0)
+        # Update Progress Bar
+        for i, item in enumerate(iterable):
+            yield item
+            printProgressBar(i + 1)
+        # Print New Line on Complete
+        print()
+    else:
+        for i, item in enumerate(iterable):
+            yield item
             
 
 textchars = bytearray({7,8,9,10,12,13,27} | set(range(0x20, 0x100)) - {0x7f}) # https://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
@@ -255,7 +303,7 @@ class MSTypes:
     
     ProMode_FORMATS =  [SYLK, CHM]
     HtaMacro_FORMATS = [LNK, CHM, INF, SYLK, CSPROJ]
-    Trojan_FORMATS = MS_OFFICE_BASIC_FORMATS + [MPP, VSD, VSD97,CHM, CSPROJ, LNK]
+    Trojan_FORMATS = MS_OFFICE_BASIC_FORMATS + [MPP, VSD, VSD97,CHM, CSPROJ, LNK, HTA]
     PE_FORMATS = [EXE, DLL]
 
     # OrderedDict([("target_url",None),("download_path",None)])

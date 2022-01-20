@@ -48,7 +48,9 @@ class PayloadBuilder(MpModule):
         # generate template
         if self.mpSession.template:
             generator = TemplateFactory(self.mpSession)
-            generator.run()
+            if not generator.run():
+                logging.error("   [!] Error while generating template.")
+                return
         
         # embed a file if asked
         if self.embeddedFilePath:

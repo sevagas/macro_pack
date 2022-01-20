@@ -38,8 +38,9 @@ class ObfuscateForm(MpModule):
     
     
     def run(self):
-        logging.info(" [+] VBA form obfuscation ...") 
-        logging.info("   [-] Remove spaces...")
+        logging.info(" [+] VBA form obfuscation ...")
+        if not self.mpSession.noSpaceStrip:
+            logging.info("   [-] Remove spaces...")
         logging.info("   [-] Remove comments...")
         for vbaFile in self.getVBAFiles():
             f = open(vbaFile)
@@ -48,10 +49,12 @@ class ObfuscateForm(MpModule):
             
             # Remove comments
             content = self._removeComments(content) # must remove comments before space to avoir empty lines
-            # Replace all tabs by space
-            content =  self._removeTabs(content)
-            # Remove spaces
-            content =  self._removeSpaces(content)
+
+            if not self.mpSession.noSpaceStrip:
+                # Replace all tabs by space
+                content =  self._removeTabs(content)
+                # Remove spaces
+                content =  self._removeSpaces(content)
         
             # Write in new file 
             f = open(vbaFile, 'w')

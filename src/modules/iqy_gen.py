@@ -2,8 +2,9 @@
 # encoding: utf-8
 
 import logging
+
+from common.utils import MPParam, getParamValue
 from modules.payload_builder import PayloadBuilder
-from collections import OrderedDict
 
 """
 
@@ -31,12 +32,13 @@ class IqyGenerator(PayloadBuilder):
     def generate(self):
                 
         logging.info(" [+] Generating %s file..." % self.outputFileType)        
-        paramDict = OrderedDict([("targetUrl",None)])      
-        self.fillInputParams(paramDict)
-        
+
+        paramArray = [MPParam("targetUrl")]
+        self.fillInputParams(paramArray)
+
         # Fill template
         urlContent = IQY_TEMPLATE
-        urlContent = urlContent.replace("<<<URL>>>", paramDict["targetUrl"])
+        urlContent = urlContent.replace("<<<URL>>>", getParamValue(paramArray, "targetUrl"))
              
         # Write in new file
         f = open(self.outputFilePath, 'w')

@@ -2,8 +2,10 @@
 # encoding: utf-8
 
 import logging
+
+from common.utils import getParamValue, MPParam
 from modules.payload_builder import PayloadBuilder
-from collections import OrderedDict
+
 
 """
 
@@ -67,13 +69,13 @@ class UrlShortcutGenerator(PayloadBuilder):
     
     def generate(self):
                 
-        logging.info(" [+] Generating %s file..." % self.outputFileType)        
-        paramDict = OrderedDict([("targetUrl",None)])      
-        self.fillInputParams(paramDict)
-        
+        logging.info(" [+] Generating %s file..." % self.outputFileType)
+        paramArray = [MPParam("targetUrl")]
+        self.fillInputParams(paramArray)
+
         # Fill template
         urlContent = URL_TEMPLATE
-        urlContent = urlContent.replace("<<<URL>>>", paramDict["targetUrl"])
+        urlContent = urlContent.replace("<<<URL>>>", getParamValue(paramArray, "targetUrl"))
              
         # Write in new SCF file
         f = open(self.outputFilePath, 'w')

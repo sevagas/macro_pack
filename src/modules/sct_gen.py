@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
+import os
 import random
 import logging
 from common.utils import randomAlpha
@@ -55,6 +55,9 @@ class SCTGenerator(VBSGenerator):
         f.close()
         logging.info("   [-] Generated Scriptlet file: %s" % self.outputFilePath)
         logging.info("   [-] Test with : \nregsvr32 /u /n /s /i:%s scrobj.dll\n" % self.outputFilePath)
+        if os.path.getsize(self.outputFilePath)> (1024*512):
+            logging.warning("   [!] Warning: The resulted %s file seems to be bigger than 512k, it will probably not work!" % self.outputFileType)
+
         
         
         

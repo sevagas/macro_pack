@@ -2,6 +2,8 @@
 # encoding: utf-8
 import string
 
+from common import utils
+from common.definitions import LOGLEVEL
 from common.utils import MSTypes
 
 class MpSession:
@@ -10,6 +12,7 @@ class MpSession:
         self.workingPath = workingPath
         self.version = version
         self.mpType = mpType
+        self.logLevel = LOGLEVEL
 
         # Attrs depending on getter/setter
         self._outputFilePath = ""
@@ -24,11 +27,15 @@ class MpSession:
 
         self.obfOnlyMain = False
         self.doNotObfConst = False
+        self.noStringsObfuscation = False
+        self.noNamesObfuscation = False
+        self.noSpaceStrip = False
         self.ObfReplaceConstants = True
 
-        self.obfuscatedNamesMinLen = 8
-        self.obfuscatedNamesMaxLen = 20
+        self.obfuscatedNamesMinLen = 6
+        self.obfuscatedNamesMaxLen = 18
         self._obfuscatedNamesCharset = string.ascii_lowercase
+        self.nameObfuscationCallback = utils.randomStringBasedOnCharset
         
         self.fileInput = None
         self.startFunction = None

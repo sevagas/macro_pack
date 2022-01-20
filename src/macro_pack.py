@@ -32,8 +32,6 @@ else:
 from colorama import init
 from termcolor import colored
 
-# {PyArmor Protection Code}
-# {PyArmor Plugins}
 # use Colorama to make Termcolor work on Windows too
 init()
 
@@ -135,6 +133,7 @@ def main(argv):
             sys.exit(0)
         elif opt=="-q" or opt=="--quiet":
             logLevel = "WARN"
+            mpSession.logLevel = "WARN"
         elif opt=="-p" or opt=="--print":
             mpSession.printFile = True
         elif opt == "--dde":
@@ -176,6 +175,18 @@ def main(argv):
 
     logging.info(colored(BANNER, 'green'))
 
+    if MP_TYPE == "Pro":
+        if mpSession.communityMode:
+            logging.warning("   [!] Running in community mode (pro features not applied)")
+            MP_TYPE="Community"
+        else:
+            arg_mgt_pro.verify(mpSession)
+            # If no argument just suggest to use help
+            if len(argv) == 0:
+                logging.info(" [+] Thank you for using MacroPack Pro! ")
+                logging.info(" [+] To get some help: \n\t %s --help \n\t %s --builder \n" % (os.path.basename(utils.getRunningApp()), os.path.basename(utils.getRunningApp())))
+                sys.exit(0)
+
     logging.info(" [+] Preparations...")
 
     # check input args
@@ -190,8 +201,7 @@ def main(argv):
                 sys.stdin = open("conIN$")
             else:
                 sys.stdin = sys.__stdin__
-            
-            
+
     else:
         if not os.path.isfile(mpSession.fileInput):
             logging.error("   [!] ERROR: Could not find %s!" % mpSession.fileInput)
@@ -199,12 +209,7 @@ def main(argv):
         else:
             logging.info("   [-] Input file path: %s" % mpSession.fileInput)
 
-    if MP_TYPE == "Pro":
-        if mpSession.communityMode:
-            logging.warning("   [!] Running in community mode (pro features not applied)")
-            MP_TYPE="Community"
-        else:
-            arg_mgt_pro.verify(mpSession)
+
         
     
         # Check output file format
@@ -243,7 +248,7 @@ def main(argv):
         if mpSession.stdinContent is not None:
             import time
             time.sleep(0.4) # Needed to avoid some weird race condition
-            logging.info("   [-] Store std input in file...")
+            logging.debug("   [-] Store std input in file...")
             f = open(inputFile, 'w')
             f.writelines(mpSession.stdinContent)
             f.close()
@@ -257,11 +262,11 @@ def main(argv):
                     if os.path.isdir(working_directory):
                         shutil.rmtree(working_directory)
                     sys.exit(2)
-                logging.info("   [-] Store input file...")
+                logging.debug("   [-] Store input file...")
                 shutil.copy2(mpSession.fileInput, inputFile)
         
         if os.path.isfile(inputFile): 
-            logging.info("   [-] Temporary input file: %s" %  inputFile)
+            logging.debug("   [-] Temporary input file: %s" %  inputFile)
             
             
         # Edit outputfile name to spoof extension if unicodeRtlo option is enabled
@@ -275,7 +280,7 @@ def main(argv):
             # Append unicode RTLO to file name
             fileName += '\u202e' 
             # Append extension to spoof in reverse order
-            fileName += '\u200b' + mpSession.unicodeRtlo[::-1] # Prepend invisible space so filename does not end with flagged extension
+            fileName += '\ufeff' + mpSession.unicodeRtlo[::-1] # Prepend invisible space so filename does not end with flagged extension
             # Append file extension
             fileName +=  fileExtension   
             mpSession.outputFilePath = fileName
@@ -337,5 +342,4 @@ if __name__ == '__main__':
     running_from = psutil.Process(os.getpid()).parent().parent().name()
     if running_from == 'explorer.exe':
         os.system("cmd.exe /k \"%s\"" % utils.getRunningApp())
-    # PyArmor Plugin: checkPlug()
     main(sys.argv[1:])

@@ -2,6 +2,8 @@
 # encoding: utf-8
 
 import logging
+
+from common.utils import getParamValue, MPParam
 from modules.payload_builder import PayloadBuilder
 from collections import OrderedDict
 
@@ -32,12 +34,13 @@ class GlkGenerator(PayloadBuilder):
     def generate(self):
                 
         logging.info(" [+] Generating %s file..." % self.outputFileType)
-        paramDict = OrderedDict([("targetUrl",None)])      
-        self.fillInputParams(paramDict)
-        
+        paramArray = [MPParam("targetUrl")]
+        self.fillInputParams(paramArray)
+        targetUrl= getParamValue(paramArray, "targetUrl")
+
         # Complete template
         glkContent = GLK_TEMPLATE
-        glkContent = glkContent.replace("<<<URL>>>", paramDict["targetUrl"])
+        glkContent = glkContent.replace("<<<URL>>>", targetUrl)
              
         # Write in new SCF file
         f = open(self.outputFilePath, 'w')

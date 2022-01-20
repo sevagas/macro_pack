@@ -2,6 +2,8 @@
 # encoding: utf-8
 
 import logging
+import os
+
 from common.utils import randomAlpha
 from modules.vbs_gen import VBSGenerator
 
@@ -42,6 +44,8 @@ class WSFGenerator(VBSGenerator):
         f.close()
         logging.info("   [-] Generated Windows Script File: %s" % self.outputFilePath)
         logging.info("   [-] Test with : \nwscript %s\n" % self.outputFilePath)
+        if os.path.getsize(self.outputFilePath)> (1024*512):
+            logging.warning("   [!] Warning: The resulted %s file seems to be bigger than 512k, it will probably not work!" % self.outputFileType)
         
         
         

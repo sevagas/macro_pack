@@ -2,6 +2,8 @@
 # encoding: utf-8
 
 import logging, os
+
+from common.utils import getParamValue, MPParam
 from modules.payload_builder import PayloadBuilder
 from collections import OrderedDict
 
@@ -118,11 +120,10 @@ class CsProjGenerator(PayloadBuilder):
     def check(self):
         
         if not self.mpSession.htaMacro:
-            paramDict = OrderedDict([("Command line",None)])      
-            self.fillInputParams(paramDict)
-            self.mpSession.dosCommand = paramDict["Command line"]
-            
-            
+            paramArray = [MPParam("Command line")]
+            self.fillInputParams(paramArray)
+            self.mpSession.dosCommand = getParamValue(paramArray, "Command line")
+
         return True
         
         

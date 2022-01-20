@@ -4,7 +4,7 @@
 # Only enabled on windows
 import sys
 import os
-from common.utils import MSTypes
+from common.utils import MSTypes, getParamValue, MPParam
 from common import utils
 if sys.platform == "win32":
     # Download and install pywin32 from https://sourceforge.net/projects/pywin32/files/pywin32/
@@ -13,7 +13,6 @@ if sys.platform == "win32":
 
 import logging
 from modules.vba_gen import VBAGenerator
-from collections import OrderedDict
 
 
 class ExcelGenerator(VBAGenerator):
@@ -32,11 +31,11 @@ class ExcelGenerator(VBAGenerator):
         objExcel = win32com.client.Dispatch("Excel.Application")
         objExcel.Visible = False # do the operation in background 
         self.version = objExcel.Application.Version
-        # IT is necessary to exit office or value wont be saved
+        # IT is necessary to exit office or value won't be saved
         objExcel.Application.Quit()
         del objExcel
         # Next change/set AccessVBOM registry value to 1
-        keyval = "Software\\Microsoft\Office\\"  + self.version + "\\Excel\\Security"
+        keyval = "Software\\Microsoft\Office\\" + self.version + "\\Excel\\Security"
         logging.info("   [-] Set %s to 1..." % keyval)
         Registrykey = winreg.CreateKey(winreg.HKEY_CURRENT_USER,keyval)
         winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,1) # "REG_DWORD"
@@ -46,7 +45,7 @@ class ExcelGenerator(VBAGenerator):
     def disableVbom(self):
         # Disable writing in VBA project
         #  Change/set AccessVBOM registry value to 0
-        keyval = "Software\\Microsoft\Office\\"  + self.version + "\\Excel\\Security"
+        keyval = "Software\\Microsoft\Office\\" + self.version + "\\Excel\\Security"
         logging.info("   [-] Set %s to 0..." % keyval)
         Registrykey = winreg.CreateKey(winreg.HKEY_CURRENT_USER,keyval)
         winreg.SetValueEx(Registrykey,"AccessVBOM",0,winreg.REG_DWORD,0) # "REG_DWORD"
@@ -75,9 +74,9 @@ class ExcelGenerator(VBAGenerator):
     def insertDDE(self):
         logging.info(" [+] Include DDE attack...")
         # Get command line
-        paramDict = OrderedDict([("Cmd_Line",None)])      
-        self.fillInputParams(paramDict)
-        command = paramDict["Cmd_Line"]
+        paramArray = [MPParam("Command line")]
+        self.fillInputParams(paramArray)
+        command = getParamValue(paramArray, "Command line")
 
         logging.info("   [-] Open document...")
         # open up an instance of Excel with the win32com driver\        \\
@@ -131,17 +130,16 @@ class ExcelGenerator(VBAGenerator):
             for vbaFile in self.getVBAFiles():
                 logging.debug("     [,] Loading %s " % vbaFile)
                 if vbaFile == self.getMainVBAFile():       
-                    with open (vbaFile, "r") as f:
+                    with open(vbaFile, "r") as f:
                         macro=f.read()
                         # Add the main macro- into ThisWorkbook part of excel file
-                        excelModule = workbook.VBProject.VBComponents("ThisWorkbook")
+                        #logging.info(" [+] VBComponents(1).name: %s" % workbook.VBProject.VBComponents(1).name)
+                        excelModule = workbook.VBProject.VBComponents(workbook.CodeName)
                         excelModule.CodeModule.AddFromString(macro)
                 else: # inject other vba files as modules
-                    with open (vbaFile, "r") as f:
+                    with open(vbaFile, "r") as f:
                         macro=f.read()
                         excelModule = workbook.VBProject.VBComponents.Add(1)
-                        
-                        
                         excelModule.Name = os.path.splitext(os.path.basename(vbaFile))[0]
                         excelModule.CodeModule.AddFromString(macro)
             

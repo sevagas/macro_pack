@@ -69,44 +69,8 @@ class MpModule:
         else:
             return ""
         
-    
-    def fillInputParams(self, paramDict):
-        """ 
-        Fill parameters dictionary using given input. If input is missing, ask for input to user.
-        """
-        # Fill parameters based on input file
-        cmdFile = self.getCMDFile()
-        if cmdFile is not None and cmdFile != "":
-            f = open(cmdFile, 'r')
-            valuesFileContent = f.read()
-            logging.debug("    -> CMD file content: \n%s" % valuesFileContent)
-            f.close()
-            os.remove(cmdFile)
-            if self.mpSession.fileInput is None or len(paramDict) > 1:# if values where passed by input pipe or in a file but there are multiple params
-                inputValues = shlex.split(valuesFileContent)# split on space but preserve what is between quotes
-            else: 
-                inputValues = [valuesFileContent] # value where passed using -f option
-            if len(inputValues) >= len(paramDict): 
-                i = 0  
-                # Fill entry parameters
-                for key, value in paramDict.items():
-                    paramDict[key] = inputValues[i]
-                    i += 1
-            else:
-                logging.error("   [!] Incorrect number of provided input parameters (%d provided where this features needs %d).\n    Required parameters: %s\n" % (len(inputValues),len(paramDict), list(paramDict.keys())))
-                return
-        else:
-            # if input was not provided
-            logging.warning("   [!] Could not find input parameters. Please provide the next values:")
-            for key, value in paramDict.items():
-                if value is None or value == "" or value.isspace():
-                    newValue = None
-                    while newValue is None or newValue == "" or newValue.isspace():
-                        newValue = input("    %s:" % key)
-                    paramDict[key] = newValue
-    
-    
-    def fillInputParams2(self, paramArray):
+
+    def fillInputParams(self, paramArray):
         """ 
         Fill parameters dictionary using given input. If input is missing, ask for input to user.
         """
@@ -125,7 +89,9 @@ class MpModule:
         if cmdFile is not None and cmdFile != "":
             f = open(cmdFile, 'r')
             valuesFileContent = f.read()
+            valuesFileContent = valuesFileContent.replace(r'\"', r'\\"') # This is necessary fo avoid schlex bux if string ends with \"
             logging.debug("    -> CMD file content: \n%s" % valuesFileContent)
+
             f.close()
             os.remove(cmdFile)
             if self.mpSession.fileInput is None or len(paramArray) > 1:# if values where passed by input pipe or in a file but there are multiple params
@@ -172,6 +138,8 @@ class MpModule:
                                 break
         logging.debug("    [*] Start function:%s" % self.startFunction)
         logging.debug("    [*] Main VBA file:%s" % result)
+        if not self.startFunction:
+            logging.error("   [!] Error: Could not find a start function, please use --start-function=FUNCTION_NAME")
         return result
     
     
@@ -234,7 +202,33 @@ class MpModule:
                     moduleContent = vbaLib.VBA
         newModuleName = self.addVBAModule(moduleContent, vbaLib.__name__)
         return newModuleName
-    
+
+
+    def getVBLibContent(self, vbaLib):
+        """
+        Return VBA code Library module depending on the current context
+        """
+        moduleContent = ''
+        if self.outputFileType in MSTypes.MS_OFFICE_FORMATS or self.mpSession.runInExcel:
+            if MSTypes.WD in self.outputFileType and hasattr(vbaLib, 'VBA_WD') and not self.mpSession.runInExcel:
+                moduleContent = vbaLib.VBA_WD
+            elif hasattr(vbaLib, 'VBA_XL') and (MSTypes.XL in self.outputFileType or self.mpSession.runInExcel):
+                logging.debug("     [,] Add Excel version of module %s " % vbaLib)
+                moduleContent = vbaLib.VBA_XL
+            elif MSTypes.PPT in self.outputFileType and hasattr(vbaLib, 'VBA_PPT'):
+                moduleContent = vbaLib.VBA_PPT
+            else:
+                moduleContent = vbaLib.VBA
+        else:
+            if self.outputFileType in [MSTypes.HTA, MSTypes.SCT] and hasattr(vbaLib, 'VBS_HTA'):
+                logging.debug("     [,] Add HTA version of module %s " % vbaLib)
+                moduleContent = vbaLib.VBS_HTA
+            else:
+                if hasattr(vbaLib, 'VBS'):
+                    moduleContent = vbaLib.VBS
+                else:
+                    moduleContent = vbaLib.VBA
+        return moduleContent
     
     
     def insertVbaCode(self, targetModule, targetFunction,targetLine, vbaCode):
