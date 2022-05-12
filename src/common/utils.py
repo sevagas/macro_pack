@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 
+import contextlib
 from random import choice
 import string
 import logging
@@ -35,16 +36,13 @@ class ColorLogFiler(logging.StreamHandler):
 
 def randomAlpha(length):
     """ Returns a random alphabetic string of length 'length' """
-    key = ''
-    for i in range(length): # @UnusedVariable
-        key += choice(string.ascii_lowercase)
-    return key
+    return ''.join(choice(string.ascii_lowercase) for _ in range(length))
 
 
 def randomStringBasedOnCharset(length, charset):
     """ Returns a random alphabetic string of length 'length' """
     key = choice('aaaabbcddeeeeeffgghhiiiijkllmmnnnoooppqrrrrsstttuvwy')  # Name has to start with a letter
-    for i in range(length): # @UnusedVariable
+    for _ in range(length):
         key += choice(charset)
     return key
 
@@ -84,10 +82,7 @@ def extractPreviousWordInString(strToParse, index):
     if i > 2:
         while i!=0 and strToParse[i-1] in " \t\n\",;": # Skip spaces nd special char before previous word
             i = i-1
-    if i > 2:
-        previousWord = extractWordInString(strToParse, i)
-    else:
-        previousWord = ""
+    previousWord = extractWordInString(strToParse, i) if i > 2 else ""
     logging.debug("     [-] extracted previous Word: %s" % previousWord)
     return previousWord
 
@@ -116,7 +111,7 @@ def getHostIp():
         # doesn't have to be reachable
         s.connect(('10.255.255.255', 1))
         IP = s.getsockname()[0]
-    except:
+    except Exception:
         IP = '127.0.0.1'
     finally:
         s.close()
@@ -126,16 +121,15 @@ def getHostIp():
 def getRunningApp():
     if getattr(sys, 'frozen', False):
         return sys.executable
-    else:
-        import __main__ as main # @UnresolvedImport To get the real origin of the script not the location of current file
-        return os.path.abspath(main.__file__)
+    import __main__ as main # @UnresolvedImport To get the real origin of the script not the location of current file
+    return os.path.abspath(main.__file__)
 
 def randomAlphaWithSeed(length, seed):
     """ Returns a random alphabetic string of length 'length' """
     key = ''
     cpt = 0
     for i in range(length): # @UnusedVariable
-        if i == 0 or i == 2 or i == 4:
+        if i in [0, 2, 4]:
             key += seed[cpt]
             cpt +=1
         else:
@@ -148,12 +142,10 @@ def checkIfProcessRunning(processName):
     """
     #Iterate over the all the running process
     for proc in psutil.process_iter():
-        try:
+        with contextlib.suppress(psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             # Check if process name contains the given name string.
             if processName.lower() in proc.name().lower():
                 return True
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            pass
     return False
 
 
@@ -162,14 +154,11 @@ def checkIfProcessRunning(processName):
 def yesOrNo(question):
     answer = input(question + "(y/n): ").lower().strip()
     print("")
-    while not(answer == "y" or answer == "yes" or answer == "n" or answer == "no"):
+    while answer not in ["y", "yes", "n", "no"]:
         print("Input yes or no")
-        answer = input(question + "(y/n):").lower().strip()
+        answer = input(f"{question}(y/n):").lower().strip()
         print("")
-    if answer[0] == "y":
-        return True
-    else:
-        return False
+    return answer[0] == "y"
 
    
 def forceProcessKill(processName):
@@ -317,76 +306,75 @@ class MSTypes:
 
 
     @classmethod
-    def guessApplicationType(self, documentPath):
+    def guessApplicationType(cls, documentPath):
         """ Guess MS application type based on extension """
         result = ""
         extension = os.path.splitext(documentPath)[1]
-        if ".xls" == extension.lower():
-            result = self.XL97
+        if extension.lower() == ".xls":
+            return cls.XL97
         elif extension.lower() in (".xlsx", ".xlsm", ".xltm"):
-            result = self.XL
-        elif ".doc" ==  extension.lower():
-            result = self.WD97
+            return cls.XL
+        elif extension.lower() == ".doc":
+            return cls.WD97
         elif extension.lower() in (".docx", ".docm", ".dotm"):
-            result = self.WD
-        elif ".hta" ==  extension.lower():
-            result = self.HTA
-        elif ".mpp" ==  extension.lower():
-            result = self.MPP
-        elif ".ppt" ==  extension.lower():
-            result = self.PPT97
+            return cls.WD
+        elif extension.lower() == ".hta":
+            return cls.HTA
+        elif extension.lower() == ".mpp":
+            return cls.MPP
+        elif extension.lower() == ".ppt":
+            return cls.PPT97
         elif extension.lower() in (".pptx", ".pptm", ".potm"):
-            result = self.PPT
-        elif ".vsd" ==  extension.lower():
-            result = self.VSD97
-        elif ".vsdm" ==  extension.lower() or extension.lower() == ".vsdx":
-            result = self.VSD
+            return cls.PPT
+        elif extension.lower() == ".vsd":
+            return cls.VSD97
+        elif extension.lower() in [".vsdm", ".vsdx"]:
+            return cls.VSD
         elif extension.lower() in (".accdb", ".accde", ".mdb"):
-            result = self.ACC
-        elif ".pub" ==  extension.lower():
-            result = self.PUB
-        elif ".vba" ==  extension.lower():
-            result = self.VBA
-        elif ".vbs" ==  extension.lower():
-            result = self.VBS
-        elif ".sct" ==  extension.lower() or extension.lower() == ".wsc":
-            result = self.SCT
-        elif ".wsf" == extension.lower():
-            result = self.WSF
-        elif ".url" ==  extension.lower():
-            result = self.URL
-        elif ".glk" ==  extension.lower():
-            result = self.GLK
-        elif ".lnk" ==  extension.lower():
-            result = self.LNK
-        elif ".settingcontent-ms" == extension.lower():
-            result = self.SETTINGS_MS
-        elif ".library-ms" == extension.lower():
-            result = self.LIBRARY_MS
-        elif ".inf" == extension.lower():
-            result = self.INF
-        elif ".scf" ==  extension.lower():
-            result = self.SCF
-        elif ".xsl" ==  extension.lower():
-            result = self.XSL
-        elif ".iqy" == extension.lower():
-            result = self.IQY
-        elif ".slk" ==  extension.lower():
-            result = self.SYLK
-        elif ".chm" == extension.lower():
-            result = self.CHM
-        elif ".csproj" == extension.lower():
-            result = self.CSPROJ
-        elif ".cmd" == extension.lower() or extension.lower() == ".bat":
-            result = self.CMD
+            return cls.ACC
+        elif extension.lower() == ".pub":
+            return cls.PUB
+        elif extension.lower() == ".vba":
+            return cls.VBA
+        elif extension.lower() == ".vbs":
+            return cls.VBS
+        elif extension.lower() in [".sct", ".wsc"]:
+            return cls.SCT
+        elif extension.lower() == ".wsf":
+            return cls.WSF
+        elif extension.lower() == ".url":
+            return cls.URL
+        elif extension.lower() == ".glk":
+            return cls.GLK
+        elif extension.lower() == ".lnk":
+            return cls.LNK
+        elif extension.lower() == ".settingcontent-ms":
+            return cls.SETTINGS_MS
+        elif extension.lower() == ".library-ms":
+            return cls.LIBRARY_MS
+        elif extension.lower() == ".inf":
+            return cls.INF
+        elif extension.lower() == ".scf":
+            return cls.SCF
+        elif extension.lower() == ".xsl":
+            return cls.XSL
+        elif extension.lower() == ".iqy":
+            return cls.IQY
+        elif extension.lower() == ".slk":
+            return cls.SYLK
+        elif extension.lower() == ".chm":
+            return cls.CHM
+        elif extension.lower() == ".csproj":
+            return cls.CSPROJ
+        elif extension.lower() in [".cmd", ".bat"]:
+            return cls.CMD
         elif extension.lower() in (".dll", ".ocx"):
-            result = self.DLL
+            return cls.DLL
         elif extension.lower() in (".exe"):
-            result = self.EXE
+            return cls.EXE
         elif extension.lower() in (".msi"):
-            result = self.MSI
+            return cls.MSI
         else:
-            result = self.UNKNOWN
-        return result
+            return cls.UNKNOWN
     
 
