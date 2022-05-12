@@ -140,19 +140,19 @@ class CsProjGenerator(PayloadBuilder):
         self.mpSession.dosCommand = self.mpSession.dosCommand.replace("&", "&amp;") # & is invalid char in XML
         csprojContent = csprojContent.replace("<<<TARGET>>>",CSPROJ_TARGET_TEMPLATE)
         csprojContent = csprojContent.replace("<<<CMDLINE>>>",self.mpSession.dosCommand)
-        f = open(csprojName, 'w')
-        f.write(csprojContent)
-        f.close()
+        with open(csprojName, 'w') as f:
+            f.write(csprojContent)
         
         logging.info("   [-] Add config file...")
-        f = open(appConfigName, 'w')
-        f.write(APP_CONFIG_TEMPLATE)
-        f.close()
+        with open(appConfigName, 'w') as f:
+            f.write(APP_CONFIG_TEMPLATE)
         
         logging.info("   [-] Add cs file...")
-        f = open(csName, 'w')
-        f.write(HELLO_CS_TEMPLATE)
-        f.close()
+        with open(csName, 'w') as f:
+            f.write(HELLO_CS_TEMPLATE)
+        logging.info(
+            f"   [-] Generated {self.outputFileType} file: {self.outputFilePath}"
+        )
         
         logging.info("   [-] Generated %s file: %s" % (self.outputFileType, self.outputFilePath))
         logging.info(r"   [-] Test with : C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe /nologo /noconsolelogger %s " % self.outputFilePath)
